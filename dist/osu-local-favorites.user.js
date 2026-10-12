@@ -3,7 +3,7 @@
 // @namespace    https://github.com/starhollow2008/osu-local-favorites
 // @updateURL    https://github.com/starhollow2008/osu-local-favorites/raw/refs/heads/main/dist/osu-local-favorites.user.js
 // @downloadURL  https://github.com/starhollow2008/osu-local-favorites/raw/refs/heads/main/dist/osu-local-favorites.user.js
-// @version      5.9.2
+// @version      5.9.3
 // @icon         https://github.com/starhollow2008/osu-local-favorites/blob/main/icons/icon48.png?raw=true
 // @description  Store osu! beatmap favorites locally instead of on osu!'s servers. Works without sign-in.
 // @author       Starhollow2008 | FlareonGhh
@@ -176,9 +176,14 @@
   function injectInterceptor() {
     const script = document.createElement("script");
     script.textContent = `(${function () {
+      const BLOCKED_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
       const origOpen = XMLHttpRequest.prototype.open;
       XMLHttpRequest.prototype.open = function (method, url) {
-        if (typeof url === "string" && url.includes("/favourites")) {
+        if (
+          typeof url === "string" &&
+          url.includes("/favourites") &&
+          BLOCKED_METHODS.has(String(method || "GET").toUpperCase())
+        ) {
           this.__blocked = true;
         }
         return origOpen.apply(this, arguments);
@@ -215,7 +220,8 @@
       const origFetch = window.fetch;
       window.fetch = function (url, options) {
         const urlStr = typeof url === "string" ? url : (url && url.url) || "";
-        if (urlStr.includes("/favourites")) {
+        const method = String((options && options.method) || (url && url.method) || "GET").toUpperCase();
+        if (urlStr.includes("/favourites") && BLOCKED_METHODS.has(method)) {
           return Promise.resolve(
             new Response("{}", {
               status: 200,
@@ -439,9 +445,69 @@
     return !!getFavorites()[id];
   }
 
+  const _FAV_STRING_FIELDS = [
+    "title", "title_unicode", "artist", "artist_unicode", "creator",
+    "user_id", "status", "source", "tags", "genre", "language",
+    "favourited_at",
+  ];
+  const _FAV_NUMBER_FIELDS = ["favourite_count", "play_count", "bpm"];
+  const _COVER_HOST_RE = /^https:\/\/([a-z0-9-]+\.)*ppy\.sh(\/|$)/i;
+
+  function sanitizeCoverUrl(u) {
+    return typeof u === "string" && _COVER_HOST_RE.test(u) ? u : undefined;
+  }
+
+  function sanitizeFavoriteRecord(fav) {
+    if (!fav || typeof fav !== "object" || Array.isArray(fav)) return null;
+    const out = {};
+    for (const k of _FAV_STRING_FIELDS) {
+      if (typeof fav[k] === "string") out[k] = fav[k];
+    }
+    for (const k of ["favourite_count", "play_count", "bpm"]) {
+      if (typeof fav[k] === "number" && isFinite(fav[k])) out[k] = fav[k];
+    }
+    for (const k of ["is_artist_featured", "nsfw", "metadata_enriched"]) {
+      if (typeof fav[k] === "boolean") out[k] = fav[k];
+    }
+    if (fav.covers && typeof fav.covers === "object" && !Array.isArray(fav.covers)) {
+      const covers = {};
+      for (const [ck, cv] of Object.entries(fav.covers)) {
+        const clean = sanitizeCoverUrl(cv);
+        if (clean !== undefined) covers[ck] = clean;
+      }
+      if (Object.keys(covers).length) out.covers = covers;
+    }
+    return out;
+  }
+
+  function parseImportedFavorites(data) {
+    if (typeof data !== "object" || data === null || Array.isArray(data)) {
+      throw new Error("Malformed backup data");
+    }
+    const out = {};
+    for (const [id, fav] of Object.entries(data)) {
+      if (!/^\d+$/.test(id)) continue;
+      const clean = sanitizeFavoriteRecord(fav);
+      if (!clean) continue;
+      clean.id = id;
+      clean.url = `https://osu.ppy.sh/beatmapsets/${id}`;
+      clean.preview = `https://b.ppy.sh/preview/${id}.mp3`;
+      if (!clean.favourited_at) clean.favourited_at = new Date().toISOString();
+      out[id] = clean;
+    }
+    return out;
+  }
+
+  const _PPY_HOST_RE = /^https:\/\/([a-z0-9-]+\.)*ppy\.sh(\/|$)/i;
+
+  function pinnedCoverUrl(u) {
+    return typeof u === "string" && _PPY_HOST_RE.test(u) ? u : undefined;
+  }
+
   function favoriteCoverUrl(f, id) {
     const c = (f && f.covers) || {};
-    return c.card || c["card@2x"] || c.list || c.cover ||
+    const pinned = [c.card, c["card@2x"], c.list, c.cover].map(pinnedCoverUrl);
+    return pinned.find(Boolean) ||
       (id ? `https://assets.ppy.sh/beatmaps/${id}/covers/card.jpg` : "");
   }
 
@@ -515,6 +581,16 @@
     return Object.entries(cols)
       .filter(([, c]) => Array.isArray(c.ids) && c.ids.includes(mapId))
       .map(([id]) => id);
+  }
+
+  function buildCollectionCountIndex() {
+    const cols = getCollections();
+    const counts = new Map();
+    for (const col of Object.values(cols)) {
+      if (!Array.isArray(col.ids)) continue;
+      for (const mapId of col.ids) counts.set(mapId, (counts.get(mapId) || 0) + 1);
+    }
+    return counts;
   }
   // ━━━━━━━━━━ src/ui/theme.js ━━━━━━━━━━
 
@@ -1094,6 +1170,20 @@
   }
 
   const _blobUrlCache = new Map();
+  const BLOB_URL_CACHE_MAX = 300;
+
+  function _blobUrlCachePut(url, objUrl) {
+    const old = _blobUrlCache.get(url);
+    if (old !== undefined) URL.revokeObjectURL(old);
+    _blobUrlCache.delete(url);
+    _blobUrlCache.set(url, objUrl);
+    while (_blobUrlCache.size > BLOB_URL_CACHE_MAX) {
+      const lruKey = _blobUrlCache.keys().next().value;
+      const lruUrl = _blobUrlCache.get(lruKey);
+      _blobUrlCache.delete(lruKey);
+      if (lruUrl) URL.revokeObjectURL(lruUrl);
+    }
+  }
 
   function isFreshEntry(entry) {
     if (!entry || !entry.blob) return false;
@@ -1175,7 +1265,7 @@
         let objUrl = _blobUrlCache.get(url);
         if (!objUrl) {
           objUrl = URL.createObjectURL(entry.blob);
-          _blobUrlCache.set(url, objUrl);
+          _blobUrlCachePut(url, objUrl);
         }
         return objUrl;
       }
@@ -1184,8 +1274,8 @@
         if (!stored) return;
         const stale = _blobUrlCache.get(url);
         if (stale) {
-          URL.revokeObjectURL(stale);
           _blobUrlCache.delete(url);
+          URL.revokeObjectURL(stale);
         }
       });
       return url;
@@ -1532,7 +1622,7 @@
     const seen = new Set();
     const artwork = [];
     for (const src of candidates) {
-      if (!src || seen.has(src)) continue;
+      if (!src || !/^https:\/\/([a-z0-9-]+\.)*ppy\.sh(\/|$)/i.test(src) || seen.has(src)) continue;
       seen.add(src);
       const entry = artworkEntry(src);
       if (entry) artwork.push(entry);
@@ -4541,9 +4631,7 @@
         if (!e.target.files[0]) return;
         try {
           const text = await e.target.files[0].text();
-          const data = JSON.parse(text);
-          if (typeof data !== "object" || Array.isArray(data))
-            throw new Error("Expected JSON object");
+          const data = parseImportedFavorites(JSON.parse(text));
           const existing = getFavorites();
           let added = 0;
           for (const [id, fav] of Object.entries(data)) {
@@ -4882,12 +4970,10 @@
           fetchBtn.disabled = true;
           ghGetGistContent("", gistId)
             .then((data) => {
-              if (typeof data !== "object" || Array.isArray(data)) {
-                throw new Error("Malformed backup data");
-              }
+              const clean = parseImportedFavorites(data);
               const existing = getFavorites();
               let added = 0;
-              for (const [id, fav] of Object.entries(data)) {
+              for (const [id, fav] of Object.entries(clean)) {
                 if (!existing[id]) {
                   existing[id] = fav;
                   added++;
@@ -5020,11 +5106,10 @@
           restoreBtn.disabled = true;
           ghGetGistContent(token, gistId)
             .then((data) => {
-              if (typeof data !== "object" || Array.isArray(data))
-                throw new Error("Malformed backup data");
+              const clean = parseImportedFavorites(data);
               const existing = getFavorites();
               let added = 0;
-              for (const [id, fav] of Object.entries(data)) {
+              for (const [id, fav] of Object.entries(clean)) {
                 if (!existing[id]) {
                   existing[id] = fav;
                   added++;
@@ -5074,11 +5159,10 @@
           fetchBtn.disabled = true;
           ghGetGistContent(token, gistId)
             .then((data) => {
-              if (typeof data !== "object" || Array.isArray(data))
-                throw new Error("Malformed backup data");
+              const clean = parseImportedFavorites(data);
               const existing = getFavorites();
               let added = 0;
-              for (const [id, fav] of Object.entries(data)) {
+              for (const [id, fav] of Object.entries(clean)) {
                 if (!existing[id]) {
                   existing[id] = fav;
                   added++;
@@ -6479,6 +6563,8 @@
 
       const cBadge = panel.querySelector("#osu-fav-count");
 
+      const _collCounts = buildCollectionCountIndex();
+
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         entries = entries.filter(
@@ -6661,7 +6747,7 @@
           "font-size:9px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
         dateDiv.textContent = formatDate(f.favourited_at);
 
-        const collCount = () => collectionsContainingMap(id).length;
+        const collCount = () => _collCounts.get(id) || 0;
         const addToCollBtn = document.createElement("button");
         addToCollBtn.type = "button";
         function refreshAddToCollBtn() {
@@ -6676,12 +6762,18 @@
         addToCollBtn.style.cssText =
           "font-size:8px;font-weight:600;padding:1px 5px;border-radius:2px;flex-shrink:0;cursor:pointer;background:transparent";
         refreshAddToCollBtn();
-        addToCollBtn.style.border = `1px solid ${collCount() ? "var(--osu-fav-accent)" : "#333"}`;
+        const _collN = collCount();
+        addToCollBtn.style.border = `1px solid ${_collN ? "var(--osu-fav-accent)" : "#333"}`;
         addToCollBtn.addEventListener("click", (e) => {
           e.stopPropagation();
           showAddToCollectionMenu(addToCollBtn, id, () => {
-            refreshAddToCollBtn();
-            addToCollBtn.style.borderColor = collCount() ? "var(--osu-fav-accent)" : "#333";
+            const n = collectionsContainingMap(id).length;
+            addToCollBtn.textContent = n ? `\u2713 ${n}` : "+ Playlist";
+            addToCollBtn.title = n
+              ? `In ${n} collection${n > 1 ? "s" : ""} - click to manage`
+              : "Add to a collection";
+            addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "#333";
+            addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "#666";
             if (activeCollectionId) renderList();
           });
         });
@@ -6703,7 +6795,7 @@
           "display:flex;flex-direction:column;gap:4px;flex-shrink:0;justify-content:center";
 
         const openLink = document.createElement("a");
-        openLink.href = f.url || `https://osu.ppy.sh/beatmapsets/${id}`;
+        openLink.href = `https://osu.ppy.sh/beatmapsets/${id}`;
         openLink.target = "_blank";
         openLink.textContent = "Open";
         openLink.style.cssText =
@@ -7782,8 +7874,17 @@
       panelWasOpenAtLastUrl = !!document.getElementById("osu-local-fav-panel");
     }, 800);
 
+    let _scanSig = "";
+    let _scanTick = 0;
     setInterval(() => {
       if (document.hidden) return;
+      _scanTick++;
+      const sig =
+        location.pathname + "#" +
+        document.querySelectorAll("button, span.beatmapset-panel__menu-item").length;
+      const changed = sig !== _scanSig;
+      _scanSig = sig;
+      if (!changed && _scanTick % 8 !== 0) return;
       refreshButtons();
       addFavoriteAllButtons();
       addGuestFavoriteButton();
