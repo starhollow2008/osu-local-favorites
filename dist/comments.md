@@ -1,6 +1,6 @@
 # Stripped comments
 
-557 comments were removed from [`osu-local-favorites.user.js`](./osu-local-favorites.user.js) by `npm run build` - the built script ships without them.
+569 comments were removed from [`osu-local-favorites.user.js`](./osu-local-favorites.user.js) by `npm run build` - the built script ships without them.
 
 Each entry links to the **line of the built userscript** the comment was attached to: the
 line it documented, or the first code line after it when the comment sat on its own. The
@@ -16,41 +16,41 @@ Not listed here, because they stay in the built file:
 
 1. [`src/core/gm-shim.js`](#core-gm-shim-js) - 12 comments, [first](./osu-local-favorites.user.js#L76)
 2. [`src/core/interceptor.js`](#core-interceptor-js) - 8 comments, [first](./osu-local-favorites.user.js#L176)
-3. [`src/core/errors.js`](#core-errors-js) - 6 comments, [first](./osu-local-favorites.user.js#L279)
-4. [`src/data/storage.js`](#data-storage-js) - 13 comments, [first](./osu-local-favorites.user.js#L354)
-5. [`src/data/collections.js`](#data-collections-js) - 4 comments, [first](./osu-local-favorites.user.js#L459)
-6. [`src/ui/theme.js`](#ui-theme-js) - 6 comments, [first](./osu-local-favorites.user.js#L521)
-7. [`src/data/mirrors.js`](#data-mirrors-js) - 9 comments, [first](./osu-local-favorites.user.js#L598)
-8. [`src/api/previews.js`](#api-previews-js) - 6 comments, [first](./osu-local-favorites.user.js#L709)
-9. [`src/data/playback-settings.js`](#data-playback-settings-js) - 2 comments, [first](./osu-local-favorites.user.js#L780)
-10. [`src/data/media-cache-db.js`](#data-media-cache-db-js) - 68 comments, [first](./osu-local-favorites.user.js#L799)
-11. [`src/ui/media-session.js`](#ui-media-session-js) - 12 comments, [first](./osu-local-favorites.user.js#L1497)
-12. [`src/ui/audio-player.js`](#ui-audio-player-js) - 26 comments, [first](./osu-local-favorites.user.js#L1678)
-13. [`src/ui/popup-menu.js`](#ui-popup-menu-js) - 3 comments, [first](./osu-local-favorites.user.js#L1915)
-14. [`src/ui/download-menu.js`](#ui-download-menu-js) - 2 comments, [first](./osu-local-favorites.user.js#L1985)
-15. [`src/ui/genre-filter.js`](#ui-genre-filter-js) - 4 comments, [first](./osu-local-favorites.user.js#L2024)
-16. [`src/ui/filter-menu.js`](#ui-filter-menu-js) - 6 comments, [first](./osu-local-favorites.user.js#L2066)
-17. [`src/ui/filters.js`](#ui-filters-js) - 7 comments, [first](./osu-local-favorites.user.js#L2258)
-18. [`src/ui/collections-menu.js`](#ui-collections-menu-js) - 1 comments, [first](./osu-local-favorites.user.js#L2647)
-19. [`src/api/gist-backup.js`](#api-gist-backup-js) - 11 comments, [first](./osu-local-favorites.user.js#L2732)
-20. [`src/api/osu-api.js`](#api-osu-api-js) - 31 comments, [first](./osu-local-favorites.user.js#L2863)
-21. [`src/data/beatmap-extraction.js`](#data-beatmap-extraction-js) - 15 comments, [first](./osu-local-favorites.user.js#L3129)
-22. [`src/data/favorite-detection.js`](#data-favorite-detection-js) - 7 comments, [first](./osu-local-favorites.user.js#L3385)
-23. [`src/ui/heart-visual.js`](#ui-heart-visual-js) - 4 comments, [first](./osu-local-favorites.user.js#L3485)
-24. [`src/data/enrichment.js`](#data-enrichment-js) - 15 comments, [first](./osu-local-favorites.user.js#L3518)
-25. [`src/data/reenrichment.js`](#data-reenrichment-js) - 3 comments, [first](./osu-local-favorites.user.js#L3677)
-26. [`src/data/toggle-favorite.js`](#data-toggle-favorite-js) - 4 comments, [first](./osu-local-favorites.user.js#L3749)
-27. [`src/ui/copy-all-button.js`](#ui-copy-all-button-js) - 13 comments, [first](./osu-local-favorites.user.js#L3785)
-28. [`src/ui/floating-heart.js`](#ui-floating-heart-js) - 26 comments, [first](./osu-local-favorites.user.js#L3926)
-29. [`src/ui/settings.js`](#ui-settings-js) - 51 comments, [first](./osu-local-favorites.user.js#L4170)
-30. [`src/ui/main-panel.js`](#ui-main-panel-js) - 104 comments, [first](./osu-local-favorites.user.js#L5549)
-31. [`src/ui/menu-commands.js`](#ui-menu-commands-js) - 1 comments, [first](./osu-local-favorites.user.js#L7007)
-32. [`src/ui/guest-fallback.js`](#ui-guest-fallback-js) - 10 comments, [first](./osu-local-favorites.user.js#L7042)
-33. [`src/ui/guest-downloads.js`](#ui-guest-downloads-js) - 16 comments, [first](./osu-local-favorites.user.js#L7114)
-34. [`src/core/toast.js`](#core-toast-js) - 1 comments, [first](./osu-local-favorites.user.js#L7266)
-35. [`src/data/version-check.js`](#data-version-check-js) - 7 comments, [first](./osu-local-favorites.user.js#L7293)
-36. [`src/ui/update-prompt.js`](#ui-update-prompt-js) - 7 comments, [first](./osu-local-favorites.user.js#L7371)
-37. [`src/core/init.js`](#core-init-js) - 36 comments, [first](./osu-local-favorites.user.js#L7481)
+3. [`src/core/errors.js`](#core-errors-js) - 6 comments, [first](./osu-local-favorites.user.js#L285)
+4. [`src/data/storage.js`](#data-storage-js) - 18 comments, [first](./osu-local-favorites.user.js#L360)
+5. [`src/data/collections.js`](#data-collections-js) - 5 comments, [first](./osu-local-favorites.user.js#L525)
+6. [`src/ui/theme.js`](#ui-theme-js) - 6 comments, [first](./osu-local-favorites.user.js#L597)
+7. [`src/data/mirrors.js`](#data-mirrors-js) - 9 comments, [first](./osu-local-favorites.user.js#L674)
+8. [`src/api/previews.js`](#api-previews-js) - 6 comments, [first](./osu-local-favorites.user.js#L785)
+9. [`src/data/playback-settings.js`](#data-playback-settings-js) - 2 comments, [first](./osu-local-favorites.user.js#L856)
+10. [`src/data/media-cache-db.js`](#data-media-cache-db-js) - 69 comments, [first](./osu-local-favorites.user.js#L875)
+11. [`src/ui/media-session.js`](#ui-media-session-js) - 13 comments, [first](./osu-local-favorites.user.js#L1587)
+12. [`src/ui/audio-player.js`](#ui-audio-player-js) - 26 comments, [first](./osu-local-favorites.user.js#L1768)
+13. [`src/ui/popup-menu.js`](#ui-popup-menu-js) - 3 comments, [first](./osu-local-favorites.user.js#L2005)
+14. [`src/ui/download-menu.js`](#ui-download-menu-js) - 2 comments, [first](./osu-local-favorites.user.js#L2075)
+15. [`src/ui/genre-filter.js`](#ui-genre-filter-js) - 4 comments, [first](./osu-local-favorites.user.js#L2114)
+16. [`src/ui/filter-menu.js`](#ui-filter-menu-js) - 6 comments, [first](./osu-local-favorites.user.js#L2156)
+17. [`src/ui/filters.js`](#ui-filters-js) - 7 comments, [first](./osu-local-favorites.user.js#L2348)
+18. [`src/ui/collections-menu.js`](#ui-collections-menu-js) - 1 comments, [first](./osu-local-favorites.user.js#L2737)
+19. [`src/api/gist-backup.js`](#api-gist-backup-js) - 11 comments, [first](./osu-local-favorites.user.js#L2822)
+20. [`src/api/osu-api.js`](#api-osu-api-js) - 31 comments, [first](./osu-local-favorites.user.js#L2953)
+21. [`src/data/beatmap-extraction.js`](#data-beatmap-extraction-js) - 15 comments, [first](./osu-local-favorites.user.js#L3219)
+22. [`src/data/favorite-detection.js`](#data-favorite-detection-js) - 7 comments, [first](./osu-local-favorites.user.js#L3475)
+23. [`src/ui/heart-visual.js`](#ui-heart-visual-js) - 4 comments, [first](./osu-local-favorites.user.js#L3575)
+24. [`src/data/enrichment.js`](#data-enrichment-js) - 15 comments, [first](./osu-local-favorites.user.js#L3608)
+25. [`src/data/reenrichment.js`](#data-reenrichment-js) - 3 comments, [first](./osu-local-favorites.user.js#L3767)
+26. [`src/data/toggle-favorite.js`](#data-toggle-favorite-js) - 4 comments, [first](./osu-local-favorites.user.js#L3839)
+27. [`src/ui/copy-all-button.js`](#ui-copy-all-button-js) - 13 comments, [first](./osu-local-favorites.user.js#L3875)
+28. [`src/ui/floating-heart.js`](#ui-floating-heart-js) - 26 comments, [first](./osu-local-favorites.user.js#L4016)
+29. [`src/ui/settings.js`](#ui-settings-js) - 51 comments, [first](./osu-local-favorites.user.js#L4260)
+30. [`src/ui/main-panel.js`](#ui-main-panel-js) - 108 comments, [first](./osu-local-favorites.user.js#L5633)
+31. [`src/ui/menu-commands.js`](#ui-menu-commands-js) - 1 comments, [first](./osu-local-favorites.user.js#L7099)
+32. [`src/ui/guest-fallback.js`](#ui-guest-fallback-js) - 10 comments, [first](./osu-local-favorites.user.js#L7134)
+33. [`src/ui/guest-downloads.js`](#ui-guest-downloads-js) - 16 comments, [first](./osu-local-favorites.user.js#L7206)
+34. [`src/core/toast.js`](#core-toast-js) - 1 comments, [first](./osu-local-favorites.user.js#L7358)
+35. [`src/data/version-check.js`](#data-version-check-js) - 7 comments, [first](./osu-local-favorites.user.js#L7385)
+36. [`src/ui/update-prompt.js`](#ui-update-prompt-js) - 7 comments, [first](./osu-local-favorites.user.js#L7463)
+37. [`src/core/init.js`](#core-init-js) - 36 comments, [first](./osu-local-favorites.user.js#L7573)
 
 ---
 
@@ -166,7 +166,7 @@ Not listed here, because they stay in the built file:
 
 ## `src/core/interceptor.js`
 
-8 comments · userscript [L176](./osu-local-favorites.user.js#L176) - [L265](./osu-local-favorites.user.js#L265)
+8 comments · userscript [L176](./osu-local-favorites.user.js#L176) - [L271](./osu-local-favorites.user.js#L271)
 
 **[L176](./osu-local-favorites.user.js#L176)** · src L1
 
@@ -178,16 +178,20 @@ Not listed here, because they stay in the built file:
 **[L179](./osu-local-favorites.user.js#L179)** · src L6
 
 ```js
-// ── XHR intercept: block /favourites requests ──
+// ── XHR intercept: block /favourites write requests ──
+// Only the write verbs (POST/PUT/PATCH/DELETE) are faked - osu!'s own
+// favorites *listing* endpoints share the /favourites path and must
+// keep hitting the network, or page code silently receives "{}"
+// instead of real JSON.
 ```
 
-**[L215](./osu-local-favorites.user.js#L215)** · src L43
+**[L220](./osu-local-favorites.user.js#L220)** · src L52
 
 ```js
-// ── Fetch intercept: block /favourites and auth-error responses ──
+// ── Fetch intercept: block /favourites write requests ──
 ```
 
-**[L229](./osu-local-favorites.user.js#L229)** · src L58
+**[L235](./osu-local-favorites.user.js#L235)** · src L68
 
 ```js
 // ── Navigation intercept: block login redirects from favourite clicks ──
@@ -196,25 +200,25 @@ Not listed here, because they stay in the built file:
 // Only redirects that originate within 500ms of a favourite-click are blocked.
 ```
 
-**[L233](./osu-local-favorites.user.js#L233)** · src L66
+**[L239](./osu-local-favorites.user.js#L239)** · src L76
 
 ```js
 // Check if this looks like a favourite button
 ```
 
-**[L252](./osu-local-favorites.user.js#L252)** · src L86
+**[L258](./osu-local-favorites.user.js#L258)** · src L96
 
 ```js
 // block login redirect
 ```
 
-**[L260](./osu-local-favorites.user.js#L260)** · src L94
+**[L266](./osu-local-favorites.user.js#L266)** · src L104
 
 ```js
 // block login redirect
 ```
 
-**[L265](./osu-local-favorites.user.js#L265)** · src L99
+**[L271](./osu-local-favorites.user.js#L271)** · src L109
 
 ```js
 // Intercept anchor navigation to /login triggered by favourite actions
@@ -223,9 +227,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/core/errors.js`
 
-6 comments · userscript [L279](./osu-local-favorites.user.js#L279) - [L334](./osu-local-favorites.user.js#L334)
+6 comments · userscript [L285](./osu-local-favorites.user.js#L285) - [L340](./osu-local-favorites.user.js#L340)
 
-**[L279](./osu-local-favorites.user.js#L279)** · src L1
+**[L285](./osu-local-favorites.user.js#L285)** · src L1
 
 ```js
 // ═══ Error reporting ═══
@@ -238,19 +242,19 @@ Not listed here, because they stay in the built file:
 // console detail for free without changing what appears on screen.
 ```
 
-**[L279](./osu-local-favorites.user.js#L279)** · src L9
+**[L285](./osu-local-favorites.user.js#L285)** · src L9
 
 ```js
 // don't flood the screen if something fails repeatedly
 ```
 
-**[L283](./osu-local-favorites.user.js#L283)** · src L13
+**[L289](./osu-local-favorites.user.js#L289)** · src L13
 
 ```js
 // page not ready - the console line already has the detail
 ```
 
-**[L311](./osu-local-favorites.user.js#L311)** · src L41
+**[L317](./osu-local-favorites.user.js#L317)** · src L41
 
 ```js
 // context: short human label for where this happened, shown in both the
@@ -262,13 +266,13 @@ Not listed here, because they stay in the built file:
 // rarely needed).
 ```
 
-**[L329](./osu-local-favorites.user.js#L329)** · src L66
+**[L335](./osu-local-favorites.user.js#L335)** · src L66
 
 ```js
 // already told the user something just failed
 ```
 
-**[L334](./osu-local-favorites.user.js#L334)** · src L71
+**[L340](./osu-local-favorites.user.js#L340)** · src L71
 
 ```js
 // Last-resort safety net for bugs that slip past every try/catch above.
@@ -283,9 +287,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/data/storage.js`
 
-13 comments · userscript [L354](./osu-local-favorites.user.js#L354) - [L448](./osu-local-favorites.user.js#L448)
+18 comments · userscript [L360](./osu-local-favorites.user.js#L360) - [L514](./osu-local-favorites.user.js#L514)
 
-**[L354](./osu-local-favorites.user.js#L354)** · src L6
+**[L360](./osu-local-favorites.user.js#L360)** · src L6
 
 ```js
 // ═══ Storage ═══
@@ -304,7 +308,7 @@ Not listed here, because they stay in the built file:
 // DOM "storage" event here for the localStorage fallback) invalidate it.
 ```
 
-**[L366](./osu-local-favorites.user.js#L366)** · src L32
+**[L372](./osu-local-favorites.user.js#L372)** · src L32
 
 ```js
 // ── Change notification ───────────────────────────────────────────────
@@ -322,7 +326,7 @@ Not listed here, because they stay in the built file:
 // be lost when Turbolinks swaps out <body>.
 ```
 
-**[L374](./osu-local-favorites.user.js#L374)** · src L53
+**[L380](./osu-local-favorites.user.js#L380)** · src L53
 
 ```js
 // A cheap signature over *which ids are favorited*, deliberately ignoring
@@ -336,7 +340,7 @@ Not listed here, because they stay in the built file:
 // work over keys that were about to be serialized by GM_setValue anyway.
 ```
 
-**[L393](./osu-local-favorites.user.js#L393)** · src L81
+**[L399](./osu-local-favorites.user.js#L399)** · src L81
 
 ```js
 // Listeners always run; the detail tells them how much actually changed.
@@ -353,14 +357,14 @@ Not listed here, because they stay in the built file:
 //                              than rebuilding the list once per second.
 ```
 
-**[L398](./osu-local-favorites.user.js#L398)** · src L98
+**[L404](./osu-local-favorites.user.js#L404)** · src L98
 
 ```js
 // One bad listener must not stop the others, and must never take
 // down the write that triggered it.
 ```
 
-**[L403](./osu-local-favorites.user.js#L403)** · src L105
+**[L409](./osu-local-favorites.user.js#L409)** · src L105
 
 ```js
 // Drops the in-memory cache so the next getFavorites() re-reads persisted
@@ -370,7 +374,7 @@ Not listed here, because they stay in the built file:
 // this module's private state.
 ```
 
-**[L404](./osu-local-favorites.user.js#L404)** · src L111
+**[L410](./osu-local-favorites.user.js#L410)** · src L111
 
 ```js
 // GM_addValueChangeListener supplies the new value directly. Prefer it when
@@ -379,7 +383,7 @@ Not listed here, because they stay in the built file:
 // against its old cache after page B changed a favorite.
 ```
 
-**[L405](./osu-local-favorites.user.js#L405)** · src L116
+**[L411](./osu-local-favorites.user.js#L411)** · src L116
 
 ```js
 // Another tab (or a restore) replaced the store wholesale, so this tab's
@@ -387,7 +391,7 @@ Not listed here, because they stay in the built file:
 // than comparing against a signature computed from the old contents.
 ```
 
-**[L409](./osu-local-favorites.user.js#L409)** · src L123
+**[L415](./osu-local-favorites.user.js#L415)** · src L123
 
 ```js
 // Drops the cache and re-reads persisted state WITHOUT notifying listeners.
@@ -399,7 +403,7 @@ Not listed here, because they stay in the built file:
 // The caller compares favoritesFingerprint() before and after and decides.
 ```
 
-**[L416](./osu-local-favorites.user.js#L416)** · src L137
+**[L422](./osu-local-favorites.user.js#L422)** · src L137
 
 ```js
 // A cheap content fingerprint: which ids are present, plus enough of each
@@ -408,7 +412,7 @@ Not listed here, because they stay in the built file:
 // and this runs every time the tab regains focus. O(n) integer work.
 ```
 
-**[L431](./osu-local-favorites.user.js#L431)** · src L156
+**[L437](./osu-local-favorites.user.js#L437)** · src L156
 
 ```js
 // Invalidate on cross-tab writes in the localStorage-fallback mode. (In
@@ -416,14 +420,68 @@ Not listed here, because they stay in the built file:
 // GM_addValueChangeListener handler covers that path instead.)
 ```
 
-**[L442](./osu-local-favorites.user.js#L442)** · src L170
+**[L448](./osu-local-favorites.user.js#L448)** · src L170
+
+```js
+// ── Import sanitization ──
+// Favorites can arrive from outside the script's own writes: JSON file import,
+// Gist fetch, and Gist restore. All three are untrusted data - the README
+// explicitly encourages importing someone else's shared list. Without a
+// schema gate, a crafted file could (a) prototype-pollute the favorites
+// object via "__proto__"/"constructor"/"prototype" keys, (b) plant record
+// fields the UI consumes verbatim (f.url -> <a href>, f.preview -> <audio>,
+// f.covers -> <img>/cache fetch), or (c) merge an unbounded payload that then
+// taxes every render and backup forever. Records are therefore rebuilt
+// field-by-field from a whitelist, ids must be numeric strings, and a raw
+// size cap rejects absurd payloads before parsing cost.
+```
+
+**[L460](./osu-local-favorites.user.js#L460)** · src L193
+
+```js
+// Rebuilds one favorite record from whitelisted fields only. Returns null
+// when the entry is not an object at all. Unknown fields are dropped, not
+// merged - the stored schema is exactly what the rest of the script reads.
+// url and preview are NOT taken from the record: parseImportedFavorites()
+// stamps them (plus id) canonically from the numeric key, so a shared
+// record can't point the Open button or <audio> at a javascript: or
+// lookalike URL.
+```
+
+**[L483](./osu-local-favorites.user.js#L483)** · src L223
+
+```js
+// Validates and sanitizes an import payload. Returns a fresh
+// { [numericId]: sanitizedRecord } map keyed only by numeric beatmap ids,
+// which also makes "__proto__"/"constructor"/"prototype" keys impossible to
+// carry over. Throws with a readable message on structurally invalid data.
+```
+
+**[L489](./osu-local-favorites.user.js#L489)** · src L233
+
+```js
+// numeric beatmap ids only
+```
+
+**[L492](./osu-local-favorites.user.js#L492)** · src L236
+
+```js
+// Canonical identity fields come from the numeric key, never from the
+// imported record (see sanitizeFavoriteRecord above).
+```
+
+**[L501](./osu-local-favorites.user.js#L501)** · src L247
 
 ```js
 // Cover art is resolved from the id when a record carries no `covers`, so
 // exports leave the object out (its URLs only differ by a cache-buster).
+// Imported records are the untrusted path into `covers` (shared Gists), so
+// anything not on an osu!/ppy.sh host is ignored here rather than rendered
+// into <img>/MediaSession - a crafted record can't make the browser fetch
+// attacker-chosen URLs.
 ```
 
-**[L448](./osu-local-favorites.user.js#L448)** · src L178
+**[L514](./osu-local-favorites.user.js#L514)** · src L266
 
 ```js
 // The JSON written by Export and the Gist backup: same records as storage
@@ -433,9 +491,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/data/collections.js`
 
-4 comments · userscript [L459](./osu-local-favorites.user.js#L459) - [L495](./osu-local-favorites.user.js#L495)
+5 comments · userscript [L525](./osu-local-favorites.user.js#L525) - [L586](./osu-local-favorites.user.js#L586)
 
-**[L459](./osu-local-favorites.user.js#L459)** · src L3
+**[L525](./osu-local-favorites.user.js#L525)** · src L3
 
 ```js
 // ═══ Collections (playlists) ═══
@@ -443,7 +501,7 @@ Not listed here, because they stay in the built file:
 // collections. Stored as { [collectionId]: { name, created, ids: [beatmapId,...] } }.
 ```
 
-**[L461](./osu-local-favorites.user.js#L461)** · src L8
+**[L527](./osu-local-favorites.user.js#L527)** · src L8
 
 ```js
 // In-memory write-through cache, mirroring the favorites store above.
@@ -455,25 +513,36 @@ Not listed here, because they stay in the built file:
 // GM_addValueChangeListener in init()).
 ```
 
-**[L472](./osu-local-favorites.user.js#L472)** · src L26
+**[L538](./osu-local-favorites.user.js#L538)** · src L26
 
 ```js
 // See invalidateFavoritesCache() in data/storage.js for why this is a
 // function rather than an exported mutable binding.
 ```
 
-**[L495](./osu-local-favorites.user.js#L495)** · src L51
+**[L561](./osu-local-favorites.user.js#L561)** · src L51
 
 ```js
 // Adds/removes a beatmap from a collection; returns the new membership state.
 ```
 
+**[L586](./osu-local-favorites.user.js#L586)** · src L77
+
+```js
+// Per-render membership index: one pass over every collection's id list,
+// producing mapId -> count. buildCard() needs only the count for the
+// "+ Playlist" badge, and the direct scan (collectionsContainingMap) is
+// O(collections x ids) per card - quadratic across a 1000-card render and
+// re-paid on every filter/sort/enrichment-triggered rebuild. Callers should
+// build this once per renderList() and pass it down instead.
+```
+
 
 ## `src/ui/theme.js`
 
-6 comments · userscript [L521](./osu-local-favorites.user.js#L521) - [L584](./osu-local-favorites.user.js#L584)
+6 comments · userscript [L597](./osu-local-favorites.user.js#L597) - [L660](./osu-local-favorites.user.js#L660)
 
-**[L521](./osu-local-favorites.user.js#L521)** · src L3
+**[L597](./osu-local-favorites.user.js#L597)** · src L3
 
 ```js
 // ═══ Theme ═══
@@ -485,14 +554,14 @@ Not listed here, because they stay in the built file:
 // to touch each individual style string.
 ```
 
-**[L537](./osu-local-favorites.user.js#L537)** · src L26
+**[L613](./osu-local-favorites.user.js#L613)** · src L26
 
 ```js
 // Simple hex darken for the accent's hover/pressed shade - mirrors the
 // original #ff66aa → #ff3377 relationship (roughly -25% lightness)
 ```
 
-**[L556](./osu-local-favorites.user.js#L556)** · src L47
+**[L632](./osu-local-favorites.user.js#L632)** · src L47
 
 ```js
 // Applies the current theme settings to :root as CSS custom properties.
@@ -500,7 +569,7 @@ Not listed here, because they stay in the built file:
 // overwrites the same handful of variables.
 ```
 
-**[L568](./osu-local-favorites.user.js#L568)** · src L62
+**[L644](./osu-local-favorites.user.js#L644)** · src L62
 
 ```js
 // Minimal heart glyph as real SVG (not emoji) - emoji hearts render from the
@@ -509,7 +578,7 @@ Not listed here, because they stay in the built file:
 // --osu-fav-heart-color actually takes effect.
 ```
 
-**[L576](./osu-local-favorites.user.js#L576)** · src L74
+**[L652](./osu-local-favorites.user.js#L652)** · src L74
 
 ```js
 // Play/pause icons as inline SVGs - the old U+25B6/U+23F8 text glyphs get
@@ -517,7 +586,7 @@ Not listed here, because they stay in the built file:
 // theming. SVGs render identically everywhere and inherit currentColor.
 ```
 
-**[L584](./osu-local-favorites.user.js#L584)** · src L85
+**[L660](./osu-local-favorites.user.js#L660)** · src L85
 
 ```js
 // Player-bar icons - previous/next/shuffle/loop, same inline-SVG approach
@@ -527,9 +596,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/data/mirrors.js`
 
-9 comments · userscript [L598](./osu-local-favorites.user.js#L598) - [L685](./osu-local-favorites.user.js#L685)
+9 comments · userscript [L674](./osu-local-favorites.user.js#L674) - [L761](./osu-local-favorites.user.js#L761)
 
-**[L598](./osu-local-favorites.user.js#L598)** · src L3
+**[L674](./osu-local-favorites.user.js#L674)** · src L3
 
 ```js
 // ═══ Download Mirrors ═══
@@ -540,7 +609,7 @@ Not listed here, because they stay in the built file:
 // after the mirror list in limjeck/osuplus.
 ```
 
-**[L641](./osu-local-favorites.user.js#L641)** · src L52
+**[L717](./osu-local-favorites.user.js#L717)** · src L52
 
 ```js
 // Detects a real logged-in osu! session via the page's own current-user
@@ -556,7 +625,7 @@ Not listed here, because they stay in the built file:
 // keeps it correct if Turbolinks swaps in a different user blob.
 ```
 
-**[L660](./osu-local-favorites.user.js#L660)** · src L82
+**[L736](./osu-local-favorites.user.js#L736)** · src L82
 
 ```js
 // Exported invalidator (see invalidateFavoritesCache() in data/storage.js
@@ -565,7 +634,7 @@ Not listed here, because they stay in the built file:
 // login state may have changed.
 ```
 
-**[L665](./osu-local-favorites.user.js#L665)** · src L91
+**[L741](./osu-local-favorites.user.js#L741)** · src L91
 
 ```js
 // Which video variant to prefer, and whether Official or Mirrors should be
@@ -574,25 +643,25 @@ Not listed here, because they stay in the built file:
 // set of options is always one click away in the dropdown.
 ```
 
-**[L665](./osu-local-favorites.user.js#L665)** · src L95
+**[L741](./osu-local-favorites.user.js#L741)** · src L95
 
 ```js
 // "video" | "novideo"
 ```
 
-**[L666](./osu-local-favorites.user.js#L666)** · src L96
+**[L742](./osu-local-favorites.user.js#L742)** · src L96
 
 ```js
 // "official" | "mirrors"
 ```
 
-**[L667](./osu-local-favorites.user.js#L667)** · src L97
+**[L743](./osu-local-favorites.user.js#L743)** · src L97
 
 ```js
 // "" | "official" | "official_novideo" | "<mirror.key>" | "<mirror.key>_novideo"
 ```
 
-**[L669](./osu-local-favorites.user.js#L669)** · src L99
+**[L745](./osu-local-favorites.user.js#L745)** · src L99
 
 ```js
 // Flat, order-independent registry of every possible download destination
@@ -603,7 +672,7 @@ Not listed here, because they stay in the built file:
 // stored default back into a real URL.
 ```
 
-**[L685](./osu-local-favorites.user.js#L685)** · src L121
+**[L761](./osu-local-favorites.user.js#L761)** · src L121
 
 ```js
 // Resolves the stored default-mirror key into an actual {label, url} for
@@ -617,9 +686,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/api/previews.js`
 
-6 comments · userscript [L709](./osu-local-favorites.user.js#L709) - [L767](./osu-local-favorites.user.js#L767)
+6 comments · userscript [L785](./osu-local-favorites.user.js#L785) - [L843](./osu-local-favorites.user.js#L843)
 
-**[L709](./osu-local-favorites.user.js#L709)** · src L5
+**[L785](./osu-local-favorites.user.js#L785)** · src L5
 
 ```js
 // ═══ Full-length previews (Hinamizawa music mirror) ═══
@@ -632,7 +701,7 @@ Not listed here, because they stay in the built file:
 // than what we already show. No auth, open CORS, HTTP Range for seeking.
 ```
 
-**[L711](./osu-local-favorites.user.js#L711)** · src L15
+**[L787](./osu-local-favorites.user.js#L787)** · src L15
 
 ```js
 // The mirror asks integrations to identify themselves so traffic can be
@@ -641,13 +710,13 @@ Not listed here, because they stay in the built file:
 // while the metadata request below is made through GM_xmlhttpRequest.
 ```
 
-**[L713](./osu-local-favorites.user.js#L713)** · src L21
+**[L789](./osu-local-favorites.user.js#L789)** · src L21
 
 ```js
 // beatmapset id -> Promise<Song|null>
 ```
 
-**[L715](./osu-local-favorites.user.js#L715)** · src L23
+**[L791](./osu-local-favorites.user.js#L791)** · src L23
 
 ```js
 // Firefox for Android on some devices (including Redmi models) is much
@@ -658,7 +727,7 @@ Not listed here, because they stay in the built file:
 // player falls back to osu!'s direct preview below.
 ```
 
-**[L728](./osu-local-favorites.user.js#L728)** · src L42
+**[L804](./osu-local-favorites.user.js#L804)** · src L42
 
 ```js
 // Fetch only when a user starts a track, never once per visible card. The
@@ -667,7 +736,7 @@ Not listed here, because they stay in the built file:
 // click that starts playback.
 ```
 
-**[L767](./osu-local-favorites.user.js#L767)** · src L85
+**[L843](./osu-local-favorites.user.js#L843)** · src L85
 
 ```js
 // Preserve the useful metadata across panel re-renders and future plays.
@@ -677,15 +746,15 @@ Not listed here, because they stay in the built file:
 
 ## `src/data/playback-settings.js`
 
-2 comments · userscript [L780](./osu-local-favorites.user.js#L780) - [L783](./osu-local-favorites.user.js#L783)
+2 comments · userscript [L856](./osu-local-favorites.user.js#L856) - [L859](./osu-local-favorites.user.js#L859)
 
-**[L780](./osu-local-favorites.user.js#L780)** · src L3
+**[L856](./osu-local-favorites.user.js#L856)** · src L3
 
 ```js
 // ═══ Music Playback settings (loop / auto next / shuffle / volume) ═══
 ```
 
-**[L783](./osu-local-favorites.user.js#L783)** · src L7
+**[L859](./osu-local-favorites.user.js#L859)** · src L7
 
 ```js
 // 0-100, applied as audio.volume/100
@@ -694,9 +763,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/data/media-cache-db.js`
 
-68 comments · userscript [L799](./osu-local-favorites.user.js#L799) - [L1494](./osu-local-favorites.user.js#L1494)
+69 comments · userscript [L875](./osu-local-favorites.user.js#L875) - [L1584](./osu-local-favorites.user.js#L1584)
 
-**[L799](./osu-local-favorites.user.js#L799)** · src L3
+**[L875](./osu-local-favorites.user.js#L875)** · src L3
 
 ```js
 // ═══ Media Cache (background covers + audio previews) ═══
@@ -714,20 +783,20 @@ Not listed here, because they stay in the built file:
 // the same way on every platform, including Firefox Android.
 ```
 
-**[L799](./osu-local-favorites.user.js#L799)** · src L16
+**[L875](./osu-local-favorites.user.js#L875)** · src L16
 
 ```js
 // "custom"|"30min"|"1h"|"6h"|"12h"|"24h"|"1week"|"1month"|"always"|"never"
 ```
 
-**[L817](./osu-local-favorites.user.js#L817)** · src L34
+**[L893](./osu-local-favorites.user.js#L893)** · src L34
 
 ```js
 // TTL in ms, or Infinity for "always" - "never" is handled by callers
 // before this is ever reached (they skip the cache store outright).
 ```
 
-**[L831](./osu-local-favorites.user.js#L831)** · src L50
+**[L907](./osu-local-favorites.user.js#L907)** · src L50
 
 ```js
 // Partial ("while streaming") downloads live in their own store until the
@@ -736,7 +805,7 @@ Not listed here, because they stay in the built file:
 // store and everything already cached in it are left untouched.
 ```
 
-**[L833](./osu-local-favorites.user.js#L833)** · src L56
+**[L909](./osu-local-favorites.user.js#L909)** · src L56
 
 ```js
 // Housekeeping limits. Without them the store only ever grew: entries past
@@ -748,31 +817,31 @@ Not listed here, because they stay in the built file:
 // limit): oldest entries are dropped past it.
 ```
 
-**[L833](./osu-local-favorites.user.js#L833)** · src L63
+**[L909](./osu-local-favorites.user.js#L909)** · src L63
 
 ```js
 // "custom"|"100mb"|"250mb"|"512mb"|"1gb"|"2gb"|"5gb"|"unlimited"
 ```
 
-**[L851](./osu-local-favorites.user.js#L851)** · src L81
+**[L927](./osu-local-favorites.user.js#L927)** · src L81
 
 ```js
 // Ceiling in bytes, or Infinity for "unlimited".
 ```
 
-**[L857](./osu-local-favorites.user.js#L857)** · src L88
+**[L933](./osu-local-favorites.user.js#L933)** · src L88
 
 ```js
 // ...down to this fraction, so it is not re-triggered every write
 ```
 
-**[L858](./osu-local-favorites.user.js#L858)** · src L89
+**[L934](./osu-local-favorites.user.js#L934)** · src L89
 
 ```js
 // abandoned half-downloads
 ```
 
-**[L861](./osu-local-favorites.user.js#L861)** · src L92
+**[L937](./osu-local-favorites.user.js#L937)** · src L92
 
 ```js
 // URLs whose stored copy was discarded as unusable (see forgetCachedMedia).
@@ -781,14 +850,14 @@ Not listed here, because they stay in the built file:
 // pick the broken copy again.
 ```
 
-**[L878](./osu-local-favorites.user.js#L878)** · src L113
+**[L954](./osu-local-favorites.user.js#L954)** · src L113
 
 ```js
 // One sweep shortly after the first open of a page load, out of the
 // way of startup work.
 ```
 
-**[L880](./osu-local-favorites.user.js#L880)** · src L117
+**[L956](./osu-local-favorites.user.js#L956)** · src L117
 
 ```js
 // Fail soft - callers treat a null db exactly like "cache
@@ -796,7 +865,7 @@ Not listed here, because they stay in the built file:
 // caching were switched off.
 ```
 
-**[L902](./osu-local-favorites.user.js#L902)** · src L142
+**[L978](./osu-local-favorites.user.js#L978)** · src L142
 
 ```js
 // One write, resolved when the transaction has actually committed. It used
@@ -805,7 +874,7 @@ Not listed here, because they stay in the built file:
 // and remembered the blob as cached even though nothing had been stored.
 ```
 
-**[L915](./osu-local-favorites.user.js#L915)** · src L159
+**[L991](./osu-local-favorites.user.js#L991)** · src L159
 
 ```js
 // Resolves true only when the entry is really stored. A failed first attempt
@@ -813,13 +882,13 @@ Not listed here, because they stay in the built file:
 // write is retried once.
 ```
 
-**[L918](./osu-local-favorites.user.js#L918)** · src L165
+**[L994](./osu-local-favorites.user.js#L994)** · src L165
 
 ```js
 // Fresh bytes are being written, so this URL is trustworthy again.
 ```
 
-**[L926](./osu-local-favorites.user.js#L926)** · src L174
+**[L1002](./osu-local-favorites.user.js#L1002)** · src L174
 
 ```js
 // Revoke every blob URL handed out from the cache - otherwise clearing
@@ -829,7 +898,7 @@ Not listed here, because they stay in the built file:
 // underlying cache entry no longer existing.
 ```
 
-**[L933](./osu-local-favorites.user.js#L933)** · src L186
+**[L1009](./osu-local-favorites.user.js#L1009)** · src L186
 
 ```js
 // Half-downloaded tracks go too - otherwise "Clear cache" would
@@ -837,7 +906,7 @@ Not listed here, because they stay in the built file:
 // audio that nothing can ever play.
 ```
 
-**[L968](./osu-local-favorites.user.js#L968)** · src L224
+**[L1044](./osu-local-favorites.user.js#L1044)** · src L224
 
 ```js
 // Oldest-cached first, until `bytesToFree` is covered. An entry that still has
@@ -845,14 +914,14 @@ Not listed here, because they stay in the built file:
 // skipped, so making room never pulls media out from under the UI.
 ```
 
-**[L981](./osu-local-favorites.user.js#L981)** · src L240
+**[L1057](./osu-local-favorites.user.js#L1057)** · src L240
 
 ```js
 // Frees at least `bytes` by dropping the oldest entries. Resolves the number
 // of bytes actually freed (0 = nothing could be dropped).
 ```
 
-**[L989](./osu-local-favorites.user.js#L989)** · src L250
+**[L1065](./osu-local-favorites.user.js#L1065)** · src L250
 
 ```js
 // Housekeeping sweep: drops entries past their TTL, abandoned half-downloads
@@ -861,20 +930,20 @@ Not listed here, because they stay in the built file:
 // after the first open).
 ```
 
-**[L991](./osu-local-favorites.user.js#L991)** · src L256
+**[L1067](./osu-local-favorites.user.js#L1067)** · src L256
 
 ```js
 // `force` skips the throttle - used when the user changes the size limit and
 // expects the store to shrink right away.
 ```
 
-**[L1003](./osu-local-favorites.user.js#L1003)** · src L270
+**[L1079](./osu-local-favorites.user.js#L1079)** · src L270
 
 ```js
 // 1. Entries past their TTL can never be served again.
 ```
 
-**[L1007](./osu-local-favorites.user.js#L1007)** · src L275
+**[L1083](./osu-local-favorites.user.js#L1083)** · src L275
 
 ```js
 // 2. Half-downloads: abandoned (nothing written for a day), or left
@@ -882,19 +951,19 @@ Not listed here, because they stay in the built file:
 // before chunks were timestamped count as abandoned.
 ```
 
-**[L1023](./osu-local-favorites.user.js#L1023)** · src L294
+**[L1099](./osu-local-favorites.user.js#L1099)** · src L294
 
 ```js
 // 3. Size cap over what is left.
 ```
 
-**[L1044](./osu-local-favorites.user.js#L1044)** · src L316
+**[L1120](./osu-local-favorites.user.js#L1120)** · src L316
 
 ```js
 // Used by the Settings panel to show how much is currently stored.
 ```
 
-**[L1049](./osu-local-favorites.user.js#L1049)** · src L322
+**[L1125](./osu-local-favorites.user.js#L1125)** · src L322
 
 ```js
 // Partial chunks count toward the reported size: they occupy the
@@ -902,7 +971,7 @@ Not listed here, because they stay in the built file:
 // freed less than it actually did.
 ```
 
-**[L1067](./osu-local-favorites.user.js#L1067)** · src L343
+**[L1143](./osu-local-favorites.user.js#L1143)** · src L343
 
 ```js
 // Fetches a URL's raw bytes as a Blob for caching, via GM_xmlhttpRequest
@@ -918,7 +987,7 @@ Not listed here, because they stay in the built file:
 // userscript manager doesn't support GM_xmlhttpRequest at all.
 ```
 
-**[L1096](./osu-local-favorites.user.js#L1096)** · src L383
+**[L1172](./osu-local-favorites.user.js#L1172)** · src L383
 
 ```js
 // Reuses one blob: URL per cached source URL for the whole tab's
@@ -931,15 +1000,27 @@ Not listed here, because they stay in the built file:
 // Blob - so without this, a long session doing a lot of re-rendering was
 // steadily accumulating orphaned blob URLs (and, for full-length preview
 // audio, several-MB Blobs behind each one) that never got released.
+// sourceUrl -> objectURL for fresh cached blobs currently in use by <img>/
+// <audio> elements. Object URLs live until revoked, so an uncapped map grows
+// for the tab's lifetime - a long session browsing thousands of covers kept
+// thousands of URLs alive. Capped LRU-style: minting past the cap revokes the
+// oldest entry (safe to revoke - entries here are only "expected reuse"
+// hints; the next resolve() re-mints from the still-cached Blob).
 ```
 
-**[L1096](./osu-local-favorites.user.js#L1096)** · src L393
+**[L1172](./osu-local-favorites.user.js#L1172)** · src L399
 
 ```js
 // sourceUrl -> objectURL
 ```
 
-**[L1098](./osu-local-favorites.user.js#L1098)** · src L395
+**[L1177](./osu-local-favorites.user.js#L1177)** · src L404
+
+```js
+// re-mint for changed bytes
+```
+
+**[L1188](./osu-local-favorites.user.js#L1188)** · src L415
 
 ```js
 // One definition of "this cache entry is usable right now", shared by the
@@ -948,7 +1029,7 @@ Not listed here, because they stay in the built file:
 // to the TTL rules could silently make one of them disagree with the others.
 ```
 
-**[L1104](./osu-local-favorites.user.js#L1104)** · src L405
+**[L1194](./osu-local-favorites.user.js#L1194)** · src L425
 
 ```js
 // A tiny in-memory LRU of fully cached songs. IndexedDB reads are async and
@@ -959,26 +1040,26 @@ Not listed here, because they stay in the built file:
 // local copy with no request at all.
 ```
 
-**[L1105](./osu-local-favorites.user.js#L1105)** · src L412
+**[L1195](./osu-local-favorites.user.js#L1195)** · src L432
 
 ```js
 // sourceUrl -> { blob, cachedAt }
 ```
 
-**[L1109](./osu-local-favorites.user.js#L1109)** · src L416
+**[L1199](./osu-local-favorites.user.js#L1199)** · src L436
 
 ```js
 // Explicitly rejected bytes (a local copy that failed to decode) must not
 // come back through a late lookup; only a new cachePut clears this.
 ```
 
-**[L1113](./osu-local-favorites.user.js#L1113)** · src L422
+**[L1203](./osu-local-favorites.user.js#L1203)** · src L442
 
 ```js
 // oldest first
 ```
 
-**[L1117](./osu-local-favorites.user.js#L1117)** · src L426
+**[L1207](./osu-local-favorites.user.js#L1207)** · src L446
 
 ```js
 // Synchronous: the Blob for url when this session has already seen a fresh
@@ -986,20 +1067,20 @@ Not listed here, because they stay in the built file:
 // the middle of a click/pointer handler.
 ```
 
-**[L1124](./osu-local-favorites.user.js#L1124)** · src L436
+**[L1214](./osu-local-favorites.user.js#L1214)** · src L456
 
 ```js
 // LRU touch
 ```
 
-**[L1129](./osu-local-favorites.user.js#L1129)** · src L441
+**[L1219](./osu-local-favorites.user.js#L1219)** · src L461
 
 ```js
 // Async boolean form of the same question - "is a request for this URL
 // pointless?" - for callers that only need to decide whether to fetch.
 ```
 
-**[L1141](./osu-local-favorites.user.js#L1141)** · src L455
+**[L1231](./osu-local-favorites.user.js#L1231)** · src L475
 
 ```js
 // Background fill for covers (and anything else resolved through
@@ -1010,13 +1091,13 @@ Not listed here, because they stay in the built file:
 // userscript manager with a request per card.
 ```
 
-**[L1142](./osu-local-favorites.user.js#L1142)** · src L462
+**[L1232](./osu-local-favorites.user.js#L1232)** · src L482
 
 ```js
 // url -> Promise<boolean stored>
 ```
 
-**[L1169](./osu-local-favorites.user.js#L1169)** · src L489
+**[L1259](./osu-local-favorites.user.js#L1259)** · src L509
 
 ```js
 // Resolves to a URL safe to hand straight to <img src> / <audio src>: a
@@ -1028,7 +1109,7 @@ Not listed here, because they stay in the built file:
 // now - caching should behave the same across browsers/platforms.
 ```
 
-**[L1185](./osu-local-favorites.user.js#L1185)** · src L512
+**[L1275](./osu-local-favorites.user.js#L1275)** · src L532
 
 ```js
 // The blob just changed (first fetch, or a re-fetch after the old
@@ -1037,7 +1118,7 @@ Not listed here, because they stay in the built file:
 // stale content forever.
 ```
 
-**[L1195](./osu-local-favorites.user.js#L1195)** · src L526
+**[L1285](./osu-local-favorites.user.js#L1285)** · src L546
 
 ```js
 // Returns the cached Blob for url when a fresh copy exists (per the current
@@ -1047,14 +1128,14 @@ Not listed here, because they stay in the built file:
 // to assign to an <img>/<audio> src.
 ```
 
-**[L1200](./osu-local-favorites.user.js#L1200)** · src L536
+**[L1290](./osu-local-favorites.user.js#L1290)** · src L556
 
 ```js
 // Remember it so the next play of this song can pick the local copy
 // synchronously, without even this lookup.
 ```
 
-**[L1205](./osu-local-favorites.user.js#L1205)** · src L543
+**[L1295](./osu-local-favorites.user.js#L1295)** · src L563
 
 ```js
 // ── Cache-first source selection ────────────────────────────────────
@@ -1075,13 +1156,13 @@ Not listed here, because they stay in the built file:
 //     so the play() that follows is still a gesture-driven call.
 ```
 
-**[L1206](./osu-local-favorites.user.js#L1206)** · src L560
+**[L1296](./osu-local-favorites.user.js#L1296)** · src L580
 
 ```js
 // url -> in-flight lookup promise
 ```
 
-**[L1208](./osu-local-favorites.user.js#L1208)** · src L562
+**[L1298](./osu-local-favorites.user.js#L1298)** · src L582
 
 ```js
 // One shared read per URL: a prewarm that is still running when the user
@@ -1089,7 +1170,7 @@ Not listed here, because they stay in the built file:
 // stack duplicate IndexedDB reads.
 ```
 
-**[L1221](./osu-local-favorites.user.js#L1221)** · src L578
+**[L1311](./osu-local-favorites.user.js#L1311)** · src L598
 
 ```js
 // Fire-and-forget hydration. Safe to call as often as the UI likes: a URL
@@ -1098,7 +1179,7 @@ Not listed here, because they stay in the built file:
 // prewarming tracks the user has not played holds no Blob alive).
 ```
 
-**[L1228](./osu-local-favorites.user.js#L1228)** · src L589
+**[L1318](./osu-local-favorites.user.js#L1318)** · src L609
 
 ```js
 // Cache-first decision for playback. Resolves to the cached Blob when this
@@ -1106,14 +1187,14 @@ Not listed here, because they stay in the built file:
 // the network source". Synchronous fast path when already hydrated.
 ```
 
-**[L1243](./osu-local-favorites.user.js#L1243)** · src L607
+**[L1333](./osu-local-favorites.user.js#L1333)** · src L627
 
 ```js
 // A timed-out lookup still populates the LRU when it eventually
 // resolves, so the next play of this song decides synchronously.
 ```
 
-**[L1250](./osu-local-favorites.user.js#L1250)** · src L616
+**[L1340](./osu-local-favorites.user.js#L1340)** · src L636
 
 ```js
 // Drops a cached copy entirely - used when the stored bytes turned out to
@@ -1121,7 +1202,7 @@ Not listed here, because they stay in the built file:
 // from the network and caches a fresh copy.
 ```
 
-**[L1265](./osu-local-favorites.user.js#L1265)** · src L634
+**[L1355](./osu-local-favorites.user.js#L1355)** · src L654
 
 ```js
 // ── Progressive ("while streaming") cache writes ────────────────────
@@ -1149,19 +1230,19 @@ Not listed here, because they stay in the built file:
 // one runs outside the page's CORS sandbox).
 ```
 
-**[L1265](./osu-local-favorites.user.js#L1265)** · src L657
+**[L1355](./osu-local-favorites.user.js#L1355)** · src L677
 
 ```js
 // batch partial writes instead of one per network packet
 ```
 
-**[L1266](./osu-local-favorites.user.js#L1266)** · src L658
+**[L1356](./osu-local-favorites.user.js#L1356)** · src L678
 
 ```js
 // url -> { promise, cancel }
 ```
 
-**[L1338](./osu-local-favorites.user.js#L1338)** · src L730
+**[L1428](./osu-local-favorites.user.js#L1428)** · src L750
 
 ```js
 // The GM_ path: one whole-file request, written in a single go. Used when
@@ -1169,21 +1250,21 @@ Not listed here, because they stay in the built file:
 // landed. Any partial chunks are discarded once the full copy is in.
 ```
 
-**[L1342](./osu-local-favorites.user.js#L1342)** · src L737
+**[L1432](./osu-local-favorites.user.js#L1432)** · src L757
 
 ```js
 // Only a committed write may retire the partial chunks or count as
 // cached; on a failed write they are still the best copy there is.
 ```
 
-**[L1355](./osu-local-favorites.user.js#L1355)** · src L752
+**[L1445](./osu-local-favorites.user.js#L1445)** · src L772
 
 ```js
 // Chunks with no validator cannot be trusted to belong to the bytes the
 // server would send now, so start over rather than resume onto them.
 ```
 
-**[L1371](./osu-local-favorites.user.js#L1371)** · src L770
+**[L1461](./osu-local-favorites.user.js#L1461)** · src L790
 
 ```js
 // A 200 while we asked for a range means If-Range failed (the file
@@ -1191,7 +1272,7 @@ Not listed here, because they stay in the built file:
 // so the chunks on disk no longer line up with it.
 ```
 
-**[L1381](./osu-local-favorites.user.js#L1381)** · src L783
+**[L1471](./osu-local-favorites.user.js#L1471)** · src L803
 
 ```js
 // One stored row per flush (~1 MB), not one per network packet: a
@@ -1199,7 +1280,7 @@ Not listed here, because they stay in the built file:
 // and stitched together at the end.
 ```
 
-**[L1402](./osu-local-favorites.user.js#L1402)** · src L807
+**[L1492](./osu-local-favorites.user.js#L1492)** · src L827
 
 ```js
 // A failed batch leaves a hole, and everything after a hole would be
@@ -1207,13 +1288,13 @@ Not listed here, because they stay in the built file:
 // once after making room, and otherwise stop with a clean prefix.
 ```
 
-**[L1413](./osu-local-favorites.user.js#L1413)** · src L821
+**[L1503](./osu-local-favorites.user.js#L1503)** · src L841
 
 ```js
 // keep what already arrived, for a resume later
 ```
 
-**[L1427](./osu-local-favorites.user.js#L1427)** · src L835
+**[L1517](./osu-local-favorites.user.js#L1517)** · src L855
 
 ```js
 // A connection that dies mid-body can end the stream without an error,
@@ -1223,33 +1304,33 @@ Not listed here, because they stay in the built file:
 // received must match it; otherwise the chunks stay for a resume.
 ```
 
-**[L1433](./osu-local-favorites.user.js#L1433)** · src L846
+**[L1523](./osu-local-favorites.user.js#L1523)** · src L866
 
 ```js
 // Chunks are only retired once the assembled copy is really stored.
 ```
 
-**[L1440](./osu-local-favorites.user.js#L1440)** · src L854
+**[L1530](./osu-local-favorites.user.js#L1530)** · src L874
 
 ```js
 // Nothing usable arrived (CORS-blocked, offline, mirror error) and no
 // bytes were persisted - let the caller try the GM_ whole-file path.
 ```
 
-**[L1450](./osu-local-favorites.user.js#L1450)** · src L866
+**[L1540](./osu-local-favorites.user.js#L1540)** · src L886
 
 ```js
 // Already fully cached (this is the track that is playing from the cache):
 // nothing to download, just make sure no half-file chunks are left behind.
 ```
 
-**[L1454](./osu-local-favorites.user.js#L1454)** · src L872
+**[L1544](./osu-local-favorites.user.js#L1544)** · src L892
 
 ```js
 // A stale/expired entry cannot be resumed onto - drop it with its chunks.
 ```
 
-**[L1466](./osu-local-favorites.user.js#L1466)** · src L885
+**[L1556](./osu-local-favorites.user.js#L1556)** · src L905
 
 ```js
 // Starts caching `url` while it is being streamed by the media element.
@@ -1261,13 +1342,13 @@ Not listed here, because they stay in the built file:
 // packet.
 ```
 
-**[L1488](./osu-local-favorites.user.js#L1488)** · src L914
+**[L1578](./osu-local-favorites.user.js#L1578)** · src L934
 
 ```js
 /* already settled */
 ```
 
-**[L1494](./osu-local-favorites.user.js#L1494)** · src L921
+**[L1584](./osu-local-favorites.user.js#L1584)** · src L941
 
 ```js
 // Used only when the Song metadata could not be read. The mirror's
@@ -1278,9 +1359,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/media-session.js`
 
-12 comments · userscript [L1497](./osu-local-favorites.user.js#L1497) - [L1648](./osu-local-favorites.user.js#L1648)
+13 comments · userscript [L1587](./osu-local-favorites.user.js#L1587) - [L1738](./osu-local-favorites.user.js#L1738)
 
-**[L1497](./osu-local-favorites.user.js#L1497)** · src L4
+**[L1587](./osu-local-favorites.user.js#L1587)** · src L4
 
 ```js
 // ═══ Media Session ═══
@@ -1297,7 +1378,7 @@ Not listed here, because they stay in the built file:
 // playback control that has nothing to do with the OS widget.
 ```
 
-**[L1502](./osu-local-favorites.user.js#L1502)** · src L22
+**[L1592](./osu-local-favorites.user.js#L1592)** · src L22
 
 ```js
 // osu!'s canonical cover renditions and their real pixel dimensions.
@@ -1308,7 +1389,7 @@ Not listed here, because they stay in the built file:
 // cached URL is still offered, just without a size hint.
 ```
 
-**[L1521](./osu-local-favorites.user.js#L1521)** · src L47
+**[L1611](./osu-local-favorites.user.js#L1611)** · src L47
 
 ```js
 // Returns several renditions rather than one. The previous single-entry
@@ -1316,7 +1397,14 @@ Not listed here, because they stay in the built file:
 // which some devices simply refused to decode and rendered as a blank tile.
 ```
 
-**[L1543](./osu-local-favorites.user.js#L1543)** · src L72
+**[L1625](./osu-local-favorites.user.js#L1625)** · src L64
+
+```js
+// Host pinning: covers can arrive from an untrusted import (shared
+// Gists); only osu!/ppy.sh artwork is handed to MediaSession.
+```
+
+**[L1633](./osu-local-favorites.user.js#L1633)** · src L74
 
 ```js
 // Set metadata only when the track actually changed. The old code rebuilt
@@ -1325,14 +1413,14 @@ Not listed here, because they stay in the built file:
 // artwork and, on some builds, resets the OS widget's seek bar.
 ```
 
-**[L1561](./osu-local-favorites.user.js#L1561)** · src L94
+**[L1651](./osu-local-favorites.user.js#L1651)** · src L96
 
 ```js
 // A rejected MediaMetadata (bad artwork URL, unsupported field) must
 // not leave a stale signature behind, or the next attempt is skipped.
 ```
 
-**[L1573](./osu-local-favorites.user.js#L1573)** · src L108
+**[L1663](./osu-local-favorites.user.js#L1663)** · src L110
 
 ```js
 // Firefox for Android can expose a live/cross-origin stream to the media
@@ -1341,7 +1429,7 @@ Not listed here, because they stay in the built file:
 // in rather than publishing the 00:00-00:00 range shown by some devices.
 ```
 
-**[L1585](./osu-local-favorites.user.js#L1585)** · src L124
+**[L1675](./osu-local-favorites.user.js#L1675)** · src L126
 
 ```js
 // playbackRate must be > 0: the spec rejects 0, which is exactly what a
@@ -1350,14 +1438,14 @@ Not listed here, because they stay in the built file:
 // previous track's position for the rest of the session.
 ```
 
-**[L1590](./osu-local-favorites.user.js#L1590)** · src L133
+**[L1680](./osu-local-favorites.user.js#L1680)** · src L135
 
 ```js
 // Some builds reject position updates while media is transitioning
 // between sources; playback itself is unaffected.
 ```
 
-**[L1597](./osu-local-favorites.user.js#L1597)** · src L142
+**[L1687](./osu-local-favorites.user.js#L1687)** · src L144
 
 ```js
 // Called with no argument, this resets the state. The old code never
@@ -1365,13 +1453,13 @@ Not listed here, because they stay in the built file:
 // last track's elapsed time against its full duration.
 ```
 
-**[L1606](./osu-local-favorites.user.js#L1606)** · src L154
+**[L1696](./osu-local-favorites.user.js#L1696)** · src L156
 
 ```js
 // Unsupported action - the browser tells us by throwing.
 ```
 
-**[L1610](./osu-local-favorites.user.js#L1610)** · src L159
+**[L1700](./osu-local-favorites.user.js#L1700)** · src L161
 
 ```js
 // Previous/next are registered separately from the transport controls
@@ -1380,7 +1468,7 @@ Not listed here, because they stay in the built file:
 // silently do nothing whenever playback was started outside the panel.
 ```
 
-**[L1648](./osu-local-favorites.user.js#L1648)** · src L201
+**[L1738](./osu-local-favorites.user.js#L1738)** · src L203
 
 ```js
 // fastSeek is what the spec asks us to honour for scrub gestures; it
@@ -1390,9 +1478,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/audio-player.js`
 
-26 comments · userscript [L1678](./osu-local-favorites.user.js#L1678) - [L1912](./osu-local-favorites.user.js#L1912)
+26 comments · userscript [L1768](./osu-local-favorites.user.js#L1768) - [L2002](./osu-local-favorites.user.js#L2002)
 
-**[L1678](./osu-local-favorites.user.js#L1678)** · src L16
+**[L1768](./osu-local-favorites.user.js#L1768)** · src L16
 
 ```js
 // Singleton <audio> element, shared across every card's preview button
@@ -1403,7 +1491,7 @@ Not listed here, because they stay in the built file:
 // stale the moment that panel is closed and reopened.
 ```
 
-**[L1681](./osu-local-favorites.user.js#L1681)** · src L25
+**[L1771](./osu-local-favorites.user.js#L1771)** · src L25
 
 ```js
 // Keep a real media element alive for the lifetime of the page. Using a
@@ -1416,7 +1504,7 @@ Not listed here, because they stay in the built file:
 // below still starts the request immediately from the user gesture.
 ```
 
-**[L1710](./osu-local-favorites.user.js#L1710)** · src L62
+**[L1800](./osu-local-favorites.user.js#L1800)** · src L62
 
 ```js
 // Source URL this track's bytes are cached under (the network URL, not
@@ -1426,7 +1514,7 @@ Not listed here, because they stay in the built file:
 // has the properties before any track is chosen.
 ```
 
-**[L1712](./osu-local-favorites.user.js#L1712)** · src L69
+**[L1802](./osu-local-favorites.user.js#L1802)** · src L69
 
 ```js
 // Cache-first source selection bookkeeping, owned by
@@ -1436,7 +1524,7 @@ Not listed here, because they stay in the built file:
 // button does not act on the previous track's still-assigned src).
 ```
 
-**[L1723](./osu-local-favorites.user.js#L1723)** · src L85
+**[L1813](./osu-local-favorites.user.js#L1813)** · src L85
 
 ```js
 // Kept as a property so the panel (which owns the Now Playing bar) can
@@ -1444,7 +1532,7 @@ Not listed here, because they stay in the built file:
 // importing the media-session module itself.
 ```
 
-**[L1729](./osu-local-favorites.user.js#L1729)** · src L94
+**[L1819](./osu-local-favorites.user.js#L1819)** · src L94
 
 ```js
 // Queue availability can change between tracks (a preview started from
@@ -1453,14 +1541,14 @@ Not listed here, because they stay in the built file:
 // element creation.
 ```
 
-**[L1736](./osu-local-favorites.user.js#L1736)** · src L105
+**[L1826](./osu-local-favorites.user.js#L1826)** · src L105
 
 ```js
 // Freeze the OS widget at the exact paused position rather than
 // whatever it last extrapolated to.
 ```
 
-**[L1738](./osu-local-favorites.user.js#L1738)** · src L109
+**[L1828](./osu-local-favorites.user.js#L1828)** · src L109
 
 ```js
 // Deliberately NOT bound to "timeupdate": that event fires every ~250ms
@@ -1475,7 +1563,7 @@ Not listed here, because they stay in the built file:
 // updates; we only need to call it on real discontinuities.
 ```
 
-**[L1758](./osu-local-favorites.user.js#L1758)** · src L139
+**[L1848](./osu-local-favorites.user.js#L1848)** · src L139
 
 ```js
 // The source has moved off the mirror URL; stop treating a local copy of
@@ -1483,7 +1571,7 @@ Not listed here, because they stay in the built file:
 // the fallback URL from here on.
 ```
 
-**[L1761](./osu-local-favorites.user.js#L1761)** · src L145
+**[L1851](./osu-local-favorites.user.js#L1851)** · src L145
 
 ```js
 // Cache-first for the official preview too: when a fresh local copy
@@ -1496,7 +1584,7 @@ Not listed here, because they stay in the built file:
 // retries from the network once.
 ```
 
-**[L1778](./osu-local-favorites.user.js#L1778)** · src L170
+**[L1868](./osu-local-favorites.user.js#L1868)** · src L170
 
 ```js
 // Source replacement can make Firefox briefly report the failed mirror
@@ -1505,7 +1593,7 @@ Not listed here, because they stay in the built file:
 // selected track can still remove it normally.
 ```
 
-**[L1797](./osu-local-favorites.user.js#L1797)** · src L193
+**[L1887](./osu-local-favorites.user.js#L1887)** · src L193
 
 ```js
 // The fallback can be selected from an asynchronous media error,
@@ -1521,7 +1609,7 @@ Not listed here, because they stay in the built file:
 // makes the same decision, from state that is actually reachable.
 ```
 
-**[L1808](./osu-local-favorites.user.js#L1808)** · src L215
+**[L1898](./osu-local-favorites.user.js#L1898)** · src L215
 
 ```js
 // Container/MP3 duration rounding is normally sub-second. Permit a
@@ -1529,14 +1617,14 @@ Not listed here, because they stay in the built file:
 // mistaken for a full track.
 ```
 
-**[L1814](./osu-local-favorites.user.js#L1814)** · src L224
+**[L1904](./osu-local-favorites.user.js#L1904)** · src L224
 
 ```js
 // Returns true when it has swapped the source, so callers know the
 // metadata they are looking at belongs to a clip being discarded.
 ```
 
-**[L1821](./osu-local-favorites.user.js#L1821)** · src L233
+**[L1911](./osu-local-favorites.user.js#L1911)** · src L233
 
 ```js
 // One handler for everything that has to happen when metadata arrives.
@@ -1547,7 +1635,7 @@ Not listed here, because they stay in the built file:
 // throw away.
 ```
 
-**[L1822](./osu-local-favorites.user.js#L1822)** · src L240
+**[L1912](./osu-local-favorites.user.js#L1912)** · src L240
 
 ```js
 // The mirror endpoint uses a short osu! clip when it has no full
@@ -1555,7 +1643,7 @@ Not listed here, because they stay in the built file:
 // short full song as that fallback.
 ```
 
-**[L1827](./osu-local-favorites.user.js#L1827)** · src L248
+**[L1917](./osu-local-favorites.user.js#L1917)** · src L248
 
 ```js
 // A mirror can be cold, unavailable, or return a response Firefox cannot
@@ -1564,7 +1652,7 @@ Not listed here, because they stay in the built file:
 // newly selected one.
 ```
 
-**[L1830](./osu-local-favorites.user.js#L1830)** · src L255
+**[L1920](./osu-local-favorites.user.js#L1920)** · src L255
 
 ```js
 // A local copy that will not decode (an interrupted write, storage
@@ -1575,14 +1663,14 @@ Not listed here, because they stay in the built file:
 // official preview by the branch below.
 ```
 
-**[L1841](./osu-local-favorites.user.js#L1841)** · src L272
+**[L1931](./osu-local-favorites.user.js#L1931)** · src L272
 
 ```js
 // Not seekable until metadata for the retry is in - fine, it starts
 // from the top.
 ```
 
-**[L1854](./osu-local-favorites.user.js#L1854)** · src L287
+**[L1944](./osu-local-favorites.user.js#L1944)** · src L287
 
 ```js
 // The fallback is normally the raw official URL, but it is a blob: URL
@@ -1590,7 +1678,7 @@ Not listed here, because they stay in the built file:
 // whichever source it actually selected.
 ```
 
-**[L1861](./osu-local-favorites.user.js#L1861)** · src L297
+**[L1951](./osu-local-favorites.user.js#L1951)** · src L297
 
 ```js
 // Do NOT clearMediaSession() before a loop/auto-next: nulling the
@@ -1603,7 +1691,7 @@ Not listed here, because they stay in the built file:
 // session on the branch below where playback is actually stopping.
 ```
 
-**[L1863](./osu-local-favorites.user.js#L1863)** · src L307
+**[L1953](./osu-local-favorites.user.js#L1953)** · src L307
 
 ```js
 // A rejected play() here (autoplay policy after a long lock-screen
@@ -1611,7 +1699,7 @@ Not listed here, because they stay in the built file:
 // OS widget advertising "playing" for audio that had stopped.
 ```
 
-**[L1882](./osu-local-favorites.user.js#L1882)** · src L329
+**[L1972](./osu-local-favorites.user.js#L1972)** · src L329
 
 ```js
 // Single teardown for "playback has stopped for good" - end of queue, or
@@ -1625,20 +1713,20 @@ Not listed here, because they stay in the built file:
 // guard, which throws if the row was re-rendered while the clip loaded.
 ```
 
-**[L1905](./osu-local-favorites.user.js#L1905)** · src L361
+**[L1995](./osu-local-favorites.user.js#L1995)** · src L361
 
 ```js
 // Drop the now-dead skip handlers too, so the OS widget stops offering
 // next/previous for a queue that no longer exists.
 ```
 
-**[L1909](./osu-local-favorites.user.js#L1909)** · src L367
+**[L1999](./osu-local-favorites.user.js#L1999)** · src L367
 
 ```js
 // Called by the panel when a source fails before any card binding exists.
 ```
 
-**[L1912](./osu-local-favorites.user.js#L1912)** · src L372
+**[L2002](./osu-local-favorites.user.js#L2002)** · src L372
 
 ```js
 // Builds the ordered list of download options for a beatmapset. Official
@@ -1651,9 +1739,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/popup-menu.js`
 
-3 comments · userscript [L1915](./osu-local-favorites.user.js#L1915) - [L1949](./osu-local-favorites.user.js#L1949)
+3 comments · userscript [L2005](./osu-local-favorites.user.js#L2005) - [L2039](./osu-local-favorites.user.js#L2039)
 
-**[L1915](./osu-local-favorites.user.js#L1915)** · src L1
+**[L2005](./osu-local-favorites.user.js#L2005)** · src L1
 
 ```js
 // Shared shell for the small floating popovers (download, collections,
@@ -1666,14 +1754,14 @@ Not listed here, because they stay in the built file:
 // anchor. Otherwise { menu, cleanup, show }: fill `menu`, then call show().
 ```
 
-**[L1930](./osu-local-favorites.user.js#L1930)** · src L24
+**[L2020](./osu-local-favorites.user.js#L2020)** · src L24
 
 ```js
 // A scroll *inside* the menu (long genre/tag or collections list) must not
 // close it; only page/panel scrolls that move the anchor away do.
 ```
 
-**[L1949](./osu-local-favorites.user.js#L1949)** · src L45
+**[L2039](./osu-local-favorites.user.js#L2039)** · src L45
 
 ```js
 // Deferred so the click that opened the menu doesn't immediately close it.
@@ -1682,9 +1770,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/download-menu.js`
 
-2 comments · userscript [L1985](./osu-local-favorites.user.js#L1985) - [L2021](./osu-local-favorites.user.js#L2021)
+2 comments · userscript [L2075](./osu-local-favorites.user.js#L2075) - [L2111](./osu-local-favorites.user.js#L2111)
 
-**[L1985](./osu-local-favorites.user.js#L1985)** · src L33
+**[L2075](./osu-local-favorites.user.js#L2075)** · src L33
 
 ```js
 // Shows a small popover of download options (official + enabled mirrors)
@@ -1694,7 +1782,7 @@ Not listed here, because they stay in the built file:
 // scrolls out from under it.
 ```
 
-**[L2021](./osu-local-favorites.user.js#L2021)** · src L75
+**[L2111](./osu-local-favorites.user.js#L2111)** · src L75
 
 ```js
 // ── Genre + Tags term collection ──
@@ -1718,9 +1806,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/genre-filter.js`
 
-4 comments · userscript [L2024](./osu-local-favorites.user.js#L2024) - [L2056](./osu-local-favorites.user.js#L2056)
+4 comments · userscript [L2114](./osu-local-favorites.user.js#L2114) - [L2146](./osu-local-favorites.user.js#L2146)
 
-**[L2024](./osu-local-favorites.user.js#L2024)** · src L1
+**[L2114](./osu-local-favorites.user.js#L2114)** · src L1
 
 ```js
 // ── Genre + tag term extraction ──
@@ -1729,19 +1817,19 @@ Not listed here, because they stay in the built file:
 // what counts as a genre, what counts as a tag, and how a tag is spelled.
 ```
 
-**[L2031](./osu-local-favorites.user.js#L2031)** · src L12
+**[L2121](./osu-local-favorites.user.js#L2121)** · src L12
 
 ```js
 // lowercase key -> { display, count }
 ```
 
-**[L2052](./osu-local-favorites.user.js#L2052)** · src L33
+**[L2142](./osu-local-favorites.user.js#L2142)** · src L33
 
 ```js
 // A term that's ever used as an actual genre value is a genre, not a tag.
 ```
 
-**[L2056](./osu-local-favorites.user.js#L2056)** · src L38
+**[L2146](./osu-local-favorites.user.js#L2146)** · src L38
 
 ```js
 // Whether a favorite matches a given genre/tag filter key (both compared
@@ -1752,9 +1840,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/filter-menu.js`
 
-6 comments · userscript [L2066](./osu-local-favorites.user.js#L2066) - [L2252](./osu-local-favorites.user.js#L2252)
+6 comments · userscript [L2156](./osu-local-favorites.user.js#L2156) - [L2342](./osu-local-favorites.user.js#L2342)
 
-**[L2066](./osu-local-favorites.user.js#L2066)** · src L3
+**[L2156](./osu-local-favorites.user.js#L2156)** · src L3
 
 ```js
 // ── Generic filter popover ──
@@ -1791,7 +1879,7 @@ Not listed here, because they stay in the built file:
 //   onSortSelect(asc) -> called on a sort pick; omitted if sortOptions is
 ```
 
-**[L2068](./osu-local-favorites.user.js#L2068)** · src L38
+**[L2158](./osu-local-favorites.user.js#L2158)** · src L38
 
 ```js
 // Long lists (tags, artists) used to build a DOM row per term on open,
@@ -1799,7 +1887,7 @@ Not listed here, because they stay in the built file:
 // capped; the live filter box (with its own larger cap) reaches the rest.
 ```
 
-**[L2084](./osu-local-favorites.user.js#L2084)** · src L57
+**[L2174](./osu-local-favorites.user.js#L2174)** · src L57
 
 ```js
 // ── Sort row ──
@@ -1809,19 +1897,19 @@ Not listed here, because they stay in the built file:
 // so the two options just swap which one is highlighted.
 ```
 
-**[L2111](./osu-local-favorites.user.js#L2111)** · src L89
+**[L2201](./osu-local-favorites.user.js#L2201)** · src L89
 
 ```js
 // already active
 ```
 
-**[L2181](./osu-local-favorites.user.js#L2181)** · src L159
+**[L2271](./osu-local-favorites.user.js#L2271)** · src L159
 
 ```js
 // Build off-DOM, then attach once - avoids a forced layout per row.
 ```
 
-**[L2252](./osu-local-favorites.user.js#L2252)** · src L231
+**[L2342](./osu-local-favorites.user.js#L2342)** · src L231
 
 ```js
 // Closes whichever filter popover is open, if any. Used when the panel is
@@ -1832,9 +1920,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/filters.js`
 
-7 comments · userscript [L2258](./osu-local-favorites.user.js#L2258) - [L2527](./osu-local-favorites.user.js#L2527)
+7 comments · userscript [L2348](./osu-local-favorites.user.js#L2348) - [L2617](./osu-local-favorites.user.js#L2617)
 
-**[L2258](./osu-local-favorites.user.js#L2258)** · src L4
+**[L2348](./osu-local-favorites.user.js#L2348)** · src L4
 
 ```js
 // ── Toolbar filter categories ──
@@ -1852,7 +1940,7 @@ Not listed here, because they stay in the built file:
 // row in ui/main-panel.js.
 ```
 
-**[L2260](./osu-local-favorites.user.js#L2260)** · src L20
+**[L2350](./osu-local-favorites.user.js#L2350)** · src L20
 
 ```js
 // Date terms are deliberately cumulative ranges rather than disjoint
@@ -1860,7 +1948,7 @@ Not listed here, because they stay in the built file:
 // is how anyone reads a date filter. Counts follow the same rule.
 ```
 
-**[L2301](./osu-local-favorites.user.js#L2301)** · src L64
+**[L2391](./osu-local-favorites.user.js#L2391)** · src L64
 
 ```js
 // Title has no natural taxonomy, so it filters by first character - the
@@ -1868,7 +1956,7 @@ Not listed here, because they stay in the built file:
 // on osu!) collapse into one "Other" row rather than being dropped.
 ```
 
-**[L2364](./osu-local-favorites.user.js#L2364)** · src L130
+**[L2454](./osu-local-favorites.user.js#L2454)** · src L130
 
 ```js
 // osu!'s own ranking states, in the order the website presents them rather
@@ -1876,7 +1964,7 @@ Not listed here, because they stay in the built file:
 // is harder to use than a fixed one.
 ```
 
-**[L2419](./osu-local-favorites.user.js#L2419)** · src L188
+**[L2509](./osu-local-favorites.user.js#L2509)** · src L188
 
 ```js
 // A category with `sortField` set also drives the main list's ordering, and
@@ -1889,14 +1977,14 @@ Not listed here, because they stay in the built file:
 // stays filter-only.
 ```
 
-**[L2503](./osu-local-favorites.user.js#L2503)** · src L280
+**[L2593](./osu-local-favorites.user.js#L2593)** · src L280
 
 ```js
 // Flattening the state once per render, rather than per favorite, keeps a
 // 500-row rebuild from re-deriving the same include/exclude lists 500 times.
 ```
 
-**[L2527](./osu-local-favorites.user.js#L2527)** · src L306
+**[L2617](./osu-local-favorites.user.js#L2617)** · src L306
 
 ```js
 // Convenience wrapper for the popover: hands each category the current
@@ -1906,9 +1994,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/collections-menu.js`
 
-1 comments · userscript [L2647](./osu-local-favorites.user.js#L2647) - [L2647](./osu-local-favorites.user.js#L2647)
+1 comments · userscript [L2737](./osu-local-favorites.user.js#L2737) - [L2737](./osu-local-favorites.user.js#L2737)
 
-**[L2647](./osu-local-favorites.user.js#L2647)** · src L119
+**[L2737](./osu-local-favorites.user.js#L2737)** · src L119
 
 ```js
 // ── Per-card "add to collection" popover ──
@@ -1919,40 +2007,40 @@ Not listed here, because they stay in the built file:
 
 ## `src/api/gist-backup.js`
 
-11 comments · userscript [L2732](./osu-local-favorites.user.js#L2732) - [L2854](./osu-local-favorites.user.js#L2854)
+11 comments · userscript [L2822](./osu-local-favorites.user.js#L2822) - [L2944](./osu-local-favorites.user.js#L2944)
 
-**[L2732](./osu-local-favorites.user.js#L2732)** · src L3
+**[L2822](./osu-local-favorites.user.js#L2822)** · src L3
 
 ```js
 // ═══ GitHub Gist Backup ═══
 ```
 
-**[L2734](./osu-local-favorites.user.js#L2734)** · src L6
+**[L2824](./osu-local-favorites.user.js#L2824)** · src L6
 
 ```js
 // ── osu! API v2 (OAuth2 authorization-code) storage keys ──
 ```
 
-**[L2736](./osu-local-favorites.user.js#L2736)** · src L9
+**[L2826](./osu-local-favorites.user.js#L2826)** · src L9
 
 ```js
 // {access,refresh,expires_at}
 ```
 
-**[L2739](./osu-local-favorites.user.js#L2739)** · src L12
+**[L2829](./osu-local-favorites.user.js#L2829)** · src L12
 
 ```js
 // The redirect URI users must register on their osu! OAuth application.
 // Must match EXACTLY (scheme/host/path, no trailing slash).
 ```
 
-**[L2744](./osu-local-favorites.user.js#L2744)** · src L19
+**[L2834](./osu-local-favorites.user.js#L2834)** · src L19
 
 ```js
 // "private" | "public"
 ```
 
-**[L2787](./osu-local-favorites.user.js#L2787)** · src L62
+**[L2877](./osu-local-favorites.user.js#L2877)** · src L62
 
 ```js
 // Looks for a gist already containing our backup filename - lets a
@@ -1960,7 +2048,7 @@ Not listed here, because they stay in the built file:
 // silently creating a duplicate.
 ```
 
-**[L2794](./osu-local-favorites.user.js#L2794)** · src L72
+**[L2884](./osu-local-favorites.user.js#L2884)** · src L72
 
 ```js
 // GitHub reports each gist's real visibility as a boolean `public` on the
@@ -1969,14 +2057,14 @@ Not listed here, because they stay in the built file:
 // for a linked gist, and only decides visibility for a gist not yet created.
 ```
 
-**[L2799](./osu-local-favorites.user.js#L2799)** · src L81
+**[L2889](./osu-local-favorites.user.js#L2889)** · src L81
 
 ```js
 // Links a gist as the backup target and adopts its real visibility, so the
 // Settings toggle shows what the gist actually is instead of a default.
 ```
 
-**[L2808](./osu-local-favorites.user.js#L2808)** · src L92
+**[L2898](./osu-local-favorites.user.js#L2898)** · src L92
 
 ```js
 // Asks GitHub what a linked gist really is, and syncs the stored setting to
@@ -1985,14 +2073,14 @@ Not listed here, because they stay in the built file:
 // the setting alone rather than guess.
 ```
 
-**[L2830](./osu-local-favorites.user.js#L2830)** · src L118
+**[L2920](./osu-local-favorites.user.js#L2920)** · src L118
 
 ```js
 // Fetches and parses the backup file from a gist. Falls back to raw_url
 // when GitHub truncates large file content in the API response.
 ```
 
-**[L2854](./osu-local-favorites.user.js#L2854)** · src L144
+**[L2944](./osu-local-favorites.user.js#L2944)** · src L144
 
 ```js
 // Pulls a gist id out of either a raw id or a pasted gist URL
@@ -2002,9 +2090,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/api/osu-api.js`
 
-31 comments · userscript [L2863](./osu-local-favorites.user.js#L2863) - [L3110](./osu-local-favorites.user.js#L3110)
+31 comments · userscript [L2953](./osu-local-favorites.user.js#L2953) - [L3200](./osu-local-favorites.user.js#L3200)
 
-**[L2863](./osu-local-favorites.user.js#L2863)** · src L8
+**[L2953](./osu-local-favorites.user.js#L2953)** · src L8
 
 ```js
 // ═══ osu! API v2 - OAuth2 authorization-code flow ═══
@@ -2024,13 +2112,13 @@ Not listed here, because they stay in the built file:
 // fetch() works - no GM_xmlhttpRequest / CORS involved.
 ```
 
-**[L2876](./osu-local-favorites.user.js#L2876)** · src L37
+**[L2966](./osu-local-favorites.user.js#L2966)** · src L37
 
 ```js
 // Random state guards against CSRF on the callback.
 ```
 
-**[L2885](./osu-local-favorites.user.js#L2885)** · src L47
+**[L2975](./osu-local-favorites.user.js#L2975)** · src L47
 
 ```js
 // osu! answers /oauth/authorize with 401 (rendered as a plain browser
@@ -2040,14 +2128,14 @@ Not listed here, because they stay in the built file:
 // of leaving them on an opaque error page.
 ```
 
-**[L2903](./osu-local-favorites.user.js#L2903)** · src L70
+**[L2993](./osu-local-favorites.user.js#L2993)** · src L70
 
 ```js
 // Pre-flight itself failed (offline etc.) - still attempt the redirect,
 // the browser will surface its own error.
 ```
 
-**[L2908](./osu-local-favorites.user.js#L2908)** · src L77
+**[L2998](./osu-local-favorites.user.js#L2998)** · src L77
 
 ```js
 // osu! documents this endpoint as application/x-www-form-urlencoded. A
@@ -2055,13 +2143,13 @@ Not listed here, because they stay in the built file:
 // user successfully approves the app.
 ```
 
-**[L2937](./osu-local-favorites.user.js#L2937)** · src L109
+**[L3027](./osu-local-favorites.user.js#L3027)** · src L109
 
 ```js
 // refresh 1 min early
 ```
 
-**[L2941](./osu-local-favorites.user.js#L2941)** · src L113
+**[L3031](./osu-local-favorites.user.js#L3031)** · src L113
 
 ```js
 // Returns a Promise<string> with a valid access token. Refreshes (and
@@ -2069,13 +2157,13 @@ Not listed here, because they stay in the built file:
 // or when both access and refresh tokens are dead.
 ```
 
-**[L2948](./osu-local-favorites.user.js#L2948)** · src L123
+**[L3038](./osu-local-favorites.user.js#L3038)** · src L123
 
 ```js
 // Deduplicate concurrent refreshes
 ```
 
-**[L2949](./osu-local-favorites.user.js#L2949)** · src L125
+**[L3039](./osu-local-favorites.user.js#L3039)** · src L125
 
 ```js
 // Per osu! docs: the refresh grant is also form-urlencoded and re-states
@@ -2084,13 +2172,13 @@ Not listed here, because they stay in the built file:
 // normalization surprises.
 ```
 
-**[L2959](./osu-local-favorites.user.js#L2959)** · src L139
+**[L3049](./osu-local-favorites.user.js#L3049)** · src L139
 
 ```js
 // Refresh dead → force a clean reconnect
 ```
 
-**[L2967](./osu-local-favorites.user.js#L2967)** · src L148
+**[L3057](./osu-local-favorites.user.js#L3057)** · src L148
 
 ```js
 // ── Rate limiting / queuing (per https://osu.ppy.sh/docs/index.html) ──
@@ -2100,82 +2188,82 @@ Not listed here, because they stay in the built file:
 // compliant regardless of where the call originates.
 ```
 
-**[L2967](./osu-local-favorites.user.js#L2967)** · src L153
+**[L3057](./osu-local-favorites.user.js#L3057)** · src L153
 
 ```js
 // ≥1s between requests
 ```
 
-**[L2968](./osu-local-favorites.user.js#L2968)** · src L154
+**[L3058](./osu-local-favorites.user.js#L3058)** · src L154
 
 ```js
 // serializes request pacing
 ```
 
-**[L2969](./osu-local-favorites.user.js#L2969)** · src L155
+**[L3059](./osu-local-favorites.user.js#L3059)** · src L155
 
 ```js
 // absolute ts while server says wait
 ```
 
-**[L2970](./osu-local-favorites.user.js#L2970)** · src L156
+**[L3060](./osu-local-favorites.user.js#L3060)** · src L156
 
 ```js
 // grows exponentially on repeat 429s
 ```
 
-**[L2971](./osu-local-favorites.user.js#L2971)** · src L157
+**[L3061](./osu-local-favorites.user.js#L3061)** · src L157
 
 ```js
 // path → response JSON (session cache)
 ```
 
-**[L2978](./osu-local-favorites.user.js#L2978)** · src L164
+**[L3068](./osu-local-favorites.user.js#L3068)** · src L164
 
 ```js
 // Serializes every API call through one queue with ≥OSU_API_MIN_GAP_MS
 // spacing, plus any server-mandated or backoff wait before dispatching.
 ```
 
-**[L2994](./osu-local-favorites.user.js#L2994)** · src L182
+**[L3084](./osu-local-favorites.user.js#L3084)** · src L182
 
 ```js
 // Docs good-practice #4: cache retrieved data and reuse it.
 ```
 
-**[L3002](./osu-local-favorites.user.js#L3002)** · src L191
+**[L3092](./osu-local-favorites.user.js#L3092)** · src L191
 
 ```js
 // Honor the server's Retry-After, then apply exponential backoff
 // for any further 429s (docs good-practice #3).
 ```
 
-**[L3008](./osu-local-favorites.user.js#L3008)** · src L199
+**[L3098](./osu-local-favorites.user.js#L3098)** · src L199
 
 ```js
 // successful window - reset backoff
 ```
 
-**[L3010](./osu-local-favorites.user.js#L3010)** · src L201
+**[L3100](./osu-local-favorites.user.js#L3100)** · src L201
 
 ```js
 // Access token died early (revoked/password change): drop cached
 // token so the next osuApiGetToken() refreshes, then retry once.
 ```
 
-**[L3022](./osu-local-favorites.user.js#L3022)** · src L215
+**[L3112](./osu-local-favorites.user.js#L3112)** · src L215
 
 ```js
 // One transparent retry after a rate-limit wait has elapsed.
 ```
 
-**[L3038](./osu-local-favorites.user.js#L3038)** · src L232
+**[L3128](./osu-local-favorites.user.js#L3128)** · src L232
 
 ```js
 // Evict oldest inserted entry
 ```
 
-**[L3049](./osu-local-favorites.user.js#L3049)** · src L244
+**[L3139](./osu-local-favorites.user.js#L3139)** · src L244
 
 ```js
 // Runs once at document-start. If we're back on osu.ppy.sh with ?code= &
@@ -2183,19 +2271,19 @@ Not listed here, because they stay in the built file:
 // renders its 404 page, then rewrite the URL clean.
 ```
 
-**[L3057](./osu-local-favorites.user.js#L3057)** · src L255
+**[L3147](./osu-local-favorites.user.js#L3147)** · src L255
 
 ```js
 // hide ?code=… immediately
 ```
 
-**[L3069](./osu-local-favorites.user.js#L3069)** · src L267
+**[L3159](./osu-local-favorites.user.js#L3159)** · src L267
 
 ```js
 /* never break page load over this */
 ```
 
-**[L3072](./osu-local-favorites.user.js#L3072)** · src L270
+**[L3162](./osu-local-favorites.user.js#L3162)** · src L270
 
 ```js
 // Fetches a beatmapset through the API v2 and normalizes it into LOF's
@@ -2203,7 +2291,7 @@ Not listed here, because they stay in the built file:
 // website's embedded JSON is basically the same object as the API payload).
 ```
 
-**[L3075](./osu-local-favorites.user.js#L3075)** · src L276
+**[L3165](./osu-local-favorites.user.js#L3165)** · src L276
 
 ```js
 // The API does not always include the featured-artist marker. `null`
@@ -2211,7 +2299,7 @@ Not listed here, because they stay in the built file:
 // the existing favorite instead of turning it off during re-enrichment.
 ```
 
-**[L3079](./osu-local-favorites.user.js#L3079)** · src L283
+**[L3169](./osu-local-favorites.user.js#L3169)** · src L283
 
 ```js
 // Creates the backup gist on first run, otherwise updates the linked one.
@@ -2223,7 +2311,7 @@ Not listed here, because they stay in the built file:
 // equal to what the linked gist actually is.
 ```
 
-**[L3097](./osu-local-favorites.user.js#L3097)** · src L308
+**[L3187](./osu-local-favorites.user.js#L3187)** · src L308
 
 ```js
 // A user can delete the linked gist directly on GitHub. Treat its 404
@@ -2231,7 +2319,7 @@ Not listed here, because they stay in the built file:
 // manual and automatic backups recover on the same attempt.
 ```
 
-**[L3110](./osu-local-favorites.user.js#L3110)** · src L324
+**[L3200](./osu-local-favorites.user.js#L3200)** · src L324
 
 ```js
 // Debounced auto-backup - call this after every favorites mutation.
@@ -2243,9 +2331,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/data/beatmap-extraction.js`
 
-15 comments · userscript [L3129](./osu-local-favorites.user.js#L3129) - [L3362](./osu-local-favorites.user.js#L3362)
+15 comments · userscript [L3219](./osu-local-favorites.user.js#L3219) - [L3452](./osu-local-favorites.user.js#L3452)
 
-**[L3129](./osu-local-favorites.user.js#L3129)** · src L1
+**[L3219](./osu-local-favorites.user.js#L3219)** · src L1
 
 ```js
 // ═══ Beatmap data extraction ═══
@@ -2255,13 +2343,13 @@ Not listed here, because they stay in the built file:
 // passes false, the API path passes null so enrichment can keep a known value.
 ```
 
-**[L3173](./osu-local-favorites.user.js#L3173)** · src L50
+**[L3263](./osu-local-favorites.user.js#L3263)** · src L50
 
 ```js
 // Skip cards inside pinned scores section
 ```
 
-**[L3186](./osu-local-favorites.user.js#L3186)** · src L64
+**[L3276](./osu-local-favorites.user.js#L3276)** · src L64
 
 ```js
 // ── Title ────────────────────────────────────────────────────
@@ -2271,7 +2359,7 @@ Not listed here, because they stay in the built file:
 // since we're favouriting the *set*, not one specific diff.
 ```
 
-**[L3204](./osu-local-favorites.user.js#L3204)** · src L87
+**[L3294](./osu-local-favorites.user.js#L3294)** · src L87
 
 ```js
 // ── Artist ───────────────────────────────────────────────────
@@ -2280,68 +2368,68 @@ Not listed here, because they stay in the built file:
 // play counts / fav counts / dates to bleed into the artist field.
 ```
 
-**[L3210](./osu-local-favorites.user.js#L3210)** · src L97
+**[L3300](./osu-local-favorites.user.js#L3300)** · src L97
 
 ```js
 // Most Played rows - text is "by Artist", stripped below
 ```
 
-**[L3240](./osu-local-favorites.user.js#L3240)** · src L127
+**[L3330](./osu-local-favorites.user.js#L3330)** · src L127
 
 ```js
 // ── Creator (mapper) ─────────────────────────────────────────
 ```
 
-**[L3246](./osu-local-favorites.user.js#L3246)** · src L134
+**[L3336](./osu-local-favorites.user.js#L3336)** · src L134
 
 ```js
 // Most Played rows - username only, no "mapped by " text to strip
 ```
 
-**[L3279](./osu-local-favorites.user.js#L3279)** · src L167
+**[L3369](./osu-local-favorites.user.js#L3369)** · src L167
 
 ```js
 // source is not present in listing card DOM - leave blank rather than
 // accidentally capturing stats / date text from info-row nodes
 ```
 
-**[L3281](./osu-local-favorites.user.js#L3281)** · src L171
+**[L3371](./osu-local-favorites.user.js#L3371)** · src L171
 
 ```js
 // Extract cover URL - try multiple methods
 ```
 
-**[L3283](./osu-local-favorites.user.js#L3283)** · src L174
+**[L3373](./osu-local-favorites.user.js#L3373)** · src L174
 
 ```js
 // Method 1: computed style --bg custom property on cover element
 ```
 
-**[L3292](./osu-local-favorites.user.js#L3292)** · src L184
+**[L3382](./osu-local-favorites.user.js#L3382)** · src L184
 
 ```js
 // Method 2: img inside cover
 ```
 
-**[L3300](./osu-local-favorites.user.js#L3300)** · src L193
+**[L3390](./osu-local-favorites.user.js#L3390)** · src L193
 
 ```js
 // Method 3: any img in card that looks like a cover
 ```
 
-**[L3310](./osu-local-favorites.user.js#L3310)** · src L204
+**[L3400](./osu-local-favorites.user.js#L3400)** · src L204
 
 ```js
 // First image that's not an icon
 ```
 
-**[L3319](./osu-local-favorites.user.js#L3319)** · src L214
+**[L3409](./osu-local-favorites.user.js#L3409)** · src L214
 
 ```js
 // Normalize URL
 ```
 
-**[L3362](./osu-local-favorites.user.js#L3362)** · src L258
+**[L3452](./osu-local-favorites.user.js#L3452)** · src L258
 
 ```js
 // Walk up from the button and find the smallest ancestor that contains
@@ -2359,22 +2447,22 @@ Not listed here, because they stay in the built file:
 
 ## `src/data/favorite-detection.js`
 
-7 comments · userscript [L3385](./osu-local-favorites.user.js#L3385) - [L3451](./osu-local-favorites.user.js#L3451)
+7 comments · userscript [L3475](./osu-local-favorites.user.js#L3475) - [L3541](./osu-local-favorites.user.js#L3541)
 
-**[L3385](./osu-local-favorites.user.js#L3385)** · src L3
+**[L3475](./osu-local-favorites.user.js#L3475)** · src L3
 
 ```js
 // ═══ Favorite button detection ═══
 // Accepts BUTTON, A, and SPAN elements (the guest-disabled span on listing pages).
 ```
 
-**[L3400](./osu-local-favorites.user.js#L3400)** · src L20
+**[L3490](./osu-local-favorites.user.js#L3490)** · src L20
 
 ```js
 // Reject download buttons immediately - never treat them as fav buttons
 ```
 
-**[L3407](./osu-local-favorites.user.js#L3407)** · src L28
+**[L3497](./osu-local-favorites.user.js#L3497)** · src L28
 
 ```js
 // ── Fast path: the guest-disabled span osu! renders when not signed in ──
@@ -2384,19 +2472,19 @@ Not listed here, because they stay in the built file:
 // </span>
 ```
 
-**[L3414](./osu-local-favorites.user.js#L3414)** · src L40
+**[L3504](./osu-local-favorites.user.js#L3504)** · src L40
 
 ```js
 // For SPANs that aren't the specific menu-item, require them to look like a fav button
 ```
 
-**[L3416](./osu-local-favorites.user.js#L3416)** · src L43
+**[L3506](./osu-local-favorites.user.js#L3506)** · src L43
 
 ```js
 // Only match spans that contain a heart icon and are inside a beatmap panel
 ```
 
-**[L3424](./osu-local-favorites.user.js#L3424)** · src L52
+**[L3514](./osu-local-favorites.user.js#L3514)** · src L52
 
 ```js
 // BUTTON / A checks below
@@ -2407,7 +2495,7 @@ Not listed here, because they stay in the built file:
 // spurious "couldn't resolve a beatmap id" errors.
 ```
 
-**[L3451](./osu-local-favorites.user.js#L3451)** · src L85
+**[L3541](./osu-local-favorites.user.js#L3541)** · src L85
 
 ```js
 // title and text are already declared at top of function - reuse them
@@ -2416,21 +2504,21 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/heart-visual.js`
 
-4 comments · userscript [L3485](./osu-local-favorites.user.js#L3485) - [L3501](./osu-local-favorites.user.js#L3501)
+4 comments · userscript [L3575](./osu-local-favorites.user.js#L3575) - [L3591](./osu-local-favorites.user.js#L3591)
 
-**[L3485](./osu-local-favorites.user.js#L3485)** · src L1
+**[L3575](./osu-local-favorites.user.js#L3575)** · src L1
 
 ```js
 // ═══ Visual helpers ═══
 ```
 
-**[L3486](./osu-local-favorites.user.js#L3486)** · src L3
+**[L3576](./osu-local-favorites.user.js#L3576)** · src L3
 
 ```js
 // Update FontAwesome heart solid/outline.
 ```
 
-**[L3492](./osu-local-favorites.user.js#L3492)** · src L10
+**[L3582](./osu-local-favorites.user.js#L3582)** · src L10
 
 ```js
 // osu! uses SVG heart icons in some layouts. Those buttons are detected by
@@ -2438,7 +2526,7 @@ Not listed here, because they stay in the built file:
 // markup, so the click was persisted while the page heart stayed unchanged.
 ```
 
-**[L3501](./osu-local-favorites.user.js#L3501)** · src L22
+**[L3591](./osu-local-favorites.user.js#L3591)** · src L22
 
 ```js
 // Also update the container span's disabled/active look
@@ -2447,9 +2535,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/data/enrichment.js`
 
-15 comments · userscript [L3518](./osu-local-favorites.user.js#L3518) - [L3662](./osu-local-favorites.user.js#L3662)
+15 comments · userscript [L3608](./osu-local-favorites.user.js#L3608) - [L3752](./osu-local-favorites.user.js#L3752)
 
-**[L3518](./osu-local-favorites.user.js#L3518)** · src L6
+**[L3608](./osu-local-favorites.user.js#L3608)** · src L6
 
 ```js
 // ═══ Background enrichment ═══
@@ -2458,7 +2546,7 @@ Not listed here, because they stay in the built file:
 // (bulk "Favorite all" import or a full-library re-enrichment) is driving it.
 ```
 
-**[L3520](./osu-local-favorites.user.js#L3520)** · src L12
+**[L3610](./osu-local-favorites.user.js#L3610)** · src L12
 
 ```js
 // Persistent queue of beatmapset IDs still missing full metadata (genre/
@@ -2479,7 +2567,7 @@ Not listed here, because they stay in the built file:
 // happens to be browsing, at the same gentle pace, until it's empty.
 ```
 
-**[L3537](./osu-local-favorites.user.js#L3537)** · src L45
+**[L3627](./osu-local-favorites.user.js#L3627)** · src L45
 
 ```js
 // Batch queue migration/import writes. Calling addToEnrichQueue once per
@@ -2488,7 +2576,7 @@ Not listed here, because they stay in the built file:
 // for a large existing library.
 ```
 
-**[L3560](./osu-local-favorites.user.js#L3560)** · src L72
+**[L3650](./osu-local-favorites.user.js#L3650)** · src L72
 
 ```js
 // Fetches the beatmapset detail page and merges full JSON data into storage.
@@ -2498,7 +2586,7 @@ Not listed here, because they stay in the built file:
 // in an older, differently-normalized format.
 ```
 
-**[L3561](./osu-local-favorites.user.js#L3561)** · src L78
+**[L3651](./osu-local-favorites.user.js#L3651)** · src L78
 
 ```js
 // Prefer the osu! API v2 when connected (clean JSON, no HTML parsing,
@@ -2506,14 +2594,14 @@ Not listed here, because they stay in the built file:
 // scraping the beatmapset page's embedded JSON when the API isn't set up.
 ```
 
-**[L3589](./osu-local-favorites.user.js#L3589)** · src L109
+**[L3679](./osu-local-favorites.user.js#L3679)** · src L109
 
 ```js
 // Removed before enrichment finished - nothing to fill in, but it's
 // also not "still needing enrichment" anymore, so stop retrying it.
 ```
 
-**[L3596](./osu-local-favorites.user.js#L3596)** · src L118
+**[L3686](./osu-local-favorites.user.js#L3686)** · src L118
 
 ```js
 // Re-enrichment must not replace the whole record with a lossy API
@@ -2524,26 +2612,26 @@ Not listed here, because they stay in the built file:
 // metadata.
 ```
 
-**[L3612](./osu-local-favorites.user.js#L3612)** · src L140
+**[L3702](./osu-local-favorites.user.js#L3702)** · src L140
 
 ```js
 // API v2 returns objects here, while the normalized API helper and
 // older page payloads may already provide plain strings.
 ```
 
-**[L3628](./osu-local-favorites.user.js#L3628)** · src L158
+**[L3718](./osu-local-favorites.user.js#L3718)** · src L158
 
 ```js
 // left in the queue - a later drain pass retries it
 ```
 
-**[L3631](./osu-local-favorites.user.js#L3631)** · src L161
+**[L3721](./osu-local-favorites.user.js#L3721)** · src L161
 
 ```js
 // Sequentially enriches a list of IDs with a delay between requests
 ```
 
-**[L3640](./osu-local-favorites.user.js#L3640)** · src L171
+**[L3730](./osu-local-favorites.user.js#L3730)** · src L171
 
 ```js
 // Quietly works through the persistent enrichment queue (see
@@ -2556,26 +2644,26 @@ Not listed here, because they stay in the built file:
 // itself once the queue is empty or every favorite it names is gone.
 ```
 
-**[L3647](./osu-local-favorites.user.js#L3647)** · src L186
+**[L3737](./osu-local-favorites.user.js#L3737)** · src L186
 
 ```js
 // Manual re-enrichment took over - back off and let it finish;
 // it removes IDs from this same queue as it goes.
 ```
 
-**[L3653](./osu-local-favorites.user.js#L3653)** · src L194
+**[L3743](./osu-local-favorites.user.js#L3743)** · src L194
 
 ```js
 // drop removed or already-enriched IDs
 ```
 
-**[L3656](./osu-local-favorites.user.js#L3656)** · src L197
+**[L3746](./osu-local-favorites.user.js#L3746)** · src L197
 
 ```js
 // queue empty - stop until something re-queues it
 ```
 
-**[L3662](./osu-local-favorites.user.js#L3662)** · src L203
+**[L3752](./osu-local-favorites.user.js#L3752)** · src L203
 
 ```js
 // Left in the queue by enrichBeatmapData on failure, but rotate it
@@ -2590,9 +2678,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/data/reenrichment.js`
 
-3 comments · userscript [L3677](./osu-local-favorites.user.js#L3677) - [L3686](./osu-local-favorites.user.js#L3686)
+3 comments · userscript [L3767](./osu-local-favorites.user.js#L3767) - [L3776](./osu-local-favorites.user.js#L3776)
 
-**[L3677](./osu-local-favorites.user.js#L3677)** · src L6
+**[L3767](./osu-local-favorites.user.js#L3767)** · src L6
 
 ```js
 // ═══ Global re-enrichment (Settings → Library Maintenance) ═══
@@ -2603,7 +2691,7 @@ Not listed here, because they stay in the built file:
 // rebuilt (e.g. re.render on unrelated state changes) while a run is live.
 ```
 
-**[L3682](./osu-local-favorites.user.js#L3682)** · src L17
+**[L3772](./osu-local-favorites.user.js#L3772)** · src L17
 
 ```js
 // Read-only accessor for other modules (data/enrichment.js,
@@ -2612,7 +2700,7 @@ Not listed here, because they stay in the built file:
 // into this module's private state.
 ```
 
-**[L3686](./osu-local-favorites.user.js#L3686)** · src L25
+**[L3776](./osu-local-favorites.user.js#L3776)** · src L25
 
 ```js
 // Pushes current progress into the Settings panel's progress bar, if it's
@@ -2623,21 +2711,21 @@ Not listed here, because they stay in the built file:
 
 ## `src/data/toggle-favorite.js`
 
-4 comments · userscript [L3749](./osu-local-favorites.user.js#L3749) - [L3777](./osu-local-favorites.user.js#L3777)
+4 comments · userscript [L3839](./osu-local-favorites.user.js#L3839) - [L3867](./osu-local-favorites.user.js#L3867)
 
-**[L3749](./osu-local-favorites.user.js#L3749)** · src L7
+**[L3839](./osu-local-favorites.user.js#L3839)** · src L7
 
 ```js
 // ═══ Toggle favorite ═══
 ```
 
-**[L3757](./osu-local-favorites.user.js#L3757)** · src L16
+**[L3847](./osu-local-favorites.user.js#L3847)** · src L16
 
 ```js
 // no longer favorited - stop trying to enrich it
 ```
 
-**[L3773](./osu-local-favorites.user.js#L3773)** · src L32
+**[L3863](./osu-local-favorites.user.js#L3863)** · src L32
 
 ```js
 // setFavorites() announces the membership change; the subscriber wired up
@@ -2650,7 +2738,7 @@ Not listed here, because they stay in the built file:
 // bar mid-preview - every time any heart was clicked.
 ```
 
-**[L3777](./osu-local-favorites.user.js#L3777)** · src L44
+**[L3867](./osu-local-favorites.user.js#L3867)** · src L44
 
 ```js
 // Persisted first so this survives even if the immediate attempt
@@ -2661,9 +2749,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/copy-all-button.js`
 
-13 comments · userscript [L3785](./osu-local-favorites.user.js#L3785) - [L3922](./osu-local-favorites.user.js#L3922)
+13 comments · userscript [L3875](./osu-local-favorites.user.js#L3875) - [L4012](./osu-local-favorites.user.js#L4012)
 
-**[L3785](./osu-local-favorites.user.js#L3785)** · src L7
+**[L3875](./osu-local-favorites.user.js#L3875)** · src L7
 
 ```js
 // ═══ Copy-all button ("Favourite Beatmaps" + "Most Played Beatmaps") ═══
@@ -2682,7 +2770,7 @@ Not listed here, because they stay in the built file:
 //     means a 20-diff mapset only ever gets added once.
 ```
 
-**[L3786](./osu-local-favorites.user.js#L3786)** · src L22
+**[L3876](./osu-local-favorites.user.js#L3876)** · src L22
 
 ```js
 // The .js-sortable--page sections these buttons attach to only exist on
@@ -2691,58 +2779,58 @@ Not listed here, because they stay in the built file:
 // so bail before any DOM work on pages that can't possibly match.
 ```
 
-**[L3796](./osu-local-favorites.user.js#L3796)** · src L36
+**[L3886](./osu-local-favorites.user.js#L3886)** · src L36
 
 ```js
 // rows sit directly in the page container, no dedicated grid wrapper
 ```
 
-**[L3808](./osu-local-favorites.user.js#L3808)** · src L48
+**[L3898](./osu-local-favorites.user.js#L3898)** · src L48
 
 ```js
 // Guard: don't add the button twice
 ```
 
-**[L3835](./osu-local-favorites.user.js#L3835)** · src L76
+**[L3925](./osu-local-favorites.user.js#L3925)** · src L76
 
 ```js
 // Click "show more" once and wait for new rows to appear
 ```
 
-**[L3869](./osu-local-favorites.user.js#L3869)** · src L111
+**[L3959](./osu-local-favorites.user.js#L3959)** · src L111
 
 ```js
 // Recursively click "show more" until everything is loaded
 ```
 
-**[L3882](./osu-local-favorites.user.js#L3882)** · src L125
+**[L3972](./osu-local-favorites.user.js#L3972)** · src L125
 
 ```js
 // Use a decreasing base timestamp so top-to-bottom DOM order is preserved
 // (panel sorts by favourited_at descending)
 ```
 
-**[L3890](./osu-local-favorites.user.js#L3890)** · src L135
+**[L3980](./osu-local-favorites.user.js#L3980)** · src L135
 
 ```js
 // Already favourited before, OR another diff of a set we
 // already added earlier in *this* run - either way, skip it.
 ```
 
-**[L3892](./osu-local-favorites.user.js#L3892)** · src L139
+**[L3982](./osu-local-favorites.user.js#L3982)** · src L139
 
 ```js
 // Subtract i seconds so first row (top) gets newest timestamp
 ```
 
-**[L3902](./osu-local-favorites.user.js#L3902)** · src L150
+**[L3992](./osu-local-favorites.user.js#L3992)** · src L150
 
 ```js
 // setFavorites() notifies the shared panel refresh subscriber.
 // Show matching/skipped count when some were already favorited
 ```
 
-**[L3906](./osu-local-favorites.user.js#L3906)** · src L156
+**[L3996](./osu-local-favorites.user.js#L3996)** · src L156
 
 ```js
 // Persist the queue first - for a big batch, this run alone can
@@ -2752,14 +2840,14 @@ Not listed here, because they stay in the built file:
 // drainer just resumes where this left off on a later page load.
 ```
 
-**[L3907](./osu-local-favorites.user.js#L3907)** · src L162
+**[L3997](./osu-local-favorites.user.js#L3997)** · src L162
 
 ```js
 // Enrich each new beatmapset sequentially - respects ENRICH_RATE_LIMIT_MS
 // (1 request/sec), the same throttle every other bulk/re-enrich path uses.
 ```
 
-**[L3922](./osu-local-favorites.user.js#L3922)** · src L179
+**[L4012](./osu-local-favorites.user.js#L4012)** · src L179
 
 ```js
 // Append button inside the heading element
@@ -2768,9 +2856,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/floating-heart.js`
 
-26 comments · userscript [L3926](./osu-local-favorites.user.js#L3926) - [L4162](./osu-local-favorites.user.js#L4162)
+26 comments · userscript [L4016](./osu-local-favorites.user.js#L4016) - [L4252](./osu-local-favorites.user.js#L4252)
 
-**[L3926](./osu-local-favorites.user.js#L3926)** · src L11
+**[L4016](./osu-local-favorites.user.js#L4016)** · src L11
 
 ```js
 // ═══ Floating heart - always visible on all osu! pages ═══
@@ -2779,13 +2867,13 @@ Not listed here, because they stay in the built file:
 // generic glowing-circle look.
 ```
 
-**[L3926](./osu-local-favorites.user.js#L3926)** · src L15
+**[L4016](./osu-local-favorites.user.js#L4016)** · src L15
 
 ```js
 // {right,bottom} px from bottom-right
 ```
 
-**[L3929](./osu-local-favorites.user.js#L3929)** · src L18
+**[L4019](./osu-local-favorites.user.js#L4019)** · src L18
 
 ```js
 // updateFloatingHeart() runs on every debounced DOM-mutation pass and
@@ -2795,7 +2883,7 @@ Not listed here, because they stay in the built file:
 // visual state is identical - the very first call still renders.
 ```
 
-**[L3935](./osu-local-favorites.user.js#L3935)** · src L29
+**[L4025](./osu-local-favorites.user.js#L4025)** · src L29
 
 ```js
 // No glow in either state. The accent-coloured border is already the
@@ -2806,25 +2894,25 @@ Not listed here, because they stay in the built file:
 // any shadow left on the element.
 ```
 
-**[L3961](./osu-local-favorites.user.js#L3961)** · src L61
+**[L4051](./osu-local-favorites.user.js#L4051)** · src L61
 
 ```js
 // Restore last saved position (drag is persisted across pages/sessions)
 ```
 
-**[L3964](./osu-local-favorites.user.js#L3964)** · src L65
+**[L4054](./osu-local-favorites.user.js#L4054)** · src L65
 
 ```js
 // Clamp into the viewport in case the window shrank since saving
 ```
 
-**[L3975](./osu-local-favorites.user.js#L3975)** · src L77
+**[L4065](./osu-local-favorites.user.js#L4065)** · src L77
 
 ```js
 // Clicking heart always opens favorites panel
 ```
 
-**[L3978](./osu-local-favorites.user.js#L3978)** · src L81
+**[L4068](./osu-local-favorites.user.js#L4068)** · src L81
 
 ```js
 // ── Click vs hold-to-drag ──
@@ -2833,13 +2921,13 @@ Not listed here, because they stay in the built file:
 // is anchored to bottom/right so it survives resizes, and persisted.
 ```
 
-**[L4006](./osu-local-favorites.user.js#L4006)** · src L113
+**[L4096](./osu-local-favorites.user.js#L4096)** · src L113
 
 ```js
 // Cancel pending drag if the finger/mouse moved before hold elapsed
 ```
 
-**[L4059](./osu-local-favorites.user.js#L4059)** · src L167
+**[L4149](./osu-local-favorites.user.js#L4149)** · src L167
 
 ```js
 // Inline style wins over osu!'s own stylesheet rules, so our button
@@ -2847,13 +2935,13 @@ Not listed here, because they stay in the built file:
 // osu!'s native heart.
 ```
 
-**[L4076](./osu-local-favorites.user.js#L4076)** · src L187
+**[L4166](./osu-local-favorites.user.js#L4166)** · src L187
 
 ```js
 // ═══ Click interception ═══
 ```
 
-**[L4079](./osu-local-favorites.user.js#L4079)** · src L191
+**[L4169](./osu-local-favorites.user.js#L4169)** · src L191
 
 ```js
 // Never treat clicks inside our own UI (the favorites panel or the
@@ -2868,13 +2956,13 @@ Not listed here, because they stay in the built file:
 // both the fix and the more robust long-term guard.
 ```
 
-**[L4081](./osu-local-favorites.user.js#L4081)** · src L203
+**[L4171](./osu-local-favorites.user.js#L4171)** · src L203
 
 ```js
 // Also intercept clicks on the guest-disabled <span> (not just button/a)
 ```
 
-**[L4084](./osu-local-favorites.user.js#L4084)** · src L207
+**[L4174](./osu-local-favorites.user.js#L4174)** · src L207
 
 ```js
 // As soon as we've identified this as a favorite button, we commit to
@@ -2888,7 +2976,7 @@ Not listed here, because they stay in the built file:
 // avoids that half-broken passthrough state.
 ```
 
-**[L4091](./osu-local-favorites.user.js#L4091)** · src L223
+**[L4181](./osu-local-favorites.user.js#L4181)** · src L223
 
 ```js
 // Not an error: isFavButton()'s matching is heuristic, so an
@@ -2896,13 +2984,13 @@ Not listed here, because they stay in the built file:
 // quietly instead of spamming the console and toasting the user.
 ```
 
-**[L4113](./osu-local-favorites.user.js#L4113)** · src L248
+**[L4203](./osu-local-favorites.user.js#L4203)** · src L248
 
 ```js
 // ═══ Refresh visible buttons ═══
 ```
 
-**[L4114](./osu-local-favorites.user.js#L4114)** · src L250
+**[L4204](./osu-local-favorites.user.js#L4204)** · src L250
 
 ```js
 // Cheap short-circuit: isFavButton() only ever returns true for an
@@ -2919,13 +3007,13 @@ Not listed here, because they stay in the built file:
 // page couldn't possibly contain any.
 ```
 
-**[L4118](./osu-local-favorites.user.js#L4118)** · src L266
+**[L4208](./osu-local-favorites.user.js#L4208)** · src L266
 
 ```js
 // Also scan disabled <span> elements used when the user is not signed in
 ```
 
-**[L4122](./osu-local-favorites.user.js#L4122)** · src L271
+**[L4212](./osu-local-favorites.user.js#L4212)** · src L271
 
 ```js
 // Cheapest checks first. The dataset flag must gate BEFORE isFavButton()
@@ -2938,7 +3026,7 @@ Not listed here, because they stay in the built file:
 // tick for as long as the panel stays open.
 ```
 
-**[L4126](./osu-local-favorites.user.js#L4126)** · src L283
+**[L4216](./osu-local-favorites.user.js#L4216)** · src L283
 
 ```js
 // Context couldn't be resolved yet - this is common when a card is
@@ -2950,7 +3038,7 @@ Not listed here, because they stay in the built file:
 // observer or periodic fallback) retries once the card has settled.
 ```
 
-**[L4128](./osu-local-favorites.user.js#L4128)** · src L292
+**[L4218](./osu-local-favorites.user.js#L4218)** · src L292
 
 ```js
 // Record the resolved id on the element. resolveBeatmapContext() is the
@@ -2960,13 +3048,13 @@ Not listed here, because they stay in the built file:
 // from the dataset turns that into a plain attribute lookup.
 ```
 
-**[L4130](./osu-local-favorites.user.js#L4130)** · src L299
+**[L4220](./osu-local-favorites.user.js#L4220)** · src L299
 
 ```js
 // Make the disabled span look clickable
 ```
 
-**[L4138](./osu-local-favorites.user.js#L4138)** · src L308
+**[L4228](./osu-local-favorites.user.js#L4228)** · src L308
 
 ```js
 // The audio element is deliberately page-lifetime. Closing the favorites panel
@@ -2975,14 +3063,14 @@ Not listed here, because they stay in the built file:
 // another app on mobile. A newly opened panel re-binds its Now Playing controls.
 ```
 
-**[L4149](./osu-local-favorites.user.js#L4149)** · src L323
+**[L4239](./osu-local-favorites.user.js#L4239)** · src L323
 
 ```js
 // The queue callback closes over this panel's DOM/list, so do not keep it after
 // the panel is gone. Playback itself remains untouched.
 ```
 
-**[L4152](./osu-local-favorites.user.js#L4152)** · src L328
+**[L4242](./osu-local-favorites.user.js#L4242)** · src L328
 
 ```js
 // Re-derives the favorited state of every heart already drawn on the page,
@@ -2996,7 +3084,7 @@ Not listed here, because they stay in the built file:
 // that was already processed.
 ```
 
-**[L4162](./osu-local-favorites.user.js#L4162)** · src L347
+**[L4252](./osu-local-favorites.user.js#L4252)** · src L347
 
 ```js
 // Clears the "already processed" markers so the next refreshButtons() pass
@@ -3009,16 +3097,16 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/settings.js`
 
-51 comments · userscript [L4170](./osu-local-favorites.user.js#L4170) - [L5545](./osu-local-favorites.user.js#L5545)
+51 comments · userscript [L4260](./osu-local-favorites.user.js#L4260) - [L5629](./osu-local-favorites.user.js#L5629)
 
-**[L4170](./osu-local-favorites.user.js#L4170)** · src L18
+**[L4260](./osu-local-favorites.user.js#L4260)** · src L18
 
 ```js
 // Gist ids whose real visibility was already checked against GitHub this page
 // load (see the Gist visibility row) - keeps the autodetect to one request.
 ```
 
-**[L4172](./osu-local-favorites.user.js#L4172)** · src L22
+**[L4262](./osu-local-favorites.user.js#L4262)** · src L22
 
 ```js
 // ═══ Settings view (⚙ in the panel header) ═══
@@ -3029,39 +3117,39 @@ Not listed here, because they stay in the built file:
 // bottom of this one is the whole interface between the two.
 ```
 
-**[L4172](./osu-local-favorites.user.js#L4172)** · src L29
+**[L4262](./osu-local-favorites.user.js#L4262)** · src L29
 
 ```js
 // Settings' own toast: a little wider than the page-level default, because
 // these messages tend to be full sentences ("Disconnected from osu! API").
 ```
 
-**[L4176](./osu-local-favorites.user.js#L4176)** · src L35
+**[L4266](./osu-local-favorites.user.js#L4266)** · src L35
 
 ```js
 // ── Settings view helpers ────────────────────────────────
 ```
 
-**[L4203](./osu-local-favorites.user.js#L4203)** · src L63
+**[L4293](./osu-local-favorites.user.js#L4293)** · src L63
 
 ```js
 // Usually plain text, but a row can also pass a Node/DocumentFragment
 // (e.g. to embed a real hyperlink inside the subtitle)
 ```
 
-**[L4211](./osu-local-favorites.user.js#L4211)** · src L73
+**[L4301](./osu-local-favorites.user.js#L4301)** · src L73
 
 ```js
 // Pink pill switch - matches the accent color used throughout the panel
 ```
 
-**[L4229](./osu-local-favorites.user.js#L4229)** · src L92
+**[L4319](./osu-local-favorites.user.js#L4319)** · src L92
 
 ```js
 // Two/three-way segmented control - mirrors the sort-button pill style
 ```
 
-**[L4254](./osu-local-favorites.user.js#L4254)** · src L118
+**[L4344](./osu-local-favorites.user.js#L4344)** · src L118
 
 ```js
 // Native <select> for settings with many choices - segmented pills work
@@ -3070,13 +3158,13 @@ Not listed here, because they stay in the built file:
 // variants, plus "not set").
 ```
 
-**[L4270](./osu-local-favorites.user.js#L4270)** · src L138
+**[L4360](./osu-local-favorites.user.js#L4360)** · src L138
 
 ```js
 // 0–100 percentage slider with a live-updating label - used by Appearance
 ```
 
-**[L4290](./osu-local-favorites.user.js#L4290)** · src L159
+**[L4380](./osu-local-favorites.user.js#L4380)** · src L159
 
 ```js
 // ── Custom color picker ──
@@ -3090,13 +3178,13 @@ Not listed here, because they stay in the built file:
 // canvas, no redraw loop, nothing outside our own DOM to be slow.
 ```
 
-**[L4294](./osu-local-favorites.user.js#L4294)** · src L173
+**[L4384](./osu-local-favorites.user.js#L4384)** · src L173
 
 ```js
 // falls back to the original #ff66aa-ish accent
 ```
 
-**[L4328](./osu-local-favorites.user.js#L4328)** · src L207
+**[L4418](./osu-local-favorites.user.js#L4418)** · src L207
 
 ```js
 // rAF-throttled pointer drag: reads the latest pointer position but
@@ -3104,7 +3192,7 @@ Not listed here, because they stay in the built file:
 // queue up more work than the display can actually show.
 ```
 
-**[L4351](./osu-local-favorites.user.js#L4351)** · src L233
+**[L4441](./osu-local-favorites.user.js#L4441)** · src L233
 
 ```js
 // Tracks whichever custom color panel is currently open (across both
@@ -3112,20 +3200,20 @@ Not listed here, because they stay in the built file:
 // instead of leaving two floating at once.
 ```
 
-**[L4351](./osu-local-favorites.user.js#L4351)** · src L236
+**[L4441](./osu-local-favorites.user.js#L4441)** · src L236
 
 ```js
 // `root` is the settings scroll container this swatch lives in: an open
 ```
 
-**[L4352](./osu-local-favorites.user.js#L4352)** · src L237
+**[L4442](./osu-local-favorites.user.js#L4442)** · src L237
 
 ```js
 // picker closes itself when that container is torn down and rebuilt, so it
 // never lingers detached from its swatch.
 ```
 
-**[L4452](./osu-local-favorites.user.js#L4452)** · src L339
+**[L4542](./osu-local-favorites.user.js#L4542)** · src L339
 
 ```js
 // Same off-screen clamping the native-input version used: prefer
@@ -3133,20 +3221,20 @@ Not listed here, because they stay in the built file:
 // right edge of the viewport), fall back to the right, clamp both.
 ```
 
-**[L4487](./osu-local-favorites.user.js#L4487)** · src L377
+**[L4577](./osu-local-favorites.user.js#L4577)** · src L377
 
 ```js
 // clicking again toggles it closed
 ```
 
-**[L4491](./osu-local-favorites.user.js#L4491)** · src L381
+**[L4581](./osu-local-favorites.user.js#L4581)** · src L381
 
 ```js
 // Clean up an open panel if the row is ever torn down (e.g. Settings
 // re-rendered) so it doesn't linger detached from its swatch.
 ```
 
-**[L4500](./osu-local-favorites.user.js#L4500)** · src L392
+**[L4590](./osu-local-favorites.user.js#L4590)** · src L392
 
 ```js
 // ── Settings view ─────────────────────────────────
@@ -3161,27 +3249,27 @@ Not listed here, because they stay in the built file:
 // so they are handed over once when the panel is built.
 ```
 
-**[L4503](./osu-local-favorites.user.js#L4503)** · src L405
+**[L4593](./osu-local-favorites.user.js#L4593)** · src L405
 
 ```js
 // The scroll container. flex:1 inside the panel's content area; hidden
 // until the gear button flips it on (see setView in ui/main-panel.js).
 ```
 
-**[L4507](./osu-local-favorites.user.js#L4507)** · src L411
+**[L4597](./osu-local-favorites.user.js#L4597)** · src L411
 
 ```js
 // ── Render settings view ─────────────────────────────────
 ```
 
-**[L4508](./osu-local-favorites.user.js#L4508)** · src L413
+**[L4598](./osu-local-favorites.user.js#L4598)** · src L413
 
 ```js
 // Clean up any real <input type="color"> elements a previous render
 // parked on <body> (see makeColorInput) before we rebuild everything.
 ```
 
-**[L4512](./osu-local-favorites.user.js#L4512)** · src L419
+**[L4602](./osu-local-favorites.user.js#L4602)** · src L419
 
 ```js
 // Attach immediately (while still empty) rather than at the end of this
@@ -3190,13 +3278,13 @@ Not listed here, because they stay in the built file:
 // that are actually part of the live document tree.
 ```
 
-**[L4515](./osu-local-favorites.user.js#L4515)** · src L426
+**[L4605](./osu-local-favorites.user.js#L4605)** · src L426
 
 ```js
 // ── Backup & Restore (Export / Import) ──
 ```
 
-**[L4566](./osu-local-favorites.user.js#L4566)** · src L478
+**[L4654](./osu-local-favorites.user.js#L4654)** · src L476
 
 ```js
 // Collections have their own portable backup: map memberships are small
@@ -3205,13 +3293,13 @@ Not listed here, because they stay in the built file:
 // COLLECTIONS_KEY storage format so it remains simple and future-proof.
 ```
 
-**[L4585](./osu-local-favorites.user.js#L4585)** · src L501
+**[L4673](./osu-local-favorites.user.js#L4673)** · src L499
 
 ```js
 // Keep the suggested filename valid on Windows, Android, and macOS.
 ```
 
-**[L4641](./osu-local-favorites.user.js#L4641)** · src L558
+**[L4729](./osu-local-favorites.user.js#L4729)** · src L556
 
 ```js
 // Collections store only beatmapset IDs. Materialize any missing IDs in
@@ -3221,7 +3309,7 @@ Not listed here, because they stay in the built file:
 // tags/genre/language/etc. in the background without a request burst.
 ```
 
-**[L4680](./osu-local-favorites.user.js#L4680)** · src L602
+**[L4768](./osu-local-favorites.user.js#L4768)** · src L600
 
 ```js
 // ── About / version / update check ──
@@ -3231,19 +3319,19 @@ Not listed here, because they stay in the built file:
 // already the first thing this hint says.
 ```
 
-**[L4711](./osu-local-favorites.user.js#L4711)** · src L638
+**[L4799](./osu-local-favorites.user.js#L4799)** · src L636
 
 ```js
 // Offer a one-click jump to the install URL
 ```
 
-**[L4730](./osu-local-favorites.user.js#L4730)** · src L658
+**[L4818](./osu-local-favorites.user.js#L4818)** · src L656
 
 ```js
 // ── osu! API v2 (OAuth) ──
 ```
 
-**[L4744](./osu-local-favorites.user.js#L4744)** · src L673
+**[L4832](./osu-local-favorites.user.js#L4832)** · src L671
 
 ```js
 // Same status row as the Gist section below: coloured dot, ellipsised
@@ -3253,19 +3341,19 @@ Not listed here, because they stay in the built file:
 // into the row (it used to be a separate full-width button below).
 ```
 
-**[L4792](./osu-local-favorites.user.js#L4792)** · src L726
+**[L4880](./osu-local-favorites.user.js#L4880)** · src L724
 
 ```js
 // Redirects to osu!'s authorize page; we resume on /home?code=…
 ```
 
-**[L4800](./osu-local-favorites.user.js#L4800)** · src L735
+**[L4888](./osu-local-favorites.user.js#L4888)** · src L733
 
 ```js
 // ── GitHub Gist Backup ──
 ```
 
-**[L4853](./osu-local-favorites.user.js#L4853)** · src L789
+**[L4941](./osu-local-favorites.user.js#L4941)** · src L787
 
 ```js
 // Public gists can be read without authentication. Keep this import
@@ -3273,7 +3361,7 @@ Not listed here, because they stay in the built file:
 // backup target, so connecting/backing up later remains independent.
 ```
 
-**[L4953](./osu-local-favorites.user.js#L4953)** · src L892
+**[L5039](./osu-local-favorites.user.js#L5039)** · src L888
 
 ```js
 // GitHub cannot change a gist's visibility after creation, so a
@@ -3283,7 +3371,7 @@ Not listed here, because they stay in the built file:
 // tracked, or one changed from another device).
 ```
 
-**[L4955](./osu-local-favorites.user.js#L4955)** · src L899
+**[L5041](./osu-local-favorites.user.js#L5041)** · src L895
 
 ```js
 // The detection call overwrites the stored setting with the
@@ -3291,7 +3379,7 @@ Not listed here, because they stay in the built file:
 // deciding what it means.
 ```
 
-**[L4966](./osu-local-favorites.user.js#L4966)** · src L913
+**[L5052](./osu-local-favorites.user.js#L5052)** · src L909
 
 ```js
 // Could not verify (offline, token problem). Fall back to the
@@ -3299,7 +3387,7 @@ Not listed here, because they stay in the built file:
 // choice is never silently ignored.
 ```
 
-**[L4977](./osu-local-favorites.user.js#L4977)** · src L927
+**[L5063](./osu-local-favorites.user.js#L5063)** · src L923
 
 ```js
 // Autodetect: once per linked gist per page load, ask GitHub what the
@@ -3307,25 +3395,25 @@ Not listed here, because they stay in the built file:
 // was wrong, so a correct setting never flickers.
 ```
 
-**[L4984](./osu-local-favorites.user.js#L4984)** · src L937
+**[L5070](./osu-local-favorites.user.js#L5070)** · src L933
 
 ```js
 // Unknown: leave the setting alone and allow a retry next time.
 ```
 
-**[L5125](./osu-local-favorites.user.js#L5125)** · src L1079
+**[L5209](./osu-local-favorites.user.js#L5209)** · src L1073
 
 ```js
 // ── Download Mirrors ──
 ```
 
-**[L5179](./osu-local-favorites.user.js#L5179)** · src L1134
+**[L5263](./osu-local-favorites.user.js#L5263)** · src L1128
 
 ```js
 // ── Music Playback ──
 ```
 
-**[L5226](./osu-local-favorites.user.js#L5226)** · src L1182
+**[L5310](./osu-local-favorites.user.js#L5310)** · src L1176
 
 ```js
 // Applied immediately to whatever's already playing, not just future
@@ -3333,57 +3421,57 @@ Not listed here, because they stay in the built file:
 // without this the change wouldn't take effect until the next track.
 ```
 
-**[L5234](./osu-local-favorites.user.js#L5234)** · src L1193
+**[L5318](./osu-local-favorites.user.js#L5318)** · src L1187
 
 ```js
 // ── Media Cache ──
 ```
 
-**[L5262](./osu-local-favorites.user.js#L5262)** · src L1222
+**[L5346](./osu-local-favorites.user.js#L5346)** · src L1216
 
 ```js
 // reveal/hide the custom-minutes row below
 ```
 
-**[L5305](./osu-local-favorites.user.js#L5305)** · src L1265
+**[L5389](./osu-local-favorites.user.js#L5389)** · src L1259
 
 ```js
 // reveal/hide the custom-size row below
 ```
 
-**[L5362](./osu-local-favorites.user.js#L5362)** · src L1322
+**[L5446](./osu-local-favorites.user.js#L5446)** · src L1316
 
 ```js
 // ── Appearance ──
 ```
 
-**[L5439](./osu-local-favorites.user.js#L5439)** · src L1400
+**[L5523](./osu-local-favorites.user.js#L5523)** · src L1394
 
 ```js
 // ── Library Maintenance ──
 ```
 
-**[L5498](./osu-local-favorites.user.js#L5498)** · src L1460
+**[L5582](./osu-local-favorites.user.js#L5582)** · src L1454
 
 ```js
 // Sync button label/progress bar to the real state in case a run is
 // already in flight (e.g. started, then user switched view and back)
 ```
 
-**[L5502](./osu-local-favorites.user.js#L5502)** · src L1466
+**[L5586](./osu-local-favorites.user.js#L5586)** · src L1460
 
 ```js
 // ── Danger Zone ──
 ```
 
-**[L5534](./osu-local-favorites.user.js#L5534)** · src L1499
+**[L5618](./osu-local-favorites.user.js#L5618)** · src L1493
 
 ```js
 // Keep the osu! API controls at the top of Settings regardless of the
 // order in which the remaining settings sections are assembled above.
 ```
 
-**[L5545](./osu-local-favorites.user.js#L5545)** · src L1512
+**[L5629](./osu-local-favorites.user.js#L5629)** · src L1506
 
 ```js
 // Handed back to the panel: the container to mount, and the render entry
@@ -3394,83 +3482,83 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/main-panel.js`
 
-104 comments · userscript [L5549](./osu-local-favorites.user.js#L5549) - [L6997](./osu-local-favorites.user.js#L6997)
+108 comments · userscript [L5633](./osu-local-favorites.user.js#L5633) - [L7089](./osu-local-favorites.user.js#L7089)
 
-**[L5549](./osu-local-favorites.user.js#L5549)** · src L21
+**[L5633](./osu-local-favorites.user.js#L5633)** · src L21
 
 ```js
 // ═══ Favorites panel ═══
 ```
 
-**[L5552](./osu-local-favorites.user.js#L5552)** · src L25
+**[L5636](./osu-local-favorites.user.js#L5636)** · src L25
 
 ```js
 // The audio element is page-lifetime, while the player UI belongs to the
 // panel. Detach only the old UI binding; never stop the preview when closing.
 ```
 
-**[L5562](./osu-local-favorites.user.js#L5562)** · src L37
+**[L5646](./osu-local-favorites.user.js#L5646)** · src L37
 
 ```js
 // { [categoryId]: { [termKey]: "include" | "exclude" } } - one entry per
 // category in ui/filters.js (date, title, artist, status, genre).
 ```
 
-**[L5563](./osu-local-favorites.user.js#L5563)** · src L40
+**[L5647](./osu-local-favorites.user.js#L5647)** · src L40
 
 ```js
 // "" = no collection filter (show all)
 ```
 
-**[L5565](./osu-local-favorites.user.js#L5565)** · src L42
+**[L5649](./osu-local-favorites.user.js#L5649)** · src L42
 
 ```js
 // Inject shared styles once - covers scrollbar, slide-down banner, and slide-up prompt
 ```
 
-**[L5611](./osu-local-favorites.user.js#L5611)** · src L89
+**[L5695](./osu-local-favorites.user.js#L5695)** · src L89
 
 ```js
 // Shows an overlay popup centered inside the panel
 ```
 
-**[L5616](./osu-local-favorites.user.js#L5616)** · src L95
+**[L5700](./osu-local-favorites.user.js#L5700)** · src L95
 
 ```js
 // Backdrop - covers the panel content but not the header
 ```
 
-**[L5622](./osu-local-favorites.user.js#L5622)** · src L102
+**[L5706](./osu-local-favorites.user.js#L5706)** · src L102
 
 ```js
 // Card
 ```
 
-**[L5628](./osu-local-favorites.user.js#L5628)** · src L109
+**[L5712](./osu-local-favorites.user.js#L5712)** · src L109
 
 ```js
 // Accent header
 ```
 
-**[L5651](./osu-local-favorites.user.js#L5651)** · src L133
+**[L5735](./osu-local-favorites.user.js#L5735)** · src L133
 
 ```js
 // Body
 ```
 
-**[L5657](./osu-local-favorites.user.js#L5657)** · src L140
+**[L5741](./osu-local-favorites.user.js#L5741)** · src L140
 
 ```js
 // Footer
 ```
 
-**[L5695](./osu-local-favorites.user.js#L5695)** · src L179
+**[L5779](./osu-local-favorites.user.js#L5779)** · src L179
 
 ```js
 // ── Header ─────────────────────────────────────────────
 ```
 
-**[L5772](./osu-local-favorites.user.js#L5772)** · src L257
+**[L5856](./osu-local-favorites.user.js#L5856)** · src L257
 
 ```js
 // Debounced search: renderList() re-filters, re-sorts, and rebuilds the
@@ -3481,13 +3569,13 @@ Not listed here, because they stay in the built file:
 // into one render.
 ```
 
-**[L5785](./osu-local-favorites.user.js#L5785)** · src L276
+**[L5869](./osu-local-favorites.user.js#L5869)** · src L276
 
 ```js
 // ── GitHub star notice (shown once, ever, on first panel open) ──
 ```
 
-**[L5820](./osu-local-favorites.user.js#L5820)** · src L312
+**[L5904](./osu-local-favorites.user.js#L5904)** · src L312
 
 ```js
 // ── Toolbar ────────────────────────────────────────────
@@ -3501,14 +3589,14 @@ Not listed here, because they stay in the built file:
 // its neighbours; labels ellipsis inside their own cell instead.
 ```
 
-**[L5835](./osu-local-favorites.user.js#L5835)** · src L336
+**[L5919](./osu-local-favorites.user.js#L5919)** · src L336
 
 ```js
 // Every category is driven by the same descriptor list, so adding one is
 // an entry in ui/filters.js rather than another hand-built button here.
 ```
 
-**[L5883](./osu-local-favorites.user.js#L5883)** · src L386
+**[L5967](./osu-local-favorites.user.js#L5967)** · src L386
 
 ```js
 // Actively filtered wins the solid fill - it is the stronger claim on
@@ -3517,33 +3605,33 @@ Not listed here, because they stay in the built file:
 // the two states stay visually distinct at a glance.
 ```
 
-**[L5916](./osu-local-favorites.user.js#L5916)** · src L423
+**[L6000](./osu-local-favorites.user.js#L6000)** · src L423
 
 ```js
 // Collections is a filter too, so it shares the filter row's last cell -
 // but it keeps its own popover, which also creates and deletes playlists.
 ```
 
-**[L5950](./osu-local-favorites.user.js#L5950)** · src L459
+**[L6034](./osu-local-favorites.user.js#L6034)** · src L459
 
 ```js
 // "Clear all" appears only while something is filtered, and occupies the
 // full width below the grid so its arrival cannot shift the rows above it.
 ```
 
-**[L5979](./osu-local-favorites.user.js#L5979)** · src L490
+**[L6063](./osu-local-favorites.user.js#L6063)** · src L490
 
 ```js
 // ── Content area (favorites list + settings view share this space) ──
 ```
 
-**[L5983](./osu-local-favorites.user.js#L5983)** · src L495
+**[L6067](./osu-local-favorites.user.js#L6067)** · src L495
 
 ```js
 // ── List ───────────────────────────────────────────────
 ```
 
-**[L5993](./osu-local-favorites.user.js#L5993)** · src L506
+**[L6077](./osu-local-favorites.user.js#L6077)** · src L506
 
 ```js
 // ── Settings view (hidden until the gear button is clicked) ──
@@ -3554,13 +3642,13 @@ Not listed here, because they stay in the built file:
 // scope, so they are already defined by the time anything calls them.
 ```
 
-**[L6005](./osu-local-favorites.user.js#L6005)** · src L524
+**[L6089](./osu-local-favorites.user.js#L6089)** · src L524
 
 ```js
 // ── Footer - sync status bar, doubles as a shortcut into Settings ──
 ```
 
-**[L6031](./osu-local-favorites.user.js#L6031)** · src L551
+**[L6115](./osu-local-favorites.user.js#L6115)** · src L551
 
 ```js
 // ── Now Playing bar - persistent mini-player ─────────────────
@@ -3569,21 +3657,21 @@ Not listed here, because they stay in the built file:
 // the favorites/settings scroll position.
 ```
 
-**[L6039](./osu-local-favorites.user.js#L6039)** · src L563
+**[L6123](./osu-local-favorites.user.js#L6123)** · src L563
 
 ```js
 // Album-art backdrop - subtle and blurred, so the bar visually inherits
 // the same artwork as the track without making the controls unreadable.
 ```
 
-**[L6049](./osu-local-favorites.user.js#L6049)** · src L575
+**[L6133](./osu-local-favorites.user.js#L6133)** · src L575
 
 ```js
 // Track thumbnail - this is deliberately a normal img rather than a
 // background-only image, so the current cover remains identifiable.
 ```
 
-**[L6133](./osu-local-favorites.user.js#L6133)** · src L661
+**[L6217](./osu-local-favorites.user.js#L6217)** · src L661
 
 ```js
 // The current track's source is still being decided (cache lookup in
@@ -3591,7 +3679,7 @@ Not listed here, because they stay in the built file:
 // act on that instead. The pending request starts playback by itself.
 ```
 
-**[L6141](./osu-local-favorites.user.js#L6141)** · src L672
+**[L6225](./osu-local-favorites.user.js#L6225)** · src L672
 
 ```js
 // Resets whatever card is currently linked to the audio element back to
@@ -3599,7 +3687,7 @@ Not listed here, because they stay in the built file:
 // the natural end-of-track path.
 ```
 
-**[L6160](./osu-local-favorites.user.js#L6160)** · src L694
+**[L6244](./osu-local-favorites.user.js#L6244)** · src L694
 
 ```js
 // Starts a track by id/record, linking up whichever card is currently
@@ -3612,7 +3700,7 @@ Not listed here, because they stay in the built file:
 // path if the mirror fails or reports a short clip.
 ```
 
-**[L6171](./osu-local-favorites.user.js#L6171)** · src L713
+**[L6255](./osu-local-favorites.user.js#L6255)** · src L713
 
 ```js
 // Per-track: true once this track started playing from the local cache
@@ -3620,7 +3708,7 @@ Not listed here, because they stay in the built file:
 // never suppresses the streaming cache write for a *different* one.
 ```
 
-**[L6182](./osu-local-favorites.user.js#L6182)** · src L727
+**[L6266](./osu-local-favorites.user.js#L6266)** · src L727
 
 ```js
 // Don't drop playbackState to "none" here: this runs on every track
@@ -3633,7 +3721,7 @@ Not listed here, because they stay in the built file:
 // moments later regardless.
 ```
 
-**[L6216](./osu-local-favorites.user.js#L6216)** · src L769
+**[L6300](./osu-local-favorites.user.js#L6300)** · src L769
 
 ```js
 // Now Playing artwork: same cache-first rule as list covers. Swap in
@@ -3641,7 +3729,7 @@ Not listed here, because they stay in the built file:
 // immediately and stays if the cache has nothing fresh.
 ```
 
-**[L6234](./osu-local-favorites.user.js#L6234)** · src L790
+**[L6318](./osu-local-favorites.user.js#L6318)** · src L790
 
 ```js
 // Release the previous track's cached object URL before switching away.
@@ -3651,7 +3739,7 @@ Not listed here, because they stay in the built file:
 // lookup below would miss (leaking the object URL for the whole tab).
 ```
 
-**[L6243](./osu-local-favorites.user.js#L6243)** · src L804
+**[L6327](./osu-local-favorites.user.js#L6327)** · src L804
 
 ```js
 // ── Cache-first source selection ─────────────────────────────────
@@ -3676,7 +3764,7 @@ Not listed here, because they stay in the built file:
 // which is exactly why the prewarm exists.
 ```
 
-**[L6244](./osu-local-favorites.user.js#L6244)** · src L825
+**[L6328](./osu-local-favorites.user.js#L6328)** · src L825
 
 ```js
 // Stamped on every request so a decision that lands after the user has
@@ -3684,7 +3772,7 @@ Not listed here, because they stay in the built file:
 // newer request's.
 ```
 
-**[L6246](./osu-local-favorites.user.js#L6246)** · src L830
+**[L6330](./osu-local-favorites.user.js#L6330)** · src L830
 
 ```js
 // Tells the card's own button that a source decision is still in flight,
@@ -3692,14 +3780,14 @@ Not listed here, because they stay in the built file:
 // track - audio.src still points at it until beginWithSource() runs.
 ```
 
-**[L6249](./osu-local-favorites.user.js#L6249)** · src L836
+**[L6333](./osu-local-favorites.user.js#L6333)** · src L836
 
 ```js
 // Superseded while the lookup was in flight (another card, Back/Next,
 // auto-next, a shuffle jump): that request owns the element now.
 ```
 
-**[L6261](./osu-local-favorites.user.js#L6261)** · src L850
+**[L6345](./osu-local-favorites.user.js#L6345)** · src L850
 
 ```js
 // Cache hit: the element only ever sees the local blob: URL. Miss: the
@@ -3707,7 +3795,7 @@ Not listed here, because they stay in the built file:
 // next play of this song is a hit.
 ```
 
-**[L6270](./osu-local-favorites.user.js#L6270)** · src L862
+**[L6354](./osu-local-favorites.user.js#L6354)** · src L862
 
 ```js
 // A response may arrive after the user chose another card. Only
@@ -3715,14 +3803,14 @@ Not listed here, because they stay in the built file:
 // still active.
 ```
 
-**[L6272](./osu-local-favorites.user.js#L6272)** · src L867
+**[L6356](./osu-local-favorites.user.js#L6356)** · src L867
 
 ```js
 // This often arrives after playback has already created Android's
 // media notification, so submit a second position state now.
 ```
 
-**[L6277](./osu-local-favorites.user.js#L6277)** · src L874
+**[L6361](./osu-local-favorites.user.js#L6361)** · src L874
 
 ```js
 // Keep this request's source so a late rejection from a failed mirror
@@ -3733,7 +3821,7 @@ Not listed here, because they stay in the built file:
 // never string-matches the request URL.
 ```
 
-**[L6282](./osu-local-favorites.user.js#L6282)** · src L885
+**[L6366](./osu-local-favorites.user.js#L6366)** · src L885
 
 ```js
 // This play() belonged to a source that has since been replaced by
@@ -3742,7 +3830,7 @@ Not listed here, because they stay in the built file:
 // mini-player.
 ```
 
-**[L6284](./osu-local-favorites.user.js#L6284)** · src L891
+**[L6368](./osu-local-favorites.user.js#L6368)** · src L891
 
 ```js
 // Firefox can reject the original mirror play() asynchronously even
@@ -3751,13 +3839,13 @@ Not listed here, because they stay in the built file:
 // may decide whether the replacement preview has genuinely failed.
 ```
 
-**[L6285](./osu-local-favorites.user.js#L6285)** · src L896
+**[L6369](./osu-local-favorites.user.js#L6369)** · src L896
 
 ```js
 // A direct official preview has no alternative source to recover to.
 ```
 
-**[L6291](./osu-local-favorites.user.js#L6291)** · src L903
+**[L6375](./osu-local-favorites.user.js#L6375)** · src L903
 
 ```js
 // Cache the track while it streams. The write is progressive (bytes are
@@ -3779,7 +3867,7 @@ Not listed here, because they stay in the built file:
 // above already answered for it, so there is nothing left to fetch.
 ```
 
-**[L6298](./osu-local-favorites.user.js#L6298)** · src L927
+**[L6382](./osu-local-favorites.user.js#L6382)** · src L927
 
 ```js
 // Explicit pre-request check: if this browser already holds a
@@ -3789,7 +3877,7 @@ Not listed here, because they stay in the built file:
 // Range request for the remainder (see startStreamingCacheWrite).
 ```
 
-**[L6308](./osu-local-favorites.user.js#L6308)** · src L942
+**[L6392](./osu-local-favorites.user.js#L6392)** · src L942
 
 ```js
 // The decision itself. A synchronous in-memory hit skips the lookup
@@ -3797,7 +3885,7 @@ Not listed here, because they stay in the built file:
 // happen before play().
 ```
 
-**[L6313](./osu-local-favorites.user.js#L6313)** · src L950
+**[L6397](./osu-local-favorites.user.js#L6397)** · src L950
 
 ```js
 // Nothing on this path is expected to throw (the lookup swallows its
@@ -3805,7 +3893,7 @@ Not listed here, because they stay in the built file:
 // be assigned at all must not leave the row stuck showing pause.
 ```
 
-**[L6321](./osu-local-favorites.user.js#L6321)** · src L961
+**[L6405](./osu-local-favorites.user.js#L6405)** · src L961
 
 ```js
 // Moves to the next (direction 1) or previous (direction -1) track in
@@ -3813,7 +3901,7 @@ Not listed here, because they stay in the built file:
 // track instead of stepping in order.
 ```
 
-**[L6345](./osu-local-favorites.user.js#L6345)** · src L988
+**[L6429](./osu-local-favorites.user.js#L6429)** · src L988
 
 ```js
 // Wire this panel's Now Playing bar + queue functions into the
@@ -3822,7 +3910,7 @@ Not listed here, because they stay in the built file:
 // the list/settings view.
 ```
 
-**[L6355](./osu-local-favorites.user.js#L6355)** · src L1002
+**[L6439](./osu-local-favorites.user.js#L6439)** · src L1002
 
 ```js
 // Reconcile the freshly-rendered favorite cards with the singleton audio.
@@ -3830,19 +3918,19 @@ Not listed here, because they stay in the built file:
 // is still alive; never let the detached node remain the active UI owner.
 ```
 
-**[L6366](./osu-local-favorites.user.js#L6366)** · src L1016
+**[L6450](./osu-local-favorites.user.js#L6450)** · src L1016
 
 ```js
 // Clear the old card refs first; then link them to this newly-mounted node.
 ```
 
-**[L6413](./osu-local-favorites.user.js#L6413)** · src L1064
+**[L6497](./osu-local-favorites.user.js#L6497)** · src L1064
 
 ```js
 // ── View switching ───────────────────────────────────────
 ```
 
-**[L6421](./osu-local-favorites.user.js#L6421)** · src L1073
+**[L6505](./osu-local-favorites.user.js#L6505)** · src L1073
 
 ```js
 // The search field belongs only to the favorites list. Collapse the
@@ -3850,7 +3938,7 @@ Not listed here, because they stay in the built file:
 // an empty search-sized gap above the controls.
 ```
 
-**[L6433](./osu-local-favorites.user.js#L6433)** · src L1088
+**[L6517](./osu-local-favorites.user.js#L6517)** · src L1088
 
 ```js
 // Returning to the list from Settings rebuilds rows so controls pick
@@ -3858,19 +3946,19 @@ Not listed here, because they stay in the built file:
 // newly-created card instead of leaving stale detached DOM refs.
 ```
 
-**[L6439](./osu-local-favorites.user.js#L6439)** · src L1097
+**[L6523](./osu-local-favorites.user.js#L6523)** · src L1097
 
 ```js
 // ── Helpers ────────────────────────────────────────────
 ```
 
-**[L6464](./osu-local-favorites.user.js#L6464)** · src L1123
+**[L6548](./osu-local-favorites.user.js#L6548)** · src L1123
 
 ```js
 // ── Render list ────────────────────────────────────────
 ```
 
-**[L6469](./osu-local-favorites.user.js#L6469)** · src L1129
+**[L6553](./osu-local-favorites.user.js#L6553)** · src L1129
 
 ```js
 // Scroll preservation. renderList() empties the list node and rebuilds
@@ -3882,13 +3970,21 @@ Not listed here, because they stay in the built file:
 // is what comparing a view key gives us for free.
 ```
 
-**[L6482](./osu-local-favorites.user.js#L6482)** · src L1149
+**[L6566](./osu-local-favorites.user.js#L6566)** · src L1149
+
+```js
+// Collection membership counts for the "+ Playlist" badges - one pass
+// over all collections per render instead of O(collections x ids) per
+// card (see buildCollectionCountIndex).
+```
+
+**[L6568](./osu-local-favorites.user.js#L6568)** · src L1154
 
 ```js
 // Filter
 ```
 
-**[L6495](./osu-local-favorites.user.js#L6495)** · src L1163
+**[L6581](./osu-local-favorites.user.js#L6581)** · src L1168
 
 ```js
 // Category filters (date / title / artist / status / genre). Terms are
@@ -3898,33 +3994,33 @@ Not listed here, because they stay in the built file:
 // flattened once per render rather than per row - see ui/filters.js.
 ```
 
-**[L6498](./osu-local-favorites.user.js#L6498)** · src L1171
+**[L6584](./osu-local-favorites.user.js#L6584)** · src L1176
 
 ```js
 // Collection filter
 ```
 
-**[L6504](./osu-local-favorites.user.js#L6504)** · src L1178
+**[L6590](./osu-local-favorites.user.js#L6590)** · src L1183
 
 ```js
 // The badge reflects the visible result set after search, genre/tag,
 // and collection filters, rather than always showing the library total.
 ```
 
-**[L6506](./osu-local-favorites.user.js#L6506)** · src L1182
+**[L6592](./osu-local-favorites.user.js#L6592)** · src L1187
 
 ```js
 // Sort
 ```
 
-**[L6522](./osu-local-favorites.user.js#L6522)** · src L1199
+**[L6608](./osu-local-favorites.user.js#L6608)** · src L1204
 
 ```js
 // Snapshot for the Now Playing bar's Back/Next/shuffle - always the
 // currently visible, filtered/sorted order.
 ```
 
-**[L6525](./osu-local-favorites.user.js#L6525)** · src L1204
+**[L6611](./osu-local-favorites.user.js#L6611)** · src L1209
 
 ```js
 // Emptying the node zeroes scrollTop in a browser, but say so explicitly:
@@ -3932,26 +4028,26 @@ Not listed here, because they stay in the built file:
 // change must land at the top whether or not the engine obliges.
 ```
 
-**[L6529](./osu-local-favorites.user.js#L6529)** · src L1211
+**[L6615](./osu-local-favorites.user.js#L6615)** · src L1216
 
 ```js
 // Invalidate any chunk-append from a previous render (also covers the
 // early-return paths below).
 ```
 
-**[L6531](./osu-local-favorites.user.js#L6531)** · src L1215
+**[L6617](./osu-local-favorites.user.js#L6617)** · src L1220
 
 ```js
 // Disconnect any previous lazy-load observer so orphaned refs don't linger
 ```
 
-**[L6535](./osu-local-favorites.user.js#L6535)** · src L1220
+**[L6621](./osu-local-favorites.user.js#L6621)** · src L1225
 
 ```js
 // IntersectionObserver rooted on the scroll container, 100px look-ahead on each side
 ```
 
-**[L6544](./osu-local-favorites.user.js#L6544)** · src L1230
+**[L6630](./osu-local-favorites.user.js#L6630)** · src L1235
 
 ```js
 // IndexedDB lookup is local and fast, so it's fine to wait for
@@ -3960,7 +4056,7 @@ Not listed here, because they stay in the built file:
 // otherwise cause a visible flicker on every card).
 ```
 
-**[L6565](./osu-local-favorites.user.js#L6565)** · src L1256
+**[L6651](./osu-local-favorites.user.js#L6651)** · src L1261
 
 ```js
 // Card BUILDER - rows are constructed lazily, one chunk per animation
@@ -3968,66 +4064,89 @@ Not listed here, because they stay in the built file:
 // doesn't build ~15k DOM nodes inside the click handler.
 ```
 
-**[L6576](./osu-local-favorites.user.js#L6576)** · src L1270
+**[L6662](./osu-local-favorites.user.js#L6662)** · src L1275
 
 ```js
 // Cover
 ```
 
-**[L6582](./osu-local-favorites.user.js#L6582)** · src L1277
+**[L6668](./osu-local-favorites.user.js#L6668)** · src L1282
 
 ```js
 // Don't set src yet - the IntersectionObserver will do it when the row
 // scrolls within 100px of the list viewport
 ```
 
-**[L6588](./osu-local-favorites.user.js#L6588)** · src L1285
+**[L6674](./osu-local-favorites.user.js#L6674)** · src L1290
 
 ```js
 // insertBefore instead of textContent= so dimOverlay & previewBtn
 // (appended after this block) are not destroyed
 ```
 
-**[L6597](./osu-local-favorites.user.js#L6597)** · src L1296
+**[L6683](./osu-local-favorites.user.js#L6683)** · src L1301
 
 ```js
 // Dim overlay - sits at --osu-fav-idle-dim normally (0 by default,
 // i.e. invisible) and brightens to --osu-fav-hover-dim on hover/while playing
 ```
 
-**[L6603](./osu-local-favorites.user.js#L6603)** · src L1304
+**[L6689](./osu-local-favorites.user.js#L6689)** · src L1309
 
 ```js
 // Info
 ```
 
-**[L6664](./osu-local-favorites.user.js#L6664)** · src L1366
+**[L6750](./osu-local-favorites.user.js#L6750)** · src L1371
 
 ```js
 // Add-to-collection dropdown - sits right next to the date-added text.
 // Shows a checkmark + count once the map is in at least one collection.
+// Counts come from the per-render index (_collCounts, built once in
+// renderList) - the direct scan here was O(collections x ids) per
+// card, i.e. quadratic across a large library, and ran 2x per card.
 ```
 
-**[L6685](./osu-local-favorites.user.js#L6685)** · src L1389
+**[L6765](./osu-local-favorites.user.js#L6765)** · src L1391
+
+```js
+// Style refresh already read the count; reuse it instead of a second scan.
+```
+
+**[L6770](./osu-local-favorites.user.js#L6770)** · src L1397
+
+```js
+// Membership may have just changed for THIS map - refresh from
+// the live store rather than the render-time index.
+```
+
+**[L6777](./osu-local-favorites.user.js#L6777)** · src L1406
 
 ```js
 // Membership changed - if a collection filter is active, this
 // card may need to appear/disappear from the visible list.
 ```
 
-**[L6691](./osu-local-favorites.user.js#L6691)** · src L1397
+**[L6783](./osu-local-favorites.user.js#L6783)** · src L1414
 
 ```js
 // Progress bar (shown during playback)
 ```
 
-**[L6701](./osu-local-favorites.user.js#L6701)** · src L1408
+**[L6793](./osu-local-favorites.user.js#L6793)** · src L1425
 
 ```js
 // Actions
 ```
 
-**[L6720](./osu-local-favorites.user.js#L6720)** · src L1428
+**[L6798](./osu-local-favorites.user.js#L6798)** · src L1431
+
+```js
+// Canonical URL from the numeric id - never the stored f.url, which
+// untrusted imports could otherwise control (javascript:/lookalike).
+```
+
+**[L6812](./osu-local-favorites.user.js#L6812)** · src L1447
 
 ```js
 // If a default mirror is configured (Settings → Download Mirrors)
@@ -4046,13 +4165,13 @@ Not listed here, because they stay in the built file:
 // plain link, same as the default-mirror path.
 ```
 
-**[L6782](./osu-local-favorites.user.js#L6782)** · src L1504
+**[L6874](./osu-local-favorites.user.js#L6874)** · src L1523
 
 ```js
 // Preview button - singleton audio (module-level ensureAudio()), only one plays at a time
 ```
 
-**[L6786](./osu-local-favorites.user.js#L6786)** · src L1509
+**[L6878](./osu-local-favorites.user.js#L6878)** · src L1528
 
 ```js
 // Hydrate this track's cache entry as soon as the user shows intent
@@ -4063,26 +4182,26 @@ Not listed here, because they stay in the built file:
 // the small LRU, so sweeping a few rows costs no retained memory.
 ```
 
-**[L6791](./osu-local-favorites.user.js#L6791)** · src L1520
+**[L6883](./osu-local-favorites.user.js#L6883)** · src L1539
 
 ```js
 // Play button - lives inside the cover, centred, shown on hover or while playing
 ```
 
-**[L6801](./osu-local-favorites.user.js#L6801)** · src L1531
+**[L6893](./osu-local-favorites.user.js#L6893)** · src L1550
 
 ```js
 // Show/hide button on cover hover; restore original border/color on hover
 ```
 
-**[L6818](./osu-local-favorites.user.js#L6818)** · src L1549
+**[L6910](./osu-local-favorites.user.js#L6910)** · src L1568
 
 ```js
 // Compare by id, not by src string - a cached play sets audio.src
 // to a local blob: URL, which never string-matches previewUrl.
 ```
 
-**[L6819](./osu-local-favorites.user.js#L6819)** · src L1552
+**[L6911](./osu-local-favorites.user.js#L6911)** · src L1571
 
 ```js
 // A source decision for this same track is still in flight, so
@@ -4090,7 +4209,7 @@ Not listed here, because they stay in the built file:
 // whatever played before. The pending play() starts on its own.
 ```
 
-**[L6830](./osu-local-favorites.user.js#L6830)** · src L1566
+**[L6922](./osu-local-favorites.user.js#L6922)** · src L1585
 
 ```js
 // Re-link the bar/dim to this card every time we (re)start
@@ -4101,14 +4220,14 @@ Not listed here, because they stay in the built file:
 // wired up to draw progress for it.
 ```
 
-**[L6844](./osu-local-favorites.user.js#L6844)** · src L1586
+**[L6936](./osu-local-favorites.user.js#L6936)** · src L1605
 
 ```js
 // Different track - hand off to the shared player so the Now
 // Playing bar and Back/Next queue stay in sync too.
 ```
 
-**[L6849](./osu-local-favorites.user.js#L6849)** · src L1593
+**[L6941](./osu-local-favorites.user.js#L6941)** · src L1612
 
 ```js
 // Reconcile a track that is already loaded in the singleton audio
@@ -4121,7 +4240,7 @@ Not listed here, because they stay in the built file:
 // chunk, exactly when the node comes into existence.
 ```
 
-**[L6873](./osu-local-favorites.user.js#L6873)** · src L1625
+**[L6965](./osu-local-favorites.user.js#L6965)** · src L1644
 
 ```js
 // Chunked build+append - mounting 500+ rows in one synchronous pass
@@ -4132,13 +4251,13 @@ Not listed here, because they stay in the built file:
 // near the top, and it's non-blocking regardless.
 ```
 
-**[L6874](./osu-local-favorites.user.js#L6874)** · src L1632
+**[L6966](./osu-local-favorites.user.js#L6966)** · src L1651
 
 ```js
 // set at top of this function
 ```
 
-**[L6876](./osu-local-favorites.user.js#L6876)** · src L1634
+**[L6968](./osu-local-favorites.user.js#L6968)** · src L1653
 
 ```js
 // Rows arrive a chunk at a time, so the saved offset usually does not
@@ -4147,7 +4266,7 @@ Not listed here, because they stay in the built file:
 // now shorter than it was), then stop checking.
 ```
 
-**[L6883](./osu-local-favorites.user.js#L6883)** · src L1645
+**[L6975](./osu-local-favorites.user.js#L6975)** · src L1664
 
 ```js
 // Keep the mobile search bar's own scroll tracking in step, so the
@@ -4155,13 +4274,13 @@ Not listed here, because they stay in the built file:
 // expand the header behind their back.
 ```
 
-**[L6886](./osu-local-favorites.user.js#L6886)** · src L1651
+**[L6978](./osu-local-favorites.user.js#L6978)** · src L1670
 
 ```js
 // superseded by newer render
 ```
 
-**[L6898](./osu-local-favorites.user.js#L6898)** · src L1663
+**[L6990](./osu-local-favorites.user.js#L6990)** · src L1682
 
 ```js
 // ── Mobile search bar behavior ─────────────────────────────
@@ -4171,14 +4290,14 @@ Not listed here, because they stay in the built file:
 // search bar hides/reappears.
 ```
 
-**[L6934](./osu-local-favorites.user.js#L6934)** · src L1704
+**[L7026](./osu-local-favorites.user.js#L7026)** · src L1723
 
 ```js
 // Collapse the header itself with the search field. The input alone can
 // disappear while osu!'s global CSS still leaves a large header box.
 ```
 
-**[L6944](./osu-local-favorites.user.js#L6944)** · src L1716
+**[L7036](./osu-local-favorites.user.js#L7036)** · src L1735
 
 ```js
 // ── Assemble & wire events ─────────────────────────────
@@ -4187,7 +4306,7 @@ Not listed here, because they stay in the built file:
 // participates in the scrollable list/settings viewport.
 ```
 
-**[L6953](./osu-local-favorites.user.js#L6953)** · src L1729
+**[L7045](./osu-local-favorites.user.js#L7045)** · src L1748
 
 ```js
 // Expose the in-place re-render so changes made anywhere else (a heart
@@ -4198,14 +4317,14 @@ Not listed here, because they stay in the built file:
 // binding intact, which destroying and reopening the panel does not.
 ```
 
-**[L6958](./osu-local-favorites.user.js#L6958)** · src L1740
+**[L7050](./osu-local-favorites.user.js#L7050)** · src L1759
 
 ```js
 // Automatic checks can be disabled in Settings. Manual checks remain
 // available from Settings and the userscript menu either way.
 ```
 
-**[L6968](./osu-local-favorites.user.js#L6968)** · src L1752
+**[L7060](./osu-local-favorites.user.js#L7060)** · src L1771
 
 ```js
 // Re-renders the favorites panel's list if it is currently open.
@@ -4224,7 +4343,7 @@ Not listed here, because they stay in the built file:
 //     an in-panel action still costs exactly one render, not two.
 ```
 
-**[L6971](./osu-local-favorites.user.js#L6971)** · src L1769
+**[L7063](./osu-local-favorites.user.js#L7063)** · src L1788
 
 ```js
 // `force` is used for storage changes received from another tab. A local
@@ -4233,20 +4352,20 @@ Not listed here, because they stay in the built file:
 // old list until the next local interaction.
 ```
 
-**[L6984](./osu-local-favorites.user.js#L6984)** · src L1786
+**[L7076](./osu-local-favorites.user.js#L7076)** · src L1805
 
 ```js
 // Re-read: the panel may have been closed, or replaced by a newly
 // opened one, between queueing and now.
 ```
 
-**[L6990](./osu-local-favorites.user.js#L6990)** · src L1794
+**[L7082](./osu-local-favorites.user.js#L7082)** · src L1813
 
 ```js
 // the panel already re-rendered itself; nothing stale left
 ```
 
-**[L6997](./osu-local-favorites.user.js#L6997)** · src L1801
+**[L7089](./osu-local-favorites.user.js#L7089)** · src L1820
 
 ```js
 // If an external notification arrived while this render was queued,
@@ -4256,9 +4375,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/menu-commands.js`
 
-1 comments · userscript [L7007](./osu-local-favorites.user.js#L7007) - [L7007](./osu-local-favorites.user.js#L7007)
+1 comments · userscript [L7099](./osu-local-favorites.user.js#L7099) - [L7099](./osu-local-favorites.user.js#L7099)
 
-**[L7007](./osu-local-favorites.user.js#L7007)** · src L5
+**[L7099](./osu-local-favorites.user.js#L7099)** · src L5
 
 ```js
 // ═══ Menu commands ═══
@@ -4271,9 +4390,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/guest-fallback.js`
 
-10 comments · userscript [L7042](./osu-local-favorites.user.js#L7042) - [L7110](./osu-local-favorites.user.js#L7110)
+10 comments · userscript [L7134](./osu-local-favorites.user.js#L7134) - [L7202](./osu-local-favorites.user.js#L7202)
 
-**[L7042](./osu-local-favorites.user.js#L7042)** · src L5
+**[L7134](./osu-local-favorites.user.js#L7134)** · src L5
 
 ```js
 // ═══ Guest-mode fallback button ═══
@@ -4281,19 +4400,19 @@ Not listed here, because they stay in the built file:
 // not signed in. We inject a standalone button into the page header area.
 ```
 
-**[L7044](./osu-local-favorites.user.js#L7044)** · src L10
+**[L7136](./osu-local-favorites.user.js#L7136)** · src L10
 
 ```js
 // Only on beatmapset detail pages (not the listing /beatmapsets)
 ```
 
-**[L7045](./osu-local-favorites.user.js#L7045)** · src L12
+**[L7137](./osu-local-favorites.user.js#L7137)** · src L12
 
 ```js
 // Don't inject if already present
 ```
 
-**[L7050](./osu-local-favorites.user.js#L7050)** · src L18
+**[L7142](./osu-local-favorites.user.js#L7142)** · src L18
 
 ```js
 // If the native osu! favourite button already exists on the page (user is logged in),
@@ -4304,7 +4423,7 @@ Not listed here, because they stay in the built file:
 // button goes undetected and we'd inject a visually-identical duplicate heart next to it.
 ```
 
-**[L7059](./osu-local-favorites.user.js#L7059)** · src L33
+**[L7151](./osu-local-favorites.user.js#L7151)** · src L33
 
 ```js
 // Try multiple anchor points in order of preference.
@@ -4312,7 +4431,7 @@ Not listed here, because they stay in the built file:
 // the native download buttons. Fall back progressively for older/different page layouts.
 ```
 
-**[L7072](./osu-local-favorites.user.js#L7072)** · src L49
+**[L7164](./osu-local-favorites.user.js#L7164)** · src L49
 
 ```js
 // Build the button using the exact same class and inner-HTML structure as osu!'s
@@ -4320,26 +4439,26 @@ Not listed here, because they stay in the built file:
 // the page's own CSS for sizing, colours, and hover effects.
 ```
 
-**[L7082](./osu-local-favorites.user.js#L7082)** · src L62
+**[L7174](./osu-local-favorites.user.js#L7174)** · src L62
 
 ```js
 // Inner HTML mirrors the native button exactly:
 // <span.btn-osu-big__content> > <span.btn-osu-big__icon> > <span.fa.fa-fw> > <span.{far|fas}.fa-heart>
 ```
 
-**[L7095](./osu-local-favorites.user.js#L7095)** · src L77
+**[L7187](./osu-local-favorites.user.js#L7187)** · src L77
 
 ```js
 // Mirror the native button's animation
 ```
 
-**[L7098](./osu-local-favorites.user.js#L7098)** · src L81
+**[L7190](./osu-local-favorites.user.js#L7190)** · src L81
 
 ```js
 // Toggle the heart icon class
 ```
 
-**[L7110](./osu-local-favorites.user.js#L7110)** · src L94
+**[L7202](./osu-local-favorites.user.js#L7202)** · src L94
 
 ```js
 // Prepend so it appears before the download buttons, matching logged-in position
@@ -4348,9 +4467,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/guest-downloads.js`
 
-16 comments · userscript [L7114](./osu-local-favorites.user.js#L7114) - [L7258](./osu-local-favorites.user.js#L7258)
+16 comments · userscript [L7206](./osu-local-favorites.user.js#L7206) - [L7350](./osu-local-favorites.user.js#L7350)
 
-**[L7114](./osu-local-favorites.user.js#L7114)** · src L4
+**[L7206](./osu-local-favorites.user.js#L7206)** · src L4
 
 ```js
 // ═══ Enable download buttons for guest/logged-out users ═══
@@ -4366,7 +4485,7 @@ Not listed here, because they stay in the built file:
 //   <a class="btn-osu-big btn-osu-big--beatmapset-header" href="…/download?noVideo=1">…without Video…</a>
 ```
 
-**[L7115](./osu-local-favorites.user.js#L7115)** · src L16
+**[L7207](./osu-local-favorites.user.js#L7207)** · src L16
 
 ```js
 // ── 1. Beatmap panel cards (listing + user pages) ────────────────────────
@@ -4374,38 +4493,38 @@ Not listed here, because they stay in the built file:
 // with real <a> links that match the logged-in element exactly.
 ```
 
-**[L7116](./osu-local-favorites.user.js#L7116)** · src L20
+**[L7208](./osu-local-favorites.user.js#L7208)** · src L20
 
 ```js
 // Already converted - skip
 ```
 
-**[L7134](./osu-local-favorites.user.js#L7134)** · src L39
+**[L7226](./osu-local-favorites.user.js#L7226)** · src L39
 
 ```js
 // Context not resolvable yet (card still mid-render) - leave unmarked
 // so the next pass retries instead of skipping this element forever.
 ```
 
-**[L7140](./osu-local-favorites.user.js#L7140)** · src L47
+**[L7232](./osu-local-favorites.user.js#L7232)** · src L47
 
 ```js
 // Match logged-in: listing pages use data-orig-title, user pages use title
 ```
 
-**[L7143](./osu-local-favorites.user.js#L7143)** · src L51
+**[L7235](./osu-local-favorites.user.js#L7235)** · src L51
 
 ```js
 // Preserve qtip attributes so tooltips work
 ```
 
-**[L7148](./osu-local-favorites.user.js#L7148)** · src L57
+**[L7240](./osu-local-favorites.user.js#L7240)** · src L57
 
 ```js
 // Inner content: keep the original icon span (fas fa-file-download)
 ```
 
-**[L7152](./osu-local-favorites.user.js#L7152)** · src L62
+**[L7244](./osu-local-favorites.user.js#L7244)** · src L62
 
 ```js
 // ── 2. Beatmapset detail pages (/beatmapsets/ID) ─────────────────────────
@@ -4413,26 +4532,26 @@ Not listed here, because they stay in the built file:
 // instead of the download links. Replace it with the exact logged-in pair.
 ```
 
-**[L7155](./osu-local-favorites.user.js#L7155)** · src L68
+**[L7247](./osu-local-favorites.user.js#L7247)** · src L68
 
 ```js
 // Guard: if real download links already exist (script ran before, or user logged in),
 // or if we already injected them, don't duplicate.
 ```
 
-**[L7167](./osu-local-favorites.user.js#L7167)** · src L82
+**[L7259](./osu-local-favorites.user.js#L7259)** · src L82
 
 ```js
 // Build "Download with Video" - matches logged-in <a class="btn-osu-big btn-osu-big--beatmapset-header">
 ```
 
-**[L7183](./osu-local-favorites.user.js#L7183)** · src L99
+**[L7275](./osu-local-favorites.user.js#L7275)** · src L99
 
 ```js
 // Build "Download without Video"
 ```
 
-**[L7202](./osu-local-favorites.user.js#L7202)** · src L119
+**[L7294](./osu-local-favorites.user.js#L7294)** · src L119
 
 ```js
 // Detects osu!plus (limjeck/osuplus) already having injected its own mirror
@@ -4441,7 +4560,7 @@ Not listed here, because they stay in the built file:
 // cluttered duplicate row of near-identical buttons.
 ```
 
-**[L7206](./osu-local-favorites.user.js#L7206)** · src L127
+**[L7298](./osu-local-favorites.user.js#L7298)** · src L127
 
 ```js
 // Builds a button matching osu!'s own native download-button markup
@@ -4450,7 +4569,7 @@ Not listed here, because they stay in the built file:
 // custom pill glued on top of it.
 ```
 
-**[L7224](./osu-local-favorites.user.js#L7224)** · src L149
+**[L7316](./osu-local-favorites.user.js#L7316)** · src L149
 
 ```js
 // Injects native-styled mirror-download buttons onto the beatmapset detail
@@ -4461,13 +4580,13 @@ Not listed here, because they stay in the built file:
 // changes, and stands down entirely if osu!plus already covers this.
 ```
 
-**[L7240](./osu-local-favorites.user.js#L7240)** · src L171
+**[L7332](./osu-local-favorites.user.js#L7332)** · src L171
 
 ```js
 // already current
 ```
 
-**[L7258](./osu-local-favorites.user.js#L7258)** · src L189
+**[L7350](./osu-local-favorites.user.js#L7350)** · src L189
 
 ```js
 // Match osu!plus's own insertion point exactly: before "…more" if it
@@ -4477,9 +4596,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/core/toast.js`
 
-1 comments · userscript [L7266](./osu-local-favorites.user.js#L7266) - [L7266](./osu-local-favorites.user.js#L7266)
+1 comments · userscript [L7358](./osu-local-favorites.user.js#L7358) - [L7358](./osu-local-favorites.user.js#L7358)
 
-**[L7266](./osu-local-favorites.user.js#L7266)** · src L1
+**[L7358](./osu-local-favorites.user.js#L7358)** · src L1
 
 ```js
 // ═══ Toast helper ═══
@@ -4488,46 +4607,46 @@ Not listed here, because they stay in the built file:
 
 ## `src/data/version-check.js`
 
-7 comments · userscript [L7293](./osu-local-favorites.user.js#L7293) - [L7347](./osu-local-favorites.user.js#L7347)
+7 comments · userscript [L7385](./osu-local-favorites.user.js#L7385) - [L7439](./osu-local-favorites.user.js#L7439)
 
-**[L7293](./osu-local-favorites.user.js#L7293)** · src L3
+**[L7385](./osu-local-favorites.user.js#L7385)** · src L3
 
 ```js
 // ═══ Version check & update helper ═══
 ```
 
-**[L7299](./osu-local-favorites.user.js#L7299)** · src L10
+**[L7391](./osu-local-favorites.user.js#L7391)** · src L10
 
 ```js
 // getCurrentVersion() reads directly from Tampermonkey's GM_info API, which always
 // mirrors the @version header - no separate constant to keep in sync.
 ```
 
-**[L7300](./osu-local-favorites.user.js#L7300)** · src L13
+**[L7392](./osu-local-favorites.user.js#L7392)** · src L13
 
 ```js
 // Primary: Tampermonkey/Violentmonkey expose GM_info.script.version from the @version tag
 ```
 
-**[L7303](./osu-local-favorites.user.js#L7303)** · src L17
+**[L7395](./osu-local-favorites.user.js#L7395)** · src L17
 
 ```js
 // Fallback: scan script tags in the document for a @version comment (development use)
 ```
 
-**[L7329](./osu-local-favorites.user.js#L7329)** · src L44
+**[L7421](./osu-local-favorites.user.js#L7421)** · src L44
 
 ```js
 // 12 hours
 ```
 
-**[L7342](./osu-local-favorites.user.js#L7342)** · src L57
+**[L7434](./osu-local-favorites.user.js#L7434)** · src L57
 
 ```js
 // Always fetch the live main branch so version checks pick up real releases
 ```
 
-**[L7347](./osu-local-favorites.user.js#L7347)** · src L63
+**[L7439](./osu-local-favorites.user.js#L7439)** · src L63
 
 ```js
 // Only scan the UserScript header block (first 2 KB) for speed
@@ -4536,9 +4655,9 @@ Not listed here, because they stay in the built file:
 
 ## `src/ui/update-prompt.js`
 
-7 comments · userscript [L7371](./osu-local-favorites.user.js#L7371) - [L7460](./osu-local-favorites.user.js#L7460)
+7 comments · userscript [L7463](./osu-local-favorites.user.js#L7463) - [L7552](./osu-local-favorites.user.js#L7552)
 
-**[L7371](./osu-local-favorites.user.js#L7371)** · src L3
+**[L7463](./osu-local-favorites.user.js#L7463)** · src L3
 
 ```js
 // ═══ Update prompt UI ═══
@@ -4546,37 +4665,37 @@ Not listed here, because they stay in the built file:
 // Reuses the same palette as the panel so it looks consistent.
 ```
 
-**[L7376](./osu-local-favorites.user.js#L7376)** · src L11
+**[L7468](./osu-local-favorites.user.js#L7468)** · src L11
 
 ```js
 // Inject slide-in keyframe if not already present
 ```
 
-**[L7390](./osu-local-favorites.user.js#L7390)** · src L26
+**[L7482](./osu-local-favorites.user.js#L7482)** · src L26
 
 ```js
 // Matches panel: dark #111 bg, #333 border, same font stack, same shadow
 ```
 
-**[L7407](./osu-local-favorites.user.js#L7407)** · src L44
+**[L7499](./osu-local-favorites.user.js#L7499)** · src L44
 
 ```js
 // Gradient accent bar - same as displayUpdateBanner inside the panel
 ```
 
-**[L7431](./osu-local-favorites.user.js#L7431)** · src L69
+**[L7523](./osu-local-favorites.user.js#L7523)** · src L69
 
 ```js
 // Body - same text color and line-height as panel text
 ```
 
-**[L7437](./osu-local-favorites.user.js#L7437)** · src L76
+**[L7529](./osu-local-favorites.user.js#L7529)** · src L76
 
 ```js
 // Footer buttons - mirror the toolbar makeBtn style from the panel
 ```
 
-**[L7460](./osu-local-favorites.user.js#L7460)** · src L100
+**[L7552](./osu-local-favorites.user.js#L7552)** · src L100
 
 ```js
 // "Update" button - same style as the in-panel banner's Update button
@@ -4585,15 +4704,15 @@ Not listed here, because they stay in the built file:
 
 ## `src/core/init.js`
 
-36 comments · userscript [L7481](./osu-local-favorites.user.js#L7481) - [L7815](./osu-local-favorites.user.js#L7815)
+36 comments · userscript [L7573](./osu-local-favorites.user.js#L7573) - [L7916](./osu-local-favorites.user.js#L7916)
 
-**[L7481](./osu-local-favorites.user.js#L7481)** · src L32
+**[L7573](./osu-local-favorites.user.js#L7573)** · src L32
 
 ```js
 // ═══ Init ═══
 ```
 
-**[L7484](./osu-local-favorites.user.js#L7484)** · src L36
+**[L7576](./osu-local-favorites.user.js#L7576)** · src L36
 
 ```js
 // osu!'s own qtip tooltips/popups (difficulty hover cards, user cards,
@@ -4607,7 +4726,7 @@ Not listed here, because they stay in the built file:
 // opened once.
 ```
 
-**[L7491](./osu-local-favorites.user.js#L7491)** · src L52
+**[L7583](./osu-local-favorites.user.js#L7583)** · src L52
 
 ```js
 // Single place where a change to the favorites store becomes visible.
@@ -4620,7 +4739,7 @@ Not listed here, because they stay in the built file:
 // Registered before anything can mutate the store.
 ```
 
-**[L7494](./osu-local-favorites.user.js#L7494)** · src L63
+**[L7586](./osu-local-favorites.user.js#L7586)** · src L63
 
 ```js
 // Enrichment filled in metadata for maps that are already favorited.
@@ -4629,14 +4748,14 @@ Not listed here, because they stay in the built file:
 // panel unusable while it runs.
 ```
 
-**[L7506](./osu-local-favorites.user.js#L7506)** · src L79
+**[L7598](./osu-local-favorites.user.js#L7598)** · src L79
 
 ```js
 // OAuth callback must be handled as early as possible so the user never
 // sees a flash of the raw ?code=…&state=… query string on /home.
 ```
 
-**[L7508](./osu-local-favorites.user.js#L7508)** · src L83
+**[L7600](./osu-local-favorites.user.js#L7600)** · src L83
 
 ```js
 // One-time-per-favorite migration: back-fill the enrichment queue with
@@ -4647,13 +4766,13 @@ Not listed here, because they stay in the built file:
 // Tampermonkey, especially on Firefox Android.
 ```
 
-**[L7514](./osu-local-favorites.user.js#L7514)** · src L95
+**[L7606](./osu-local-favorites.user.js#L7606)** · src L95
 
 ```js
 /* never break page load over this */
 ```
 
-**[L7522](./osu-local-favorites.user.js#L7522)** · src L103
+**[L7614](./osu-local-favorites.user.js#L7614)** · src L103
 
 ```js
 // ═══ Cross-tab sync ═══
@@ -4667,13 +4786,13 @@ Not listed here, because they stay in the built file:
 // far better than losing everything after it.
 ```
 
-**[L7525](./osu-local-favorites.user.js#L7525)** · src L115
+**[L7617](./osu-local-favorites.user.js#L7617)** · src L115
 
 ```js
 // ignore writes from this same tab
 ```
 
-**[L7527](./osu-local-favorites.user.js#L7527)** · src L117
+**[L7619](./osu-local-favorites.user.js#L7619)** · src L117
 
 ```js
 // Use the value delivered with the notification instead of asking
@@ -4682,13 +4801,13 @@ Not listed here, because they stay in the built file:
 // would leave page A showing page B's old list until another event.
 ```
 
-**[L7530](./osu-local-favorites.user.js#L7530)** · src L124
+**[L7622](./osu-local-favorites.user.js#L7622)** · src L124
 
 ```js
 // Re-render floating heart (filled/outline SVG) for the current beatmap
 ```
 
-**[L7532](./osu-local-favorites.user.js#L7532)** · src L127
+**[L7624](./osu-local-favorites.user.js#L7624)** · src L127
 
 ```js
 // Re-render the existing panel in place. Reopening it here would
@@ -4696,13 +4815,13 @@ Not listed here, because they stay in the built file:
 // progress, leaving page A with the old list or a partial list.
 ```
 
-**[L7534](./osu-local-favorites.user.js#L7534)** · src L132
+**[L7626](./osu-local-favorites.user.js#L7626)** · src L132
 
 ```js
 // Re-check all visible card hearts (clear the "already scanned" flag first)
 ```
 
-**[L7548](./osu-local-favorites.user.js#L7548)** · src L147
+**[L7640](./osu-local-favorites.user.js#L7640)** · src L147
 
 ```js
 // Some userscript managers expose working GM_getValue/GM_setValue but
@@ -4714,27 +4833,27 @@ Not listed here, because they stay in the built file:
 // settle pass covers slower extension-storage implementations.
 ```
 
-**[L7553](./osu-local-favorites.user.js#L7553)** · src L159
+**[L7645](./osu-local-favorites.user.js#L7645)** · src L159
 
 ```js
 // The signal only carries the key; wait for the manager's storage
 // read to settle before invalidating and rebuilding the panel.
 ```
 
-**[L7591](./osu-local-favorites.user.js#L7591)** · src L199
+**[L7683](./osu-local-favorites.user.js#L7683)** · src L199
 
 ```js
 // BroadcastChannel is more reliable than storage events in extension
 // sandboxes and reaches sibling tabs/windows on the same origin directly.
 ```
 
-**[L7601](./osu-local-favorites.user.js#L7601)** · src L211
+**[L7693](./osu-local-favorites.user.js#L7693)** · src L211
 
 ```js
 // storage-event fallback above remains active.
 ```
 
-**[L7603](./osu-local-favorites.user.js#L7603)** · src L214
+**[L7695](./osu-local-favorites.user.js#L7695)** · src L214
 
 ```js
 // A tab can be backgrounded while another tab changes the store. On return,
@@ -4750,7 +4869,7 @@ Not listed here, because they stay in the built file:
 // the hidden period instead, and only repaint when it genuinely moved.
 ```
 
-**[L7640](./osu-local-favorites.user.js#L7640)** · src L262
+**[L7732](./osu-local-favorites.user.js#L7732)** · src L262
 
 ```js
 // Collections (playlists) live under their own GM key, entirely separate
@@ -4765,7 +4884,7 @@ Not listed here, because they stay in the built file:
 // and refreshing is enough - no full panel teardown/rebuild needed.
 ```
 
-**[L7652](./osu-local-favorites.user.js#L7652)** · src L284
+**[L7744](./osu-local-favorites.user.js#L7744)** · src L284
 
 ```js
 // Same story for the Appearance settings (accent, heart color, cover-art
@@ -4778,19 +4897,19 @@ Not listed here, because they stay in the built file:
 // idempotent to call from any of them changing remotely.
 ```
 
-**[L7677](./osu-local-favorites.user.js#L7677)** · src L317
+**[L7769](./osu-local-favorites.user.js#L7769)** · src L317
 
 ```js
 // Auto-check version updates only when the user has left the setting on.
 ```
 
-**[L7686](./osu-local-favorites.user.js#L7686)** · src L327
+**[L7778](./osu-local-favorites.user.js#L7778)** · src L327
 
 ```js
 // Debounced observer - runs at most once per 600ms to avoid freezing the page
 ```
 
-**[L7691](./osu-local-favorites.user.js#L7691)** · src L333
+**[L7783](./osu-local-favorites.user.js#L7783)** · src L333
 
 ```js
 // Skip while the tab is in the background - a MutationObserver on
@@ -4804,7 +4923,7 @@ Not listed here, because they stay in the built file:
 // backgrounded.
 ```
 
-**[L7712](./osu-local-favorites.user.js#L7712)** · src L363
+**[L7804](./osu-local-favorites.user.js#L7804)** · src L363
 
 ```js
 // ═══ Turbolinks / back-forward resiliency ═══
@@ -4824,7 +4943,7 @@ Not listed here, because they stay in the built file:
 // both issues at once.
 ```
 
-**[L7718](./osu-local-favorites.user.js#L7718)** · src L384
+**[L7810](./osu-local-favorites.user.js#L7810)** · src L384
 
 ```js
 // Listen for the browser's native SPA navigation signal as well. The
@@ -4832,7 +4951,7 @@ Not listed here, because they stay in the built file:
 // which is why the URL poll remains as a final fallback.
 ```
 
-**[L7727](./osu-local-favorites.user.js#L7727)** · src L396
+**[L7819](./osu-local-favorites.user.js#L7819)** · src L396
 
 ```js
 // Keep a live panel node when osu! swaps content in place. If a
@@ -4840,7 +4959,7 @@ Not listed here, because they stay in the built file:
 // so discard that inert copy and recreate it below when it was open.
 ```
 
-**[L7739](./osu-local-favorites.user.js#L7739)** · src L411
+**[L7831](./osu-local-favorites.user.js#L7831)** · src L411
 
 ```js
 // Beatmap context (isLoggedIn's cached user blob, mirror row state)
@@ -4848,7 +4967,7 @@ Not listed here, because they stay in the built file:
 // as a different (or no) user, so stale caches must not survive it.
 ```
 
-**[L7754](./osu-local-favorites.user.js#L7754)** · src L429
+**[L7846](./osu-local-favorites.user.js#L7846)** · src L429
 
 ```js
 // Remember whether the panel should be restored if navigation replaces the
@@ -4857,21 +4976,21 @@ Not listed here, because they stay in the built file:
 // survives page changes.
 ```
 
-**[L7757](./osu-local-favorites.user.js#L7757)** · src L436
+**[L7849](./osu-local-favorites.user.js#L7849)** · src L436
 
 ```js
 // Turbolinks (classic) fires "turbolinks:load"; Hotwire Turbo renamed it
 // to "turbo:load" - listen for both since we can't be sure which is live.
 ```
 
-**[L7759](./osu-local-favorites.user.js#L7759)** · src L440
+**[L7851](./osu-local-favorites.user.js#L7851)** · src L440
 
 ```js
 // Fallback for a genuine browser back/forward-cache restore, in case any
 // navigation path bypasses Turbolinks entirely.
 ```
 
-**[L7763](./osu-local-favorites.user.js#L7763)** · src L446
+**[L7855](./osu-local-favorites.user.js#L7855)** · src L446
 
 ```js
 // Polling for SPA navigation (low overhead). Some osu! routes do not emit
@@ -4880,7 +4999,7 @@ Not listed here, because they stay in the built file:
 // the panel is recreated on the new page instead of silently disappearing.
 ```
 
-**[L7771](./osu-local-favorites.user.js#L7771)** · src L458
+**[L7863](./osu-local-favorites.user.js#L7863)** · src L458
 
 ```js
 // The page content changed without a Turbolinks event. Markers left
@@ -4889,7 +5008,7 @@ Not listed here, because they stay in the built file:
 // scratch.
 ```
 
-**[L7785](./osu-local-favorites.user.js#L7785)** · src L476
+**[L7877](./osu-local-favorites.user.js#L7877)** · src L476
 
 ```js
 // Periodic fallback scan - the MutationObserver above catches almost
@@ -4903,9 +5022,16 @@ Not listed here, because they stay in the built file:
 // above - a background tab has no reason to keep re-scanning the page
 // every 1.5s forever; the visibilitychange listener below runs one pass
 // immediately on returning to the tab instead.
+//
+// Change-gated: the five scan functions together iterate every <button>
+// and download menu-item on the page. A DOM-signature check (single
+// querySelectorAll pass, same set refreshButtons() walks) skips passes
+// where nothing new appeared and the URL didn't change - the observer
+// remains the primary driver for real DOM changes, and every 8th tick
+// (~12s) still runs a full pass as a safety net for same-count DOM swaps.
 ```
 
-**[L7795](./osu-local-favorites.user.js#L7795)** · src L497
+**[L7896](./osu-local-favorites.user.js#L7896)** · src L513
 
 ```js
 // Firefox Android may hand a media session to Android right as its tab is
@@ -4916,14 +5042,14 @@ Not listed here, because they stay in the built file:
 // event would violate Android's autoplay policy.
 ```
 
-**[L7805](./osu-local-favorites.user.js#L7805)** · src L513
+**[L7906](./osu-local-favorites.user.js#L7906)** · src L529
 
 ```js
 // Catch up in one pass after returning to the tab, so pausing the scans
 // above while hidden never leaves the page UI stale.
 ```
 
-**[L7815](./osu-local-favorites.user.js#L7815)** · src L525
+**[L7916](./osu-local-favorites.user.js#L7916)** · src L541
 
 ```js
 // Initial refresh after page settles

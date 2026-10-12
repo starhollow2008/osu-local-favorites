@@ -167,11 +167,99 @@ export function isFavorited(id) {
   return !!getFavorites()[id];
 }
 
+// ── Import sanitization ──
+// Favorites can arrive from outside the script's own writes: JSON file import,
+// Gist fetch, and Gist restore. All three are untrusted data - the README
+// explicitly encourages importing someone else's shared list. Without a
+// schema gate, a crafted file could (a) prototype-pollute the favorites
+// object via "__proto__"/"constructor"/"prototype" keys, (b) plant record
+// fields the UI consumes verbatim (f.url -> <a href>, f.preview -> <audio>,
+// f.covers -> <img>/cache fetch), or (c) merge an unbounded payload that then
+// taxes every render and backup forever. Records are therefore rebuilt
+// field-by-field from a whitelist, ids must be numeric strings, and a raw
+// size cap rejects absurd payloads before parsing cost.
+const _FAV_STRING_FIELDS = [
+  "title", "title_unicode", "artist", "artist_unicode", "creator",
+  "user_id", "status", "source", "tags", "genre", "language",
+  "favourited_at",
+];
+const _FAV_NUMBER_FIELDS = ["favourite_count", "play_count", "bpm"];
+const _COVER_HOST_RE = /^https:\/\/([a-z0-9-]+\.)*ppy\.sh(\/|$)/i;
+
+function sanitizeCoverUrl(u) {
+  return typeof u === "string" && _COVER_HOST_RE.test(u) ? u : undefined;
+}
+
+// Rebuilds one favorite record from whitelisted fields only. Returns null
+// when the entry is not an object at all. Unknown fields are dropped, not
+// merged - the stored schema is exactly what the rest of the script reads.
+// url and preview are NOT taken from the record: parseImportedFavorites()
+// stamps them (plus id) canonically from the numeric key, so a shared
+// record can't point the Open button or <audio> at a javascript: or
+// lookalike URL.
+export function sanitizeFavoriteRecord(fav) {
+  if (!fav || typeof fav !== "object" || Array.isArray(fav)) return null;
+  const out = {};
+  for (const k of _FAV_STRING_FIELDS) {
+    if (typeof fav[k] === "string") out[k] = fav[k];
+  }
+  for (const k of ["favourite_count", "play_count", "bpm"]) {
+    if (typeof fav[k] === "number" && isFinite(fav[k])) out[k] = fav[k];
+  }
+  for (const k of ["is_artist_featured", "nsfw", "metadata_enriched"]) {
+    if (typeof fav[k] === "boolean") out[k] = fav[k];
+  }
+  if (fav.covers && typeof fav.covers === "object" && !Array.isArray(fav.covers)) {
+    const covers = {};
+    for (const [ck, cv] of Object.entries(fav.covers)) {
+      const clean = sanitizeCoverUrl(cv);
+      if (clean !== undefined) covers[ck] = clean;
+    }
+    if (Object.keys(covers).length) out.covers = covers;
+  }
+  return out;
+}
+
+// Validates and sanitizes an import payload. Returns a fresh
+// { [numericId]: sanitizedRecord } map keyed only by numeric beatmap ids,
+// which also makes "__proto__"/"constructor"/"prototype" keys impossible to
+// carry over. Throws with a readable message on structurally invalid data.
+export function parseImportedFavorites(data) {
+  if (typeof data !== "object" || data === null || Array.isArray(data)) {
+    throw new Error("Malformed backup data");
+  }
+  const out = {};
+  for (const [id, fav] of Object.entries(data)) {
+    if (!/^\d+$/.test(id)) continue; // numeric beatmap ids only
+    const clean = sanitizeFavoriteRecord(fav);
+    if (!clean) continue;
+    // Canonical identity fields come from the numeric key, never from the
+    // imported record (see sanitizeFavoriteRecord above).
+    clean.id = id;
+    clean.url = `https://osu.ppy.sh/beatmapsets/${id}`;
+    clean.preview = `https://b.ppy.sh/preview/${id}.mp3`;
+    if (!clean.favourited_at) clean.favourited_at = new Date().toISOString();
+    out[id] = clean;
+  }
+  return out;
+}
+
 // Cover art is resolved from the id when a record carries no `covers`, so
 // exports leave the object out (its URLs only differ by a cache-buster).
+// Imported records are the untrusted path into `covers` (shared Gists), so
+// anything not on an osu!/ppy.sh host is ignored here rather than rendered
+// into <img>/MediaSession - a crafted record can't make the browser fetch
+// attacker-chosen URLs.
+const _PPY_HOST_RE = /^https:\/\/([a-z0-9-]+\.)*ppy\.sh(\/|$)/i;
+
+function pinnedCoverUrl(u) {
+  return typeof u === "string" && _PPY_HOST_RE.test(u) ? u : undefined;
+}
+
 export function favoriteCoverUrl(f, id) {
   const c = (f && f.covers) || {};
-  return c.card || c["card@2x"] || c.list || c.cover ||
+  const pinned = [c.card, c["card@2x"], c.list, c.cover].map(pinnedCoverUrl);
+  return pinned.find(Boolean) ||
     (id ? `https://assets.ppy.sh/beatmaps/${id}/covers/card.jpg` : "");
 }
 

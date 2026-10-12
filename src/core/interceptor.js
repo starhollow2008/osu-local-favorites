@@ -3,10 +3,19 @@
 export function injectInterceptor() {
   const script = document.createElement("script");
   script.textContent = `(${function () {
-    // ── XHR intercept: block /favourites requests ──
+    // ── XHR intercept: block /favourites write requests ──
+    // Only the write verbs (POST/PUT/PATCH/DELETE) are faked - osu!'s own
+    // favorites *listing* endpoints share the /favourites path and must
+    // keep hitting the network, or page code silently receives "{}"
+    // instead of real JSON.
+    const BLOCKED_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
     const origOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function (method, url) {
-      if (typeof url === "string" && url.includes("/favourites")) {
+      if (
+        typeof url === "string" &&
+        url.includes("/favourites") &&
+        BLOCKED_METHODS.has(String(method || "GET").toUpperCase())
+      ) {
         this.__blocked = true;
       }
       return origOpen.apply(this, arguments);
@@ -40,11 +49,12 @@ export function injectInterceptor() {
       return origSend.apply(this, arguments);
     };
 
-    // ── Fetch intercept: block /favourites and auth-error responses ──
+    // ── Fetch intercept: block /favourites write requests ──
     const origFetch = window.fetch;
     window.fetch = function (url, options) {
       const urlStr = typeof url === "string" ? url : (url && url.url) || "";
-      if (urlStr.includes("/favourites")) {
+      const method = String((options && options.method) || (url && url.method) || "GET").toUpperCase();
+      if (urlStr.includes("/favourites") && BLOCKED_METHODS.has(method)) {
         return Promise.resolve(
           new Response("{}", {
             status: 200,

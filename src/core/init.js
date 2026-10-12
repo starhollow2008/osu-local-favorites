@@ -484,8 +484,24 @@ function init() {
   // above - a background tab has no reason to keep re-scanning the page
   // every 1.5s forever; the visibilitychange listener below runs one pass
   // immediately on returning to the tab instead.
+  //
+  // Change-gated: the five scan functions together iterate every <button>
+  // and download menu-item on the page. A DOM-signature check (single
+  // querySelectorAll pass, same set refreshButtons() walks) skips passes
+  // where nothing new appeared and the URL didn't change - the observer
+  // remains the primary driver for real DOM changes, and every 8th tick
+  // (~12s) still runs a full pass as a safety net for same-count DOM swaps.
+  let _scanSig = "";
+  let _scanTick = 0;
   setInterval(() => {
     if (document.hidden) return;
+    _scanTick++;
+    const sig =
+      location.pathname + "#" +
+      document.querySelectorAll("button, span.beatmapset-panel__menu-item").length;
+    const changed = sig !== _scanSig;
+    _scanSig = sig;
+    if (!changed && _scanTick % 8 !== 0) return;
     refreshButtons();
     addFavoriteAllButtons();
     addGuestFavoriteButton();

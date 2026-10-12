@@ -10,7 +10,7 @@ import { CACHE_CUSTOM_MINUTES_KEY, CACHE_DURATION_KEY, CACHE_SIZE_CUSTOM_MB_KEY,
 import { DL_DEFAULT_MIRROR_KEY, DL_SOURCE_PREF_KEY, DL_VIDEO_PREF_KEY, MIRRORS, getAllDownloadDestinations, isMirrorEnabled } from "../data/mirrors.js";
 import { MUSIC_AUTONEXT_KEY, MUSIC_LOOP_KEY, MUSIC_SHUFFLE_KEY, MUSIC_VOLUME_KEY, musicAutoNextEnabled, musicLoopEnabled, musicShuffleEnabled, musicVolumePct } from "../data/playback-settings.js";
 import { cancelGlobalReenrichment, isReenrichRunning, runGlobalReenrichment, updateReenrichmentUI } from "../data/reenrichment.js";
-import { getFavorites, serializeFavorites, setFavorites } from "../data/storage.js";
+import { getFavorites, parseImportedFavorites, serializeFavorites, setFavorites } from "../data/storage.js";
 import { AUTO_UPDATE_CHECK_KEY, autoUpdateChecksEnabled, checkVersionUpdate, getCurrentVersion } from "../data/version-check.js";
 import { updateFloatingHeart } from "./floating-heart.js";
 import { THEME_ACCENT_KEY, THEME_ACTIVE_OPACITY_KEY, THEME_DEFAULTS, THEME_HEART_KEY, THEME_HOVER_DIM_KEY, THEME_IDLE_DIM_KEY, THEME_IDLE_OPACITY_KEY, applyTheme, getThemeSettings } from "./theme.js";
@@ -453,9 +453,7 @@ export function createSettingsView(deps) {
       if (!e.target.files[0]) return;
       try {
         const text = await e.target.files[0].text();
-        const data = JSON.parse(text);
-        if (typeof data !== "object" || Array.isArray(data))
-          throw new Error("Expected JSON object");
+        const data = parseImportedFavorites(JSON.parse(text));
         const existing = getFavorites();
         let added = 0;
         for (const [id, fav] of Object.entries(data)) {
@@ -821,12 +819,10 @@ export function createSettingsView(deps) {
         fetchBtn.disabled = true;
         ghGetGistContent("", gistId)
           .then((data) => {
-            if (typeof data !== "object" || Array.isArray(data)) {
-              throw new Error("Malformed backup data");
-            }
+            const clean = parseImportedFavorites(data);
             const existing = getFavorites();
             let added = 0;
-            for (const [id, fav] of Object.entries(data)) {
+            for (const [id, fav] of Object.entries(clean)) {
               if (!existing[id]) {
                 existing[id] = fav;
                 added++;
@@ -974,11 +970,10 @@ export function createSettingsView(deps) {
         restoreBtn.disabled = true;
         ghGetGistContent(token, gistId)
           .then((data) => {
-            if (typeof data !== "object" || Array.isArray(data))
-              throw new Error("Malformed backup data");
+            const clean = parseImportedFavorites(data);
             const existing = getFavorites();
             let added = 0;
-            for (const [id, fav] of Object.entries(data)) {
+            for (const [id, fav] of Object.entries(clean)) {
               if (!existing[id]) {
                 existing[id] = fav;
                 added++;
@@ -1028,11 +1023,10 @@ export function createSettingsView(deps) {
         fetchBtn.disabled = true;
         ghGetGistContent(token, gistId)
           .then((data) => {
-            if (typeof data !== "object" || Array.isArray(data))
-              throw new Error("Malformed backup data");
+            const clean = parseImportedFavorites(data);
             const existing = getFavorites();
             let added = 0;
-            for (const [id, fav] of Object.entries(data)) {
+            for (const [id, fav] of Object.entries(clean)) {
               if (!existing[id]) {
                 existing[id] = fav;
                 added++;

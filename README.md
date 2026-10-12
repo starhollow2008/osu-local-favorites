@@ -116,7 +116,7 @@ Everything below lives behind the ⚙ **Settings** button in the side panel head
 ## Limitations
 
 - Purely local by default - favorites don't sync between devices unless you export/import or connect GitHub Gist backup
-- Gist backup requires a GitHub personal access token with `gist` scope, stored locally by Tampermonkey - treat it like any other credential
+- Gist backup requires a GitHub personal access token with `gist` scope, stored locally by Tampermonkey - treat it like any other credential. On userscript managers with a broken `GM_setValue`/`GM_getValue` implementation the script transparently falls back to `localStorage`, which — unlike GM storage — **is** readable by page scripts; the GitHub token and osu! API credentials then share that reduced isolation (see `src/core/gm-shim.js`)
 - Download mirrors (Beatconnect, NeriNyan, Sayobot, Mino) are third-party services, not affiliated with or endorsed by osu! - they're off by default except Beatconnect and NeriNyan; enable/disable them in Settings
 - Only works on `osu.ppy.sh` beatmap pages
 - May need updates if osu! changes their page layout

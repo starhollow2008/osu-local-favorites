@@ -2,7 +2,7 @@ import { GH_AUTO_BACKUP_KEY, GH_LAST_SYNC_KEY, GH_TOKEN_KEY } from "../api/gist-
 import { scheduleAutoBackup } from "../api/osu-api.js";
 import { fetchHinaiSong, hinaiDurationSec, previewSourceUrl, storeHinaiSongMetadata } from "../api/previews.js";
 import { GM_getValue, GM_setValue } from "../core/gm-shim.js";
-import { collectionsContainingMap, getCollections } from "../data/collections.js";
+import { buildCollectionCountIndex, collectionsContainingMap, getCollections } from "../data/collections.js";
 import { _blobUrlCache, cacheDurationMode, getKnownCachedBlob, hasFreshCachedCopy, lookupCachedBlob, prewarmCachedPreview, resolveCachedMediaUrl, startStreamingCacheWrite } from "../data/media-cache-db.js";
 import { resolveDefaultMirror } from "../data/mirrors.js";
 import { MUSIC_LOOP_KEY, MUSIC_SHUFFLE_KEY, musicLoopEnabled, musicShuffleEnabled } from "../data/playback-settings.js";
@@ -1146,6 +1146,11 @@ export function showFavoritesPanel() {
 
     const cBadge = panel.querySelector("#osu-fav-count");
 
+    // Collection membership counts for the "+ Playlist" badges - one pass
+    // over all collections per render instead of O(collections x ids) per
+    // card (see buildCollectionCountIndex).
+    const _collCounts = buildCollectionCountIndex();
+
     // Filter
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -1365,7 +1370,10 @@ export function showFavoritesPanel() {
 
       // Add-to-collection dropdown - sits right next to the date-added text.
       // Shows a checkmark + count once the map is in at least one collection.
-      const collCount = () => collectionsContainingMap(id).length;
+      // Counts come from the per-render index (_collCounts, built once in
+      // renderList) - the direct scan here was O(collections x ids) per
+      // card, i.e. quadratic across a large library, and ran 2x per card.
+      const collCount = () => _collCounts.get(id) || 0;
       const addToCollBtn = document.createElement("button");
       addToCollBtn.type = "button";
       function refreshAddToCollBtn() {
@@ -1380,12 +1388,21 @@ export function showFavoritesPanel() {
       addToCollBtn.style.cssText =
         "font-size:8px;font-weight:600;padding:1px 5px;border-radius:2px;flex-shrink:0;cursor:pointer;background:transparent";
       refreshAddToCollBtn();
-      addToCollBtn.style.border = `1px solid ${collCount() ? "var(--osu-fav-accent)" : "#333"}`;
+      // Style refresh already read the count; reuse it instead of a second scan.
+      const _collN = collCount();
+      addToCollBtn.style.border = `1px solid ${_collN ? "var(--osu-fav-accent)" : "#333"}`;
       addToCollBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         showAddToCollectionMenu(addToCollBtn, id, () => {
-          refreshAddToCollBtn();
-          addToCollBtn.style.borderColor = collCount() ? "var(--osu-fav-accent)" : "#333";
+          // Membership may have just changed for THIS map - refresh from
+          // the live store rather than the render-time index.
+          const n = collectionsContainingMap(id).length;
+          addToCollBtn.textContent = n ? `\u2713 ${n}` : "+ Playlist";
+          addToCollBtn.title = n
+            ? `In ${n} collection${n > 1 ? "s" : ""} - click to manage`
+            : "Add to a collection";
+          addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "#333";
+          addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "#666";
           // Membership changed - if a collection filter is active, this
           // card may need to appear/disappear from the visible list.
           if (activeCollectionId) renderList();
@@ -1411,7 +1428,9 @@ export function showFavoritesPanel() {
         "display:flex;flex-direction:column;gap:4px;flex-shrink:0;justify-content:center";
 
       const openLink = document.createElement("a");
-      openLink.href = f.url || `https://osu.ppy.sh/beatmapsets/${id}`;
+      // Canonical URL from the numeric id - never the stored f.url, which
+      // untrusted imports could otherwise control (javascript:/lookalike).
+      openLink.href = `https://osu.ppy.sh/beatmapsets/${id}`;
       openLink.target = "_blank";
       openLink.textContent = "Open";
       openLink.style.cssText =

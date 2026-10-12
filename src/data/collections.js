@@ -74,3 +74,19 @@ export function collectionsContainingMap(mapId) {
     .map(([id]) => id);
 }
 
+// Per-render membership index: one pass over every collection's id list,
+// producing mapId -> count. buildCard() needs only the count for the
+// "+ Playlist" badge, and the direct scan (collectionsContainingMap) is
+// O(collections x ids) per card - quadratic across a 1000-card render and
+// re-paid on every filter/sort/enrichment-triggered rebuild. Callers should
+// build this once per renderList() and pass it down instead.
+export function buildCollectionCountIndex() {
+  const cols = getCollections();
+  const counts = new Map();
+  for (const col of Object.values(cols)) {
+    if (!Array.isArray(col.ids)) continue;
+    for (const mapId of col.ids) counts.set(mapId, (counts.get(mapId) || 0) + 1);
+  }
+  return counts;
+}
+

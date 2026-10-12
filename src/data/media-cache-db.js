@@ -390,7 +390,27 @@ export function gmFetchBlob(url) {
 // Blob - so without this, a long session doing a lot of re-rendering was
 // steadily accumulating orphaned blob URLs (and, for full-length preview
 // audio, several-MB Blobs behind each one) that never got released.
+// sourceUrl -> objectURL for fresh cached blobs currently in use by <img>/
+// <audio> elements. Object URLs live until revoked, so an uncapped map grows
+// for the tab's lifetime - a long session browsing thousands of covers kept
+// thousands of URLs alive. Capped LRU-style: minting past the cap revokes the
+// oldest entry (safe to revoke - entries here are only "expected reuse"
+// hints; the next resolve() re-mints from the still-cached Blob).
 export const _blobUrlCache = new Map(); // sourceUrl -> objectURL
+const BLOB_URL_CACHE_MAX = 300;
+
+function _blobUrlCachePut(url, objUrl) {
+  const old = _blobUrlCache.get(url);
+  if (old !== undefined) URL.revokeObjectURL(old); // re-mint for changed bytes
+  _blobUrlCache.delete(url);
+  _blobUrlCache.set(url, objUrl);
+  while (_blobUrlCache.size > BLOB_URL_CACHE_MAX) {
+    const lruKey = _blobUrlCache.keys().next().value;
+    const lruUrl = _blobUrlCache.get(lruKey);
+    _blobUrlCache.delete(lruKey);
+    if (lruUrl) URL.revokeObjectURL(lruUrl);
+  }
+}
 
 // One definition of "this cache entry is usable right now", shared by the
 // playback source choice, the streaming writer's pre-request check and
@@ -502,7 +522,7 @@ export function resolveCachedMediaUrl(url) {
       let objUrl = _blobUrlCache.get(url);
       if (!objUrl) {
         objUrl = URL.createObjectURL(entry.blob);
-        _blobUrlCache.set(url, objUrl);
+        _blobUrlCachePut(url, objUrl);
       }
       return objUrl;
     }
@@ -515,8 +535,8 @@ export function resolveCachedMediaUrl(url) {
       // stale content forever.
       const stale = _blobUrlCache.get(url);
       if (stale) {
-        URL.revokeObjectURL(stale);
         _blobUrlCache.delete(url);
+        URL.revokeObjectURL(stale);
       }
     });
     return url;

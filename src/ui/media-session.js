@@ -61,7 +61,9 @@ function buildArtwork(favorite, id) {
   const seen = new Set();
   const artwork = [];
   for (const src of candidates) {
-    if (!src || seen.has(src)) continue;
+    // Host pinning: covers can arrive from an untrusted import (shared
+    // Gists); only osu!/ppy.sh artwork is handed to MediaSession.
+    if (!src || !/^https:\/\/([a-z0-9-]+\.)*ppy\.sh(\/|$)/i.test(src) || seen.has(src)) continue;
     seen.add(src);
     const entry = artworkEntry(src);
     if (entry) artwork.push(entry);
