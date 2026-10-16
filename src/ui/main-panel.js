@@ -9,7 +9,7 @@ import { MUSIC_LOOP_KEY, MUSIC_SHUFFLE_KEY, musicLoopEnabled, musicShuffleEnable
 import { favoriteCoverUrl, getFavorites, setFavorites } from "../data/storage.js";
 import { flushOnPageHide, loadPanelState, loadPlaybackState, savePanelState } from "../data/session-state.js";
 import { autoUpdateChecksEnabled, checkVersionUpdate, getCurrentVersion, isNewerVersion } from "../data/version-check.js";
-import { ensureAudio } from "./audio-player.js";
+import { ensureAudio, swapAudioSourceToCached } from "./audio-player.js";
 import { clearMediaSession, setMediaSessionMetadata } from "./media-session.js";
 import { showAddToCollectionMenu, showCollectionsMenu } from "./collections-menu.js";
 import { buildDownloadOptions, showDownloadMenu } from "./download-menu.js";
@@ -1021,7 +1021,24 @@ export function showFavoritesPanel() {
           // Range request for the remainder (see startStreamingCacheWrite).
           hasFreshCachedCopy(previewUrl).then((alreadyCached) => {
             if (alreadyCached || !stillWanted()) return;
-            startStreamingCacheWrite(previewUrl, { isStillWanted: stillWanted });
+            // Cache-overtake swap: the writer runs at full network speed
+            // while the element's own request is paced by playback, so on
+            // anything but the slowest connections the local copy completes
+            // while the song is still playing. Once it has, swap the
+            // element over to the cached blob and drop the network
+            // connection - gaplessly, via a shadow element that bridges
+            // the handoff (see swapAudioSourceToCached in audio-player).
+            startStreamingCacheWrite(previewUrl, { isStillWanted: stillWanted })
+              .then((stored) => {
+                if (!stored) return;
+                // The user may have skipped away, or the source may have
+                // already fallen back, in the time the download took.
+                if (audio._npCurrentId !== id || audio._usingBlobCache) return;
+                if (audio._sourceFallbackAttempted) return;
+                if (audio.ended) return;
+                swapAudioSourceToCached(audio, previewUrl);
+              })
+              .catch(() => { /* a failed swap just keeps the network source */ });
           });
         };
         if (audio.paused) audio.addEventListener("play", startStreamCache, { once: true });

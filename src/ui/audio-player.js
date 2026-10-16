@@ -400,6 +400,150 @@ function resetPlaybackAfterError(audio) {
   stopPlayback(audio);
 }
 
+// ── Cache-overtake source swap (gapless) ─────────────────────────────
+// Called by the panel when the streaming cache writer finishes a FULL local
+// copy while this track is still playing from its network source. The
+// element's own connection is then redundant - the whole rest of the song
+// is on disk - so the source is swapped to the cached blob, which also
+// closes the element's request.
+//
+// Swapping naively (src = blob; load(); seek; play) produces an audible
+// gap: load() flushes the pipeline, then metadata, decode and seek have to
+// finish before audio resumes - easily 100ms+. The gap is bridged instead:
+//   1. a hidden shadow Audio preloads the blob and starts playing from the
+//      live element's position - it covers the handoff audibly;
+//   2. the main element warms its pipeline for the same blob meanwhile;
+//   3. once the main element can play (canplaythrough on a fully-local blob
+//      is near-instant), it is seeked to wherever the shadow got to and
+//      started, and the shadow is paused - in the same tick, so the two
+//      never sound together and no step of audio is repeated.
+// While paused, the swap is silent and needs no bridge at all.
+//
+// The main element's identity never changes, so every listener, the media
+// session and all _np* UI bindings stay attached. The shadow is a
+// throwaway with no bindings of its own.
+export function swapAudioSourceToCached(audio, sourceUrl) {
+  const cachedBlob = getKnownCachedBlob(sourceUrl);
+  if (!cachedBlob) return Promise.resolve(false);
+
+  let localUrl = _blobUrlCache.get(sourceUrl);
+  if (!localUrl) {
+    localUrl = URL.createObjectURL(cachedBlob);
+    _blobUrlCache.set(sourceUrl, localUrl);
+  }
+
+  const applyState = () => {
+    // Same bookkeeping a cache-first play uses, so the decode-error path,
+    // stillWanted() and the fallback logic all treat the new source as
+    // "playing from cache" from here on.
+    audio._usingBlobCache = true;
+    audio._activePreviewUrl = localUrl;
+    // _activeCacheKey already points at the network URL the bytes are
+    // cached under - unchanged by the swap.
+  };
+
+  const directSwap = () => {
+    applyState();
+    audio.src = localUrl;
+    audio.load();
+    return Promise.resolve(true);
+  };
+
+  // Paused (or ended mid-swap): no sound to bridge. The paused position
+  // survives via the seek below; a paused element reloads silently.
+  if (audio.paused || audio.ended) {
+    const resumeAt = audio.currentTime;
+    audio.src = localUrl;
+    audio.load();
+    audio.addEventListener("loadedmetadata", () => {
+      try {
+        if (Number.isFinite(resumeAt) && resumeAt > 0 && resumeAt < (audio.duration || Infinity)) {
+          audio.currentTime = resumeAt;
+        }
+      } catch (e) { /* unseekable blob - restart from the top */ }
+    }, { once: true });
+    applyState();
+    return Promise.resolve(true);
+  }
+
+  // Playing: bridge with a shadow element. Bounded hard - a shadow that
+  // cannot start within the budget falls back to the direct swap (gap, but
+  // correct) rather than stalling the live track.
+  return new Promise((resolve) => {
+    let settled = false;
+    let shadow = null;
+    let watchdog = null;
+    const finish = (ok) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(watchdog);
+      if (shadow) {
+        try { shadow.pause(); } catch (e) { /* already gone */ }
+        try { shadow.src = ""; } catch (e) { /* same */ }
+        shadow = null;
+      }
+      resolve(ok);
+    };
+
+    const beginHandoff = () => {
+      // The shadow has reached the live position and is covering. Warm the
+      // main element's pipeline; it was paused? No - it is still playing its
+      // network source. Re-point it at the blob now: its old request aborts,
+      // and while it re-decodes (fast: fully local), the shadow covers.
+      const handoffAt = shadow.currentTime;
+      applyState();
+      audio.src = localUrl;
+      audio.load();
+      audio.addEventListener("canplay", () => {
+        try {
+          audio.currentTime = handoffAt + (shadow.currentTime - handoffAt);
+        } catch (e) { /* stay wherever the decode landed */ }
+        const p = audio.play();
+        if (p && typeof p.catch === "function") p.catch(() => { /* kept paused; user taps play */ });
+        // Stop the shadow the moment the main element is actually sounding,
+        // so the two never overlap and no content replays.
+        audio.addEventListener("playing", () => finish(true), { once: true });
+        // Safety net: if "playing" never fires (exotic autoplay rejection),
+        // finish anyway - the shadow would otherwise double-run forever.
+        setTimeout(() => finish(true), 800);
+      }, { once: true });
+    };
+
+    try {
+      shadow = new Audio(localUrl);
+      shadow.preload = "auto";
+      shadow.addEventListener("canplay", () => {
+        try {
+          shadow.currentTime = audio.currentTime;
+        } catch (e) { /* cannot seek - the direct-swap watchdog covers us */ }
+        const sp = shadow.play();
+        if (sp && typeof sp.catch === "function") {
+          sp.then(beginHandoff).catch(() => {
+            // Shadow cannot start (autoplay edge mid-session): the bridge is
+            // unavailable; take the small gap instead of risking a stall.
+            finish(false);
+            if (!settled) { /* direct swap */ }
+            directSwap();
+            resolve(true);
+          });
+        } else {
+          beginHandoff();
+        }
+      }, { once: true });
+      watchdog = setTimeout(() => {
+        // Blob decode should take tens of ms; at 1.5s something is wrong.
+        if (!settled) {
+          finish(false);
+          directSwap();
+        }
+      }, 1500);
+    } catch (e) {
+      finish(false);
+      directSwap();
+    }
+  });
+}
+
 // Builds the ordered list of download options for a beatmapset. Official
 // download offers both a with-video and no-video (confirmed real
 // ?noVideo=1 param) variant - previously this was hardcoded to

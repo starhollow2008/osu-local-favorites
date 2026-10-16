@@ -2083,6 +2083,107 @@
     stopPlayback(audio);
   }
 
+  function swapAudioSourceToCached(audio, sourceUrl) {
+    const cachedBlob = getKnownCachedBlob(sourceUrl);
+    if (!cachedBlob) return Promise.resolve(false);
+
+    let localUrl = _blobUrlCache.get(sourceUrl);
+    if (!localUrl) {
+      localUrl = URL.createObjectURL(cachedBlob);
+      _blobUrlCache.set(sourceUrl, localUrl);
+    }
+
+    const applyState = () => {
+      audio._usingBlobCache = true;
+      audio._activePreviewUrl = localUrl;
+    };
+
+    const directSwap = () => {
+      applyState();
+      audio.src = localUrl;
+      audio.load();
+      return Promise.resolve(true);
+    };
+
+    if (audio.paused || audio.ended) {
+      const resumeAt = audio.currentTime;
+      audio.src = localUrl;
+      audio.load();
+      audio.addEventListener("loadedmetadata", () => {
+        try {
+          if (Number.isFinite(resumeAt) && resumeAt > 0 && resumeAt < (audio.duration || Infinity)) {
+            audio.currentTime = resumeAt;
+          }
+        } catch (e) {  }
+      }, { once: true });
+      applyState();
+      return Promise.resolve(true);
+    }
+
+    return new Promise((resolve) => {
+      let settled = false;
+      let shadow = null;
+      let watchdog = null;
+      const finish = (ok) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(watchdog);
+        if (shadow) {
+          try { shadow.pause(); } catch (e) {  }
+          try { shadow.src = ""; } catch (e) {  }
+          shadow = null;
+        }
+        resolve(ok);
+      };
+
+      const beginHandoff = () => {
+        const handoffAt = shadow.currentTime;
+        applyState();
+        audio.src = localUrl;
+        audio.load();
+        audio.addEventListener("canplay", () => {
+          try {
+            audio.currentTime = handoffAt + (shadow.currentTime - handoffAt);
+          } catch (e) {  }
+          const p = audio.play();
+          if (p && typeof p.catch === "function") p.catch(() => {  });
+          audio.addEventListener("playing", () => finish(true), { once: true });
+          setTimeout(() => finish(true), 800);
+        }, { once: true });
+      };
+
+      try {
+        shadow = new Audio(localUrl);
+        shadow.preload = "auto";
+        shadow.addEventListener("canplay", () => {
+          try {
+            shadow.currentTime = audio.currentTime;
+          } catch (e) {  }
+          const sp = shadow.play();
+          if (sp && typeof sp.catch === "function") {
+            sp.then(beginHandoff).catch(() => {
+              finish(false);
+              if (!settled) {  }
+              directSwap();
+              resolve(true);
+            });
+          } else {
+            beginHandoff();
+          }
+        }, { once: true });
+        watchdog = setTimeout(() => {
+          if (!settled) {
+            finish(false);
+            directSwap();
+          }
+        }, 1500);
+      } catch (e) {
+        finish(false);
+        directSwap();
+      }
+    });
+  }
+
   // ━━━━━━━━━━ src/ui/popup-menu.js ━━━━━━━━━━
 
   function createPopupMenu(anchorEl, id, css) {
@@ -6820,7 +6921,15 @@
           const startStreamCache = () => {
             hasFreshCachedCopy(previewUrl).then((alreadyCached) => {
               if (alreadyCached || !stillWanted()) return;
-              startStreamingCacheWrite(previewUrl, { isStillWanted: stillWanted });
+              startStreamingCacheWrite(previewUrl, { isStillWanted: stillWanted })
+                .then((stored) => {
+                  if (!stored) return;
+                  if (audio._npCurrentId !== id || audio._usingBlobCache) return;
+                  if (audio._sourceFallbackAttempted) return;
+                  if (audio.ended) return;
+                  swapAudioSourceToCached(audio, previewUrl);
+                })
+                .catch(() => {  });
             });
           };
           if (audio.paused) audio.addEventListener("play", startStreamCache, { once: true });
