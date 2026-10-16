@@ -73,8 +73,8 @@
 
   // ━━━━━━━━━━ src/core/gm-shim.js ━━━━━━━━━━
 
-  const _nativeGM_getValue = typeof GM_getValue === "function" ? GM_getValue : null;
-  const _nativeGM_setValue = typeof GM_setValue === "function" ? GM_setValue : null;
+  const _nativeGM_getValue = typeof globalThis.GM_getValue === "function" ? globalThis.GM_getValue : null;
+  const _nativeGM_setValue = typeof globalThis.GM_setValue === "function" ? globalThis.GM_setValue : null;
   const _GM_FALLBACK_LS_KEY = "__osu_local_favorites_gm_fallback__";
   const _GM_CROSS_TAB_SYNC_KEY = "__osu_local_favorites_cross_tab_sync__";
   const _GM_CROSS_TAB_CHANNEL = "osu-local-favorites-cross-tab";
@@ -129,6 +129,10 @@
       return false;
     }
   })();
+
+  function gmStorageIsNative() {
+    return _gmStorageWorks;
+  }
 
   function GM_getValue(key, defaultValue) {
     if (_gmStorageWorks) {
@@ -3058,8 +3062,39 @@
   let _osuApiQueueTail = Promise.resolve();
   let _osuApiRetryAfterUntil = 0;
   let _osuApiBackoffMs = 0;
+  const OSU_API_CACHE_KEY = "osu_api_response_cache";
+  const OSU_API_BACKOFF_KEY = "osu_api_rate_limit_state";
+  const OSU_API_CACHE_SHARED_MAX = 400;
+  const OSU_API_CACHE_PERSIST_MAX_BYTES = 1.5 * 1024 * 1024;
+
   const _osuApiCache = new Map();
   const OSU_API_CACHE_MAX = 500;
+  const _osuApiEncoded = new Map();
+  let _osuApiCacheFlushTimer = null;
+
+  function _osuApiLoadBackoffState() {
+    try {
+      const s = GM_getValue(OSU_API_BACKOFF_KEY, null);
+      if (!s || typeof s !== "object") return { until: 0, backoff: 0 };
+      return { until: Number(s.until) || 0, backoff: Number(s.backoff) || 0 };
+    } catch (e) {
+      return { until: 0, backoff: 0 };
+    }
+  }
+
+  function _osuApiSaveBackoffState(until, backoff) {
+    try {
+      const prev = _osuApiLoadBackoffState();
+      if (until > 0 && prev.until > until) return;
+      GM_setValue(OSU_API_BACKOFF_KEY, { until, backoff, ts: Date.now() });
+    } catch (e) {  }
+  }
+
+  if (typeof window !== "undefined" && window.addEventListener) {
+    window.addEventListener("pagehide", () => {
+      if (_osuApiCacheFlushTimer) _osuApiFlushSharedCache();
+    });
+  }
 
   function _osuApiDelay(ms) {
     return new Promise((res) => setTimeout(res, ms));
@@ -3068,8 +3103,10 @@
   function _osuApiGate(fn) {
     const run = () => {
       const now = Date.now();
+      const shared = _osuApiLoadBackoffState();
       const wait = Math.max(
         _osuApiRetryAfterUntil - now,
+        shared.until - now,
         _osuApiBackoffMs ? (_osuApiRetryAfterUntil || now) + _osuApiBackoffMs - now : 0,
       );
       return (wait > 0 ? _osuApiDelay(wait) : Promise.resolve()).then(fn);
@@ -3081,7 +3118,8 @@
 
   function osuApiGet(path) {
     const cleanPath = path.replace(/^\//, "");
-    if (_osuApiCache.has(cleanPath)) return Promise.resolve(_osuApiCache.get(cleanPath));
+    const cached = _osuApiCacheGet(cleanPath);
+    if (cached !== undefined) return Promise.resolve(cached);
 
     const attempt = (isRetry) =>
       osuApiGetToken().then((token) =>
@@ -3093,9 +3131,14 @@
             if (!isRetry && _osuApiBackoffMs === 0) _osuApiBackoffMs = 2000;
             else _osuApiBackoffMs = Math.min(_osuApiBackoffMs * 2 || 2000, 60000);
             _osuApiRetryAfterUntil = Date.now() + (Number.isFinite(raHeader) && raHeader > 0 ? raHeader * 1000 : _osuApiBackoffMs);
+            _osuApiSaveBackoffState(_osuApiRetryAfterUntil, _osuApiBackoffMs);
             throw Object.assign(new Error("rate limited by osu! API"), { rateLimited: true });
           }
           _osuApiBackoffMs = 0;
+          const sharedNow = _osuApiLoadBackoffState();
+          if (sharedNow.until > 0 && sharedNow.until <= Date.now()) {
+            _osuApiSaveBackoffState(0, 0);
+          }
           if (r.status === 401 && !isRetry) {
             GM_setValue(OSU_API_TOKEN_KEY, null);
             return attempt(true);
@@ -3119,15 +3162,99 @@
     }).then((data) => {
       _osuApiCacheSet(cleanPath, data);
       return data;
+    }).catch((err) => {
+      const stale = _osuApiStaleStoreEntry(cleanPath);
+      if (stale !== undefined) {
+        _osuApiCacheSet(cleanPath, stale);
+        return stale;
+      }
+      throw err;
     });
+  }
+
+  function _osuApiStaleStoreEntry(path) {
+    const store = _osuApiReadStore();
+    const entry = store ? store[path] : null;
+    if (!entry || typeof entry.j !== "string") return undefined;
+    try {
+      return JSON.parse(entry.j);
+    } catch (e) {
+      return undefined;
+    }
   }
 
   function _osuApiCacheSet(path, data) {
     if (!data || typeof data !== "object") return;
+    const cachedAt = Date.now();
     if (_osuApiCache.size >= OSU_API_CACHE_MAX) {
       _osuApiCache.delete(_osuApiCache.keys().next().value);
     }
-    _osuApiCache.set(path, data);
+    _osuApiCache.set(path, { d: data, c: cachedAt });
+
+    if (!gmStorageIsNative()) return;
+    try {
+      _osuApiEncoded.set(path, { j: JSON.stringify(data), c: cachedAt });
+      while (_osuApiEncoded.size > OSU_API_CACHE_SHARED_MAX) {
+        _osuApiEncoded.delete(_osuApiEncoded.keys().next().value);
+      }
+      if (!_osuApiCacheFlushTimer) {
+        _osuApiCacheFlushTimer = setTimeout(_osuApiFlushSharedCache, 1000);
+      }
+    } catch (e) {  }
+  }
+
+  let _osuApiStoreSnapshot = null;
+  const OSU_API_STORE_SNAPSHOT_TTL_MS = 2000;
+
+  function _osuApiReadStore() {
+    const now = Date.now();
+    if (_osuApiStoreSnapshot && now - _osuApiStoreSnapshot.at < OSU_API_STORE_SNAPSHOT_TTL_MS) {
+      return _osuApiStoreSnapshot.raw;
+    }
+    let raw = null;
+    try {
+      const v = GM_getValue(OSU_API_CACHE_KEY, null);
+      if (v && typeof v === "object" && v.v === 1 && v.entries && typeof v.entries === "object") {
+        raw = v.entries;
+      }
+    } catch (e) { raw = null; }
+    _osuApiStoreSnapshot = { raw, at: now };
+    return raw;
+  }
+
+  function _osuApiFlushSharedCache() {
+    _osuApiCacheFlushTimer = null;
+    if (!gmStorageIsNative()) return;
+    try {
+      const entries = Object.assign({}, _osuApiReadStore() || {});
+      let bytes = 2;
+      for (const [p, e] of _osuApiEncoded) {
+        const cost = e.j.length + p.length + 16;
+        if (bytes + cost > OSU_API_CACHE_PERSIST_MAX_BYTES) break;
+        entries[p] = e;
+        bytes += cost;
+      }
+      GM_setValue(OSU_API_CACHE_KEY, { v: 1, entries });
+      _osuApiStoreSnapshot = { raw: entries, at: Date.now() };
+    } catch (e) {  }
+  }
+
+  function _osuApiCacheGet(path) {
+    const hit = _osuApiCache.get(path);
+    if (hit) return hit.d;
+    const store = _osuApiReadStore();
+    const entry = store ? store[path] : null;
+    if (!entry || typeof entry.j !== "string") return undefined;
+    try {
+      const d = JSON.parse(entry.j);
+      if (_osuApiCache.size >= OSU_API_CACHE_MAX) {
+        _osuApiCache.delete(_osuApiCache.keys().next().value);
+      }
+      _osuApiCache.set(path, { d, c: Number(entry.c) || 0 });
+      return d;
+    } catch (e) {
+      return undefined;
+    }
   }
 
   function osuApiDisconnect() {

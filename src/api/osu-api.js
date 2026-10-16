@@ -1,6 +1,6 @@
 import { GH_AUTO_BACKUP_KEY, GH_GIST_ID_KEY, GH_GIST_URL_KEY, GH_LAST_SYNC_KEY, GH_PRIVACY_KEY, GH_TOKEN_KEY, OSU_API_CLIENT_ID_KEY, OSU_API_CLIENT_SECRET_KEY, OSU_API_REDIRECT_URI, OSU_API_STATE_KEY, OSU_API_TOKEN_KEY, OSU_API_USERNAME_KEY, ghAdoptGist, ghCreateGist, ghGistVisibility, ghUpdateGist } from "./gist-backup.js";
 import { reportError } from "../core/errors.js";
-import { GM_getValue, GM_setValue } from "../core/gm-shim.js";
+import { GM_getValue, GM_setValue, gmStorageIsNative } from "../core/gm-shim.js";
 import { showOsuFavToast } from "../core/toast.js";
 import { getFavorites } from "../data/storage.js";
 import { normalizeBeatmapset } from "../data/beatmap-extraction.js";
@@ -150,12 +150,74 @@ function osuApiGetToken() {
 // Retry-After on HTTP 429, use exponential backoff, and cache responses.
 // All of that is enforced centrally here so every osuApiGet() caller is
 // compliant regardless of where the call originates.
+//
+// Cross-page state (Stage 1 of the cross-page API work): the response
+// cache and the 429 backoff now live in GM storage, which every osu.ppy.sh
+// page shares, so tab B hits tab A's cached responses and tab A's 429s
+// immediately throttle tab B. The queue itself (_osuApiQueueTail) stays
+// per-realm - a JS promise chain cannot outlive its document - until the
+// leader-election stage; multi-tab pacing is therefore additive, but the
+// shared cache removes the duplicate *requests* the duplicate queues used
+// to issue. The localStorage GM fallback is deliberately excluded from
+// shared-cache writes: it re-serializes the whole store per write, the
+// favorites payload already dominates that budget, and those environments
+// are rare.
 const OSU_API_MIN_GAP_MS = 1050;        // ≥1s between requests
-let _osuApiQueueTail = Promise.resolve(); // serializes request pacing
-let _osuApiRetryAfterUntil = 0;         // absolute ts while server says wait
-let _osuApiBackoffMs = 0;               // grows exponentially on repeat 429s
-const _osuApiCache = new Map();         // path → response JSON (session cache)
+let _osuApiQueueTail = Promise.resolve(); // serializes request pacing (per page)
+let _osuApiRetryAfterUntil = 0;         // absolute ts while server says wait (this page)
+let _osuApiBackoffMs = 0;               // grows exponentially on repeat 429s (this page)
+const OSU_API_CACHE_KEY = "osu_api_response_cache"; // { v:1, entries:{ path:{d,c} } }
+const OSU_API_BACKOFF_KEY = "osu_api_rate_limit_state"; // { until, backoff }
+const OSU_API_CACHE_SHARED_MAX = 400;   // entries persisted in GM storage
+const OSU_API_CACHE_PERSIST_MAX_BYTES = 1.5 * 1024 * 1024; // manager storage safety valve
+
+// In-memory mirror of the shared cache (read-through; no per-request GM read).
+// One entry per path: { d: data, c: cachedAt }. Capacity bound stays in
+// memory only; the store carries the newest shared entries up to its cap.
+const _osuApiCache = new Map();         // path → { d, c }
 const OSU_API_CACHE_MAX = 500;
+// Pre-encoded copies of the entries destined for GM storage (path →
+// { j: "<json string>", c: ts }). Written once per response, not once per
+// flush, so the throttled flush never re-serializes payloads.
+const _osuApiEncoded = new Map();
+// Throttle for persisting the shared cache: entries land in GM storage at
+// most once per second (flush coalesces everything since the last write).
+let _osuApiCacheFlushTimer = null;
+
+// ── Shared 429 backoff state (read/write helpers) ──
+function _osuApiLoadBackoffState() {
+  try {
+    const s = GM_getValue(OSU_API_BACKOFF_KEY, null);
+    if (!s || typeof s !== "object") return { until: 0, backoff: 0 };
+    return { until: Number(s.until) || 0, backoff: Number(s.backoff) || 0 };
+  } catch (e) {
+    return { until: 0, backoff: 0 };
+  }
+}
+
+// Writes are timestamp-compared so a late write from a tab that saw an
+// OLDER rate-limit state cannot roll a newer one back (GM storage has no
+// CAS). A clear (until=0) always passes: callers only issue clears after
+// observing that the shared window has already expired, and a clear that
+// races a fresh 429 from another page costs at most one extra 429 there.
+function _osuApiSaveBackoffState(until, backoff) {
+  try {
+    const prev = _osuApiLoadBackoffState();
+    if (until > 0 && prev.until > until) return; // stale writer - keep the newer state
+    GM_setValue(OSU_API_BACKOFF_KEY, { until, backoff, ts: Date.now() });
+  } catch (e) { /* pacing degrades to local-only, which is fine */ }
+}
+
+// Flush anything still pending when the page goes away - the 1s throttle
+// would otherwise lose the last second's worth of responses on navigation
+// or tab close, which is exactly the moment before the next page starts
+// asking for them. Function/const declarations above are hoisted enough
+// for this handler: it only runs after the module has fully evaluated.
+if (typeof window !== "undefined" && window.addEventListener) {
+  window.addEventListener("pagehide", () => {
+    if (_osuApiCacheFlushTimer) _osuApiFlushSharedCache();
+  });
+}
 
 function _osuApiDelay(ms) {
   return new Promise((res) => setTimeout(res, ms));
@@ -163,11 +225,16 @@ function _osuApiDelay(ms) {
 
 // Serializes every API call through one queue with ≥OSU_API_MIN_GAP_MS
 // spacing, plus any server-mandated or backoff wait before dispatching.
+// The wait is computed from BOTH this page's own backoff vars and the
+// shared GM state, so another page's 429 throttles this one immediately
+// (see the Stage 1 note above).
 function _osuApiGate(fn) {
   const run = () => {
     const now = Date.now();
+    const shared = _osuApiLoadBackoffState();
     const wait = Math.max(
       _osuApiRetryAfterUntil - now,
+      shared.until - now,
       _osuApiBackoffMs ? (_osuApiRetryAfterUntil || now) + _osuApiBackoffMs - now : 0,
     );
     return (wait > 0 ? _osuApiDelay(wait) : Promise.resolve()).then(fn);
@@ -177,10 +244,15 @@ function _osuApiGate(fn) {
   return result;
 }
 
-function osuApiGet(path) {
+// Exported for the cross-page smoke test; production callers go through
+// osuApiFetchBeatmapset and the enrichment paths.
+export function osuApiGet(path) {
   const cleanPath = path.replace(/^\//, "");
-  // Docs good-practice #4: cache retrieved data and reuse it.
-  if (_osuApiCache.has(cleanPath)) return Promise.resolve(_osuApiCache.get(cleanPath));
+  // Docs good-practice #4: cache retrieved data and reuse it. Memory first,
+  // then the shared GM store (see _osuApiCacheGet) - so a response another
+  // page already fetched is served locally with no request at all.
+  const cached = _osuApiCacheGet(cleanPath);
+  if (cached !== undefined) return Promise.resolve(cached);
 
   const attempt = (isRetry) =>
     osuApiGetToken().then((token) =>
@@ -189,14 +261,24 @@ function osuApiGet(path) {
       }).then(async (r) => {
         if (r.status === 429) {
           // Honor the server's Retry-After, then apply exponential backoff
-          // for any further 429s (docs good-practice #3).
+          // for any further 429s (docs good-practice #3). Persisted to GM
+          // storage so every other osu.ppy.sh page throttles too.
           const raHeader = parseFloat(r.headers.get("Retry-After") || "0");
           if (!isRetry && _osuApiBackoffMs === 0) _osuApiBackoffMs = 2000;
           else _osuApiBackoffMs = Math.min(_osuApiBackoffMs * 2 || 2000, 60000);
           _osuApiRetryAfterUntil = Date.now() + (Number.isFinite(raHeader) && raHeader > 0 ? raHeader * 1000 : _osuApiBackoffMs);
+          _osuApiSaveBackoffState(_osuApiRetryAfterUntil, _osuApiBackoffMs);
           throw Object.assign(new Error("rate limited by osu! API"), { rateLimited: true });
         }
         _osuApiBackoffMs = 0; // successful window - reset backoff
+        // A success after the shared backoff window has expired also clears
+        // it for every other page. The until>0 guard means we only clear a
+        // window that has already lapsed - an ACTIVE Retry-After from
+        // another page is never erased by this page's success.
+        const sharedNow = _osuApiLoadBackoffState();
+        if (sharedNow.until > 0 && sharedNow.until <= Date.now()) {
+          _osuApiSaveBackoffState(0, 0);
+        }
         if (r.status === 401 && !isRetry) {
           // Access token died early (revoked/password change): drop cached
           // token so the next osuApiGetToken() refreshes, then retry once.
@@ -223,16 +305,126 @@ function osuApiGet(path) {
   }).then((data) => {
     _osuApiCacheSet(cleanPath, data);
     return data;
+  }).catch((err) => {
+    // Last-resort: a network failure after a cache miss may still find a
+    // STALE copy in the shared store - a previous page fetched this path in
+    // an earlier session and the entry outlived its in-memory caches. For
+    // read-only lookups (beatmapset metadata, user profiles) stale data
+    // beats a hard error; the next successful pass overwrites it.
+    const stale = _osuApiStaleStoreEntry(cleanPath);
+    if (stale !== undefined) {
+      _osuApiCacheSet(cleanPath, stale);
+      return stale;
+    }
+    throw err;
   });
+}
+
+// A past-TTL copy straight from the shared store, bypassing freshness
+// entirely. Used only by the osuApiGet failure path: stale-but-plausible
+// data beats an error for read-only lookups.
+function _osuApiStaleStoreEntry(path) {
+  const store = _osuApiReadStore();
+  const entry = store ? store[path] : null;
+  if (!entry || typeof entry.j !== "string") return undefined;
+  try {
+    return JSON.parse(entry.j);
+  } catch (e) {
+    return undefined;
+  }
 }
 
 function _osuApiCacheSet(path, data) {
   if (!data || typeof data !== "object") return;
+  const cachedAt = Date.now();
   if (_osuApiCache.size >= OSU_API_CACHE_MAX) {
     // Evict oldest inserted entry
     _osuApiCache.delete(_osuApiCache.keys().next().value);
   }
-  _osuApiCache.set(path, data);
+  _osuApiCache.set(path, { d: data, c: cachedAt });
+
+  // Shared-cache side: encode once (the stringified payload is what GM
+  // storage actually persists), then flush on a 1s throttle so a bulk run
+  // costs one write per second instead of one per response. Encoded strings
+  // are stored as strings, so flushes never re-serialize the whole store.
+  if (!gmStorageIsNative()) return;
+  try {
+    _osuApiEncoded.set(path, { j: JSON.stringify(data), c: cachedAt });
+    while (_osuApiEncoded.size > OSU_API_CACHE_SHARED_MAX) {
+      // Drop the oldest-encoded entry; it remains in the in-memory cache.
+      _osuApiEncoded.delete(_osuApiEncoded.keys().next().value);
+    }
+    if (!_osuApiCacheFlushTimer) {
+      _osuApiCacheFlushTimer = setTimeout(_osuApiFlushSharedCache, 1000);
+    }
+  } catch (e) { /* unencodable response - memory-only caching for it */ }
+}
+
+// ── Shared response cache storage ──
+// Store shape: { v:1, entries:{ path:{ j:"<json string>", c:ts } } }. Values
+// are pre-encoded JSON strings on purpose: writes stay cheap (no whole-store
+// re-serialization) and reads parse only the entry actually requested.
+// Cross-tab coherence is intentionally best-effort: each page flushes its
+// own view (last writer wins), so a concurrent page's brand-new entries can
+// be dropped from the store until its next flush re-adds them. Losing cache
+// entries is always benign - the worst case is one duplicate request.
+let _osuApiStoreSnapshot = null; // { raw, at } - parsed store, short TTL
+const OSU_API_STORE_SNAPSHOT_TTL_MS = 2000;
+
+function _osuApiReadStore() {
+  const now = Date.now();
+  if (_osuApiStoreSnapshot && now - _osuApiStoreSnapshot.at < OSU_API_STORE_SNAPSHOT_TTL_MS) {
+    return _osuApiStoreSnapshot.raw;
+  }
+  let raw = null;
+  try {
+    const v = GM_getValue(OSU_API_CACHE_KEY, null);
+    if (v && typeof v === "object" && v.v === 1 && v.entries && typeof v.entries === "object") {
+      raw = v.entries;
+    }
+  } catch (e) { raw = null; }
+  _osuApiStoreSnapshot = { raw, at: now };
+  return raw;
+}
+
+function _osuApiFlushSharedCache() {
+  _osuApiCacheFlushTimer = null;
+  if (!gmStorageIsNative()) return;
+  try {
+    // Merge with what this page last knew from the store so entries written
+    // by another page (and not superseded locally) survive the rewrite.
+    const entries = Object.assign({}, _osuApiReadStore() || {});
+    let bytes = 2;
+    for (const [p, e] of _osuApiEncoded) {
+      const cost = e.j.length + p.length + 16;
+      if (bytes + cost > OSU_API_CACHE_PERSIST_MAX_BYTES) break;
+      entries[p] = e;
+      bytes += cost;
+    }
+    GM_setValue(OSU_API_CACHE_KEY, { v: 1, entries });
+    _osuApiStoreSnapshot = { raw: entries, at: Date.now() };
+  } catch (e) { /* a failed shared write only costs cross-tab hits */ }
+}
+
+// Synchronous read path for osuApiGet: memory first, then one hydrate from
+// the shared store (bounded by the snapshot TTL above, so a run of cache
+// misses costs at most one GM read per 2s, not one per miss).
+function _osuApiCacheGet(path) {
+  const hit = _osuApiCache.get(path);
+  if (hit) return hit.d;
+  const store = _osuApiReadStore();
+  const entry = store ? store[path] : null;
+  if (!entry || typeof entry.j !== "string") return undefined;
+  try {
+    const d = JSON.parse(entry.j);
+    if (_osuApiCache.size >= OSU_API_CACHE_MAX) {
+      _osuApiCache.delete(_osuApiCache.keys().next().value);
+    }
+    _osuApiCache.set(path, { d, c: Number(entry.c) || 0 });
+    return d;
+  } catch (e) {
+    return undefined; // corrupt entry - treat as a miss, network refetches
+  }
 }
 
 export function osuApiDisconnect() {
