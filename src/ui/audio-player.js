@@ -1,5 +1,6 @@
 import { hinaiDurationSec, isFirefoxAndroid } from "../api/previews.js";
 import { _blobUrlCache, forgetCachedMedia, getKnownCachedBlob, prewarmCachedPreview } from "../data/media-cache-db.js";
+import { clearPlaybackState, flushOnPageHide, savePlaybackState } from "../data/session-state.js";
 import { musicAutoNextEnabled, musicLoopEnabled, musicVolumePct } from "../data/playback-settings.js";
 import {
   bindMediaSessionActions,
@@ -11,6 +12,26 @@ import {
 } from "./media-session.js";
 import { pauseSVG, playSVG } from "./theme.js";
 
+
+// ── Cross-page playback session state ──────────────────────────────
+// The audio element dies with the page on every osu! navigation, so the
+// current track and position are persisted (throttled - timeupdate fires
+// ~4x/sec) and the next page's panel offers a one-tap resume from that
+// position. See data/session-state.js for the storage layer. Module-scope
+// on purpose: one throttle window per page, not per audio element.
+const PLAYBACK_SAVE_INTERVAL_MS = 5000;
+let _lastPlaybackSaveAt = 0;
+function persistPlaybackState(audio) {
+  const now = Date.now();
+  if (now - _lastPlaybackSaveAt < PLAYBACK_SAVE_INTERVAL_MS) return;
+  _lastPlaybackSaveAt = now;
+  savePlaybackState(audio._npCurrentId, audio.currentTime, !audio.paused);
+}
+
+function persistPlaybackStateNow(audio) {
+  _lastPlaybackSaveAt = Date.now();
+  savePlaybackState(audio._npCurrentId, audio.currentTime, !audio.paused);
+}
 const SHORT_CLIP_MAX_SECONDS = 35;
 
 // Singleton <audio> element, shared across every card's preview button
@@ -38,6 +59,9 @@ export function ensureAudio() {
   audio.volume = musicVolumePct() / 100;
   (document.body || document.documentElement).appendChild(audio);
   window._osuFavAudio = audio;
+  // Navigation is the one moment this state actually matters: the next
+  // osu! page rebuilds its player from whatever this flush saved.
+  flushOnPageHide(() => persistPlaybackStateNow(audio));
   audio._activeBtn = null;
   audio._activeBar = null;
   audio._activeDim = null;
@@ -78,6 +102,7 @@ export function ensureAudio() {
     const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
     if (audio._activeBar) audio._activeBar.style.width = pct + "%";
     if (audio._npProgressBar) audio._npProgressBar.style.width = pct + "%";
+    persistPlaybackState(audio);
   });
 
   audio._mediaSessionSignature = null;
@@ -98,6 +123,7 @@ export function ensureAudio() {
     refreshMediaSessionQueueActions(audio);
     setMediaSessionPlaybackState("playing");
     updateMediaSessionPosition(audio);
+    persistPlaybackStateNow(audio);
   });
   audio.addEventListener("pause", () => {
     if (audio._npPlayBtn) audio._npPlayBtn.innerHTML = playSVG();
@@ -105,6 +131,7 @@ export function ensureAudio() {
     // Freeze the OS widget at the exact paused position rather than
     // whatever it last extrapolated to.
     updateMediaSessionPosition(audio);
+    persistPlaybackStateNow(audio);
   });
   // Deliberately NOT bound to "timeupdate": that event fires every ~250ms
   // while foregrounded but gets throttled to roughly once/sec by the
@@ -362,6 +389,10 @@ function stopPlayback(audio) {
   // next/previous for a queue that no longer exists.
   refreshMediaSessionQueueActions(audio);
   clearMediaSession(audio);
+  // Playback ended for good (queue exhausted, or every source failed):
+  // there is no position worth resuming, so the next page must not offer
+  // a stale "resume" bar either.
+  clearPlaybackState();
 }
 
 // Called by the panel when a source fails before any card binding exists.

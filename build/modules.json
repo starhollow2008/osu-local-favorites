@@ -27,6 +27,7 @@
     "api/previews.js",
     "data/playback-settings.js",
     "data/media-cache-db.js",
+    "data/session-state.js",
     "ui/media-session.js",
     "ui/audio-player.js",
     "ui/popup-menu.js",

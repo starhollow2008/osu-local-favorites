@@ -40,33 +40,34 @@
  *    8. api/previews.js             (src/api/previews.js)
  *    9. data/playback-settings.js   (src/data/playback-settings.js)
  *   10. data/media-cache-db.js      (src/data/media-cache-db.js)
- *   11. ui/media-session.js         (src/ui/media-session.js)
- *   12. ui/audio-player.js          (src/ui/audio-player.js)
- *   13. ui/popup-menu.js            (src/ui/popup-menu.js)
- *   14. ui/download-menu.js         (src/ui/download-menu.js)
- *   15. ui/genre-filter.js          (src/ui/genre-filter.js)
- *   16. ui/filter-menu.js           (src/ui/filter-menu.js)
- *   17. ui/filters.js               (src/ui/filters.js)
- *   18. ui/collections-menu.js      (src/ui/collections-menu.js)
- *   19. api/gist-backup.js          (src/api/gist-backup.js)
- *   20. api/osu-api.js              (src/api/osu-api.js)
- *   21. data/beatmap-extraction.js  (src/data/beatmap-extraction.js)
- *   22. data/favorite-detection.js  (src/data/favorite-detection.js)
- *   23. ui/heart-visual.js          (src/ui/heart-visual.js)
- *   24. data/enrichment.js          (src/data/enrichment.js)
- *   25. data/reenrichment.js        (src/data/reenrichment.js)
- *   26. data/toggle-favorite.js     (src/data/toggle-favorite.js)
- *   27. ui/copy-all-button.js       (src/ui/copy-all-button.js)
- *   28. ui/floating-heart.js        (src/ui/floating-heart.js)
- *   29. ui/settings.js              (src/ui/settings.js)
- *   30. ui/main-panel.js            (src/ui/main-panel.js)
- *   31. ui/menu-commands.js         (src/ui/menu-commands.js)
- *   32. ui/guest-fallback.js        (src/ui/guest-fallback.js)
- *   33. ui/guest-downloads.js       (src/ui/guest-downloads.js)
- *   34. core/toast.js               (src/core/toast.js)
- *   35. data/version-check.js       (src/data/version-check.js)
- *   36. ui/update-prompt.js         (src/ui/update-prompt.js)
- *   37. core/init.js                (src/core/init.js)
+ *   11. data/session-state.js       (src/data/session-state.js)
+ *   12. ui/media-session.js         (src/ui/media-session.js)
+ *   13. ui/audio-player.js          (src/ui/audio-player.js)
+ *   14. ui/popup-menu.js            (src/ui/popup-menu.js)
+ *   15. ui/download-menu.js         (src/ui/download-menu.js)
+ *   16. ui/genre-filter.js          (src/ui/genre-filter.js)
+ *   17. ui/filter-menu.js           (src/ui/filter-menu.js)
+ *   18. ui/filters.js               (src/ui/filters.js)
+ *   19. ui/collections-menu.js      (src/ui/collections-menu.js)
+ *   20. api/gist-backup.js          (src/api/gist-backup.js)
+ *   21. api/osu-api.js              (src/api/osu-api.js)
+ *   22. data/beatmap-extraction.js  (src/data/beatmap-extraction.js)
+ *   23. data/favorite-detection.js  (src/data/favorite-detection.js)
+ *   24. ui/heart-visual.js          (src/ui/heart-visual.js)
+ *   25. data/enrichment.js          (src/data/enrichment.js)
+ *   26. data/reenrichment.js        (src/data/reenrichment.js)
+ *   27. data/toggle-favorite.js     (src/data/toggle-favorite.js)
+ *   28. ui/copy-all-button.js       (src/ui/copy-all-button.js)
+ *   29. ui/floating-heart.js        (src/ui/floating-heart.js)
+ *   30. ui/settings.js              (src/ui/settings.js)
+ *   31. ui/main-panel.js            (src/ui/main-panel.js)
+ *   32. ui/menu-commands.js         (src/ui/menu-commands.js)
+ *   33. ui/guest-fallback.js        (src/ui/guest-fallback.js)
+ *   34. ui/guest-downloads.js       (src/ui/guest-downloads.js)
+ *   35. core/toast.js               (src/core/toast.js)
+ *   36. data/version-check.js       (src/data/version-check.js)
+ *   37. ui/update-prompt.js         (src/ui/update-prompt.js)
+ *   38. core/init.js                (src/core/init.js)
  */
 (() => {
   "use strict";
@@ -1586,6 +1587,65 @@
     return promise;
   }
 
+  // ━━━━━━━━━━ src/data/session-state.js ━━━━━━━━━━
+
+  const PANEL_STATE_KEY = "osu_lof_panel_state_v1";
+  const PLAYBACK_STATE_KEY = "osu_lof_playback_state_v1";
+
+  const PANEL_STATE_MAX_AGE_MS = 30 * 60 * 1000;
+  const PLAYBACK_STATE_MAX_AGE_MS = 30 * 60 * 1000;
+
+  function loadPanelState() {
+    try {
+      const s = GM_getValue(PANEL_STATE_KEY, null);
+      if (!s || typeof s !== "object" || s.v !== 1) return null;
+      if (Date.now() - (Number(s.at) || 0) > PANEL_STATE_MAX_AGE_MS) return null;
+      return s;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function savePanelState(state) {
+    try {
+      GM_setValue(PANEL_STATE_KEY, Object.assign({ v: 1, at: Date.now() }, state));
+    } catch (e) {  }
+  }
+
+  function loadPlaybackState() {
+    try {
+      const s = GM_getValue(PLAYBACK_STATE_KEY, null);
+      if (!s || typeof s !== "object" || s.v !== 1) return null;
+      if (Date.now() - (Number(s.at) || 0) > PLAYBACK_STATE_MAX_AGE_MS) return null;
+      if (!s.id) return null;
+      return {
+        id: String(s.id),
+        position: Number(s.position) > 0 ? Number(s.position) : 0,
+        playing: !!s.playing,
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function savePlaybackState(id, position, playing) {
+    try {
+      GM_setValue(PLAYBACK_STATE_KEY, { v: 1, at: Date.now(), id: String(id), position: Number(position) || 0, playing: !!playing });
+    } catch (e) {  }
+  }
+
+  function clearPlaybackState() {
+    try {
+      GM_setValue(PLAYBACK_STATE_KEY, null);
+    } catch (e) {  }
+  }
+
+  let _onPageHide = null;
+  function flushOnPageHide(saveFn) {
+    if (_onPageHide) window.removeEventListener("pagehide", _onPageHide);
+    _onPageHide = () => { try { saveFn(); } catch (e) {  } };
+    window.addEventListener("pagehide", _onPageHide);
+  }
   // ━━━━━━━━━━ src/ui/media-session.js ━━━━━━━━━━
 
   function mediaSession() {
@@ -1767,6 +1827,19 @@
   }
   // ━━━━━━━━━━ src/ui/audio-player.js ━━━━━━━━━━
 
+  const PLAYBACK_SAVE_INTERVAL_MS = 5000;
+  let _lastPlaybackSaveAt = 0;
+  function persistPlaybackState(audio) {
+    const now = Date.now();
+    if (now - _lastPlaybackSaveAt < PLAYBACK_SAVE_INTERVAL_MS) return;
+    _lastPlaybackSaveAt = now;
+    savePlaybackState(audio._npCurrentId, audio.currentTime, !audio.paused);
+  }
+
+  function persistPlaybackStateNow(audio) {
+    _lastPlaybackSaveAt = Date.now();
+    savePlaybackState(audio._npCurrentId, audio.currentTime, !audio.paused);
+  }
   const SHORT_CLIP_MAX_SECONDS = 35;
 
   function ensureAudio() {
@@ -1780,6 +1853,7 @@
     audio.volume = musicVolumePct() / 100;
     (document.body || document.documentElement).appendChild(audio);
     window._osuFavAudio = audio;
+    flushOnPageHide(() => persistPlaybackStateNow(audio));
     audio._activeBtn = null;
     audio._activeBar = null;
     audio._activeDim = null;
@@ -1810,6 +1884,7 @@
       const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
       if (audio._activeBar) audio._activeBar.style.width = pct + "%";
       if (audio._npProgressBar) audio._npProgressBar.style.width = pct + "%";
+      persistPlaybackState(audio);
     });
 
     audio._mediaSessionSignature = null;
@@ -1823,11 +1898,13 @@
       refreshMediaSessionQueueActions(audio);
       setMediaSessionPlaybackState("playing");
       updateMediaSessionPosition(audio);
+      persistPlaybackStateNow(audio);
     });
     audio.addEventListener("pause", () => {
       if (audio._npPlayBtn) audio._npPlayBtn.innerHTML = playSVG();
       if (!audio.ended) setMediaSessionPlaybackState("paused");
       updateMediaSessionPosition(audio);
+      persistPlaybackStateNow(audio);
     });
     const syncPosition = () => updateMediaSessionPosition(audio);
     audio.addEventListener("seeked", syncPosition);
@@ -1998,6 +2075,7 @@
     audio._queueAdvance = null;
     refreshMediaSessionQueueActions(audio);
     clearMediaSession(audio);
+    clearPlaybackState();
   }
 
   function resetPlaybackAfterError(audio) {
@@ -5773,6 +5851,48 @@
       filterState = makeEmptyFilterState(),
       activeCollectionId = "";
 
+    const _session = loadPanelState();
+    if (_session) {
+      if (typeof _session.sort === "string" && _session.sort) currentSort = _session.sort;
+      sortAsc = !!_session.sortAsc;
+      if (typeof _session.search === "string") searchQuery = _session.search;
+      if (_session.filters && typeof _session.filters === "object") {
+        FILTER_CATEGORIES.forEach((cat) => {
+          const savedCat = _session.filters[cat.id];
+          if (savedCat && typeof savedCat === "object") {
+            Object.keys(savedCat).forEach((term) => {
+              const mode = savedCat[term];
+              if (mode === "include" || mode === "exclude") filterState[cat.id][term] = mode;
+            });
+          }
+        });
+      }
+      if (typeof _session.collectionId === "string") activeCollectionId = _session.collectionId;
+      settingsOpen = !!_session.settingsOpen;
+    }
+    const _sessionScrollTop = _session && Number(_session.scrollTop) > 0 ? Number(_session.scrollTop) : 0;
+
+    function persistPanelState() {
+      savePanelState({
+        sort: currentSort,
+        sortAsc,
+        search: searchQuery,
+        filters: filterState,
+        collectionId: activeCollectionId,
+        settingsOpen,
+        scrollTop: listEl ? listEl.scrollTop : 0,
+      });
+    }
+
+    let _persistScrollTimer = null;
+    function _throttledPersistPanelState() {
+      if (_persistScrollTimer) return;
+      _persistScrollTimer = setTimeout(() => {
+        _persistScrollTimer = null;
+        persistPanelState();
+      }, 1000);
+    }
+
     if (!document.getElementById("osu-fav-panel-style")) {
       const s = document.createElement("style");
       s.id = "osu-fav-panel-style";
@@ -5987,6 +6107,7 @@
       searchRenderTimer = setTimeout(() => {
         searchRenderTimer = null;
         renderList();
+        persistPanelState();
       }, 150);
     });
 
@@ -6066,6 +6187,7 @@
                   sortAsc = asc;
                   updateFilterBtns();
                   renderList();
+                  persistPanelState();
                 }
               : undefined,
           },
@@ -6075,6 +6197,7 @@
             updateFilterBtn(cat.id);
             updateClearAllRow();
             renderList();
+            persistPanelState();
           },
         );
       });
@@ -6154,6 +6277,7 @@
         updateCollectionsBtn();
         updateClearAllRow();
         renderList();
+        persistPanelState();
       });
     });
     filterRow.appendChild(collectionsBtn);
@@ -6176,6 +6300,7 @@
       updateCollectionsBtn();
       updateClearAllRow();
       renderList();
+      persistPanelState();
     });
     clearAllRow.appendChild(clearAllBtn);
 
@@ -6340,7 +6465,15 @@
     npNextBtn.addEventListener("click", () => queueAdvance(1));
     npPlayBtn.addEventListener("click", () => {
       const audio = window._osuFavAudio;
-      if (!audio || !audio.src) return;
+      if (!audio) return;
+      if (audio._npCurrentId && !audio.src) {
+        const fav = getFavorites()[audio._npCurrentId];
+        if (fav) {
+          startPlayback(audio._npCurrentId, fav, {});
+          return;
+        }
+      }
+      if (!audio.src) return;
       if (audio._pendingSourceId) return;
       if (audio.paused) audio.play();
       else audio.pause();
@@ -6474,6 +6607,16 @@
         audio.src = audio._activePreviewUrl;
         audio.load();
 
+        if (audio._sessionResumeAt > 0) {
+          const seekTo = audio._sessionResumeAt;
+          audio._sessionResumeAt = null;
+          audio.addEventListener("loadedmetadata", () => {
+            try {
+              if (Number.isFinite(seekTo) && seekTo < (audio.duration || Infinity)) audio.currentTime = seekTo;
+            } catch (e) {  }
+          }, { once: true });
+        }
+
         if (audio._usingFullSongSource) {
           fetchHinaiSong(id).then((song) => {
             if (!song) return;
@@ -6563,6 +6706,21 @@
     npAudio._npBg = npBg;
     npAudio._queueAdvance = queueAdvance;
 
+    if (!npAudio._npCurrentId) {
+      const saved = loadPlaybackState();
+      const savedFav = saved ? getFavorites()[saved.id] : null;
+      if (saved && savedFav) {
+        npAudio._npCurrentId = saved.id;
+        npAudio._npCurrentTitle = savedFav.title || savedFav.title_unicode || "Unknown";
+        npAudio._npCurrentArtist = savedFav.artist || savedFav.artist_unicode || "";
+        npAudio._sessionResumeAt = saved.position;
+        if (npTitle) npTitle.textContent = npAudio._npCurrentTitle;
+        if (npArtist) npArtist.textContent = npAudio._npCurrentArtist;
+        npPlayBtn.innerHTML = playSVG();
+        nowPlayingBar.style.display = "flex";
+      }
+    }
+
     function syncCurrentCardUI() {
       const audio = window._osuFavAudio;
       if (!audio || !audio._npCurrentId) return;
@@ -6623,6 +6781,7 @@
 
     function setView(showSettings) {
       settingsOpen = showSettings;
+      persistPanelState();
       toolbar.style.display = showSettings ? "none" : "flex";
       if (showSettings) closeFilterMenu();
       listEl.style.display = showSettings ? "none" : "block";
@@ -7171,6 +7330,23 @@
     document.body.appendChild(panel);
     panel._osuFavRefresh = renderList;
     renderList();
+    if (_session) {
+      if (searchQuery) searchInput.value = searchQuery;
+      if (settingsOpen) setView(true);
+      if (_sessionScrollTop > 0) {
+        const trySessionScroll = () => {
+          if (panel._osuFavRenderCount && listEl.scrollHeight - listEl.clientHeight >= _sessionScrollTop) {
+            listEl.scrollTop = _sessionScrollTop;
+          } else if (panel._osuFavRenderCount < 20) {
+            requestAnimationFrame(trySessionScroll);
+          }
+        };
+        requestAnimationFrame(trySessionScroll);
+      }
+    }
+    listEl.addEventListener("scroll", _throttledPersistPanelState, { passive: true });
+    flushOnPageHide(persistPanelState);
+    persistPanelState();
     updateFooterStatus();
         updateMobileSearchBar();
 

@@ -7,6 +7,7 @@ import { _blobUrlCache, cacheDurationMode, getKnownCachedBlob, hasFreshCachedCop
 import { resolveDefaultMirror } from "../data/mirrors.js";
 import { MUSIC_LOOP_KEY, MUSIC_SHUFFLE_KEY, musicLoopEnabled, musicShuffleEnabled } from "../data/playback-settings.js";
 import { favoriteCoverUrl, getFavorites, setFavorites } from "../data/storage.js";
+import { flushOnPageHide, loadPanelState, loadPlaybackState, savePanelState } from "../data/session-state.js";
 import { autoUpdateChecksEnabled, checkVersionUpdate, getCurrentVersion, isNewerVersion } from "../data/version-check.js";
 import { ensureAudio } from "./audio-player.js";
 import { clearMediaSession, setMediaSessionMetadata } from "./media-session.js";
@@ -38,6 +39,63 @@ export function showFavoritesPanel() {
     // category in ui/filters.js (date, title, artist, status, genre).
     filterState = makeEmptyFilterState(),
     activeCollectionId = ""; // "" = no collection filter (show all)
+
+  // ── Cross-page session restore (see data/session-state.js) ────────
+  // Navigation on osu! is a full document load, which used to throw away
+  // the list view: reopening the panel on the next page restarted at the
+  // default sort with no filters and scroll at the top. Everything that
+  // defines the view is plain serializable state, so it is saved on every
+  // change (plus a throttled scroll save) and re-applied here on build.
+  const _session = loadPanelState();
+  if (_session) {
+    if (typeof _session.sort === "string" && _session.sort) currentSort = _session.sort;
+    sortAsc = !!_session.sortAsc;
+    if (typeof _session.search === "string") searchQuery = _session.search;
+    if (_session.filters && typeof _session.filters === "object") {
+      // Only copy categories the current filter model knows about, so a
+      // future layout change can't inject unknown keys into the state.
+      FILTER_CATEGORIES.forEach((cat) => {
+        const savedCat = _session.filters[cat.id];
+        if (savedCat && typeof savedCat === "object") {
+          Object.keys(savedCat).forEach((term) => {
+            const mode = savedCat[term];
+            if (mode === "include" || mode === "exclude") filterState[cat.id][term] = mode;
+          });
+        }
+      });
+    }
+    if (typeof _session.collectionId === "string") activeCollectionId = _session.collectionId;
+    settingsOpen = !!_session.settingsOpen;
+  }
+  // Kept out of the filter/sort restore above because it must be applied
+  // AFTER the first renderList() has laid out content (renderList itself
+  // restores within-view scroll once the view key matches).
+  const _sessionScrollTop = _session && Number(_session.scrollTop) > 0 ? Number(_session.scrollTop) : 0;
+
+  function persistPanelState() {
+    savePanelState({
+      sort: currentSort,
+      sortAsc,
+      search: searchQuery,
+      filters: filterState,
+      collectionId: activeCollectionId,
+      settingsOpen,
+      scrollTop: listEl ? listEl.scrollTop : 0,
+    });
+  }
+
+  // Scroll fires continuously while the list is being dragged; one save
+  // per second of idle captures the final position without turning every
+  // pixel into a GM write. pagehide (registered at build time, below)
+  // catches whatever was still pending.
+  let _persistScrollTimer = null;
+  function _throttledPersistPanelState() {
+    if (_persistScrollTimer) return;
+    _persistScrollTimer = setTimeout(() => {
+      _persistScrollTimer = null;
+      persistPanelState();
+    }, 1000);
+  }
 
   // Inject shared styles once - covers scrollbar, slide-down banner, and slide-up prompt
   if (!document.getElementById("osu-fav-panel-style")) {
@@ -267,6 +325,7 @@ export function showFavoritesPanel() {
     searchRenderTimer = setTimeout(() => {
       searchRenderTimer = null;
       renderList();
+      persistPanelState();
     }, 150);
   });
 
@@ -358,6 +417,7 @@ export function showFavoritesPanel() {
                 sortAsc = asc;
                 updateFilterBtns();
                 renderList();
+                persistPanelState();
               }
             : undefined,
         },
@@ -367,6 +427,7 @@ export function showFavoritesPanel() {
           updateFilterBtn(cat.id);
           updateClearAllRow();
           renderList();
+          persistPanelState();
         },
       );
     });
@@ -452,6 +513,7 @@ export function showFavoritesPanel() {
       updateCollectionsBtn();
       updateClearAllRow();
       renderList();
+      persistPanelState();
     });
   });
   filterRow.appendChild(collectionsBtn);
@@ -476,6 +538,7 @@ export function showFavoritesPanel() {
     updateCollectionsBtn();
     updateClearAllRow();
     renderList();
+    persistPanelState();
   });
   clearAllRow.appendChild(clearAllBtn);
 
@@ -657,7 +720,18 @@ export function showFavoritesPanel() {
   npNextBtn.addEventListener("click", () => queueAdvance(1));
   npPlayBtn.addEventListener("click", () => {
     const audio = window._osuFavAudio;
-    if (!audio || !audio.src) return;
+    if (!audio) return;
+    // Cross-page session restore: the bar shows a saved track that this
+    // page's element has no source for yet. The tap IS the user gesture,
+    // so use it to start the track from the saved position.
+    if (audio._npCurrentId && !audio.src) {
+      const fav = getFavorites()[audio._npCurrentId];
+      if (fav) {
+        startPlayback(audio._npCurrentId, fav, {});
+        return;
+      }
+    }
+    if (!audio.src) return;
     // The current track's source is still being decided (cache lookup in
     // flight), so audio.src is whatever played before: play/pause here would
     // act on that instead. The pending request starts playback by itself.
@@ -855,6 +929,22 @@ export function showFavoritesPanel() {
       audio.src = audio._activePreviewUrl;
       audio.load();
 
+      // Session resume (see the restore block near the NP wiring): this
+      // track was started by the cross-page resume tap, which stamps the
+      // saved position here. Seeking needs metadata, so it happens on
+      // loadedmetadata; one-shot - the flag is cleared immediately so
+      // later reloads of the same source start at the top like any other
+      // play.
+      if (audio._sessionResumeAt > 0) {
+        const seekTo = audio._sessionResumeAt;
+        audio._sessionResumeAt = null;
+        audio.addEventListener("loadedmetadata", () => {
+          try {
+            if (Number.isFinite(seekTo) && seekTo < (audio.duration || Infinity)) audio.currentTime = seekTo;
+          } catch (e) { /* seeking unsupported for this blob - start from top */ }
+        }, { once: true });
+      }
+
       if (audio._usingFullSongSource) {
         fetchHinaiSong(id).then((song) => {
           if (!song) return;
@@ -999,6 +1089,30 @@ export function showFavoritesPanel() {
   npAudio._npBg = npBg;
   npAudio._queueAdvance = queueAdvance;
 
+  // ── Cross-page playback restore ─────────────────────────────────
+  // The audio element is per-page, so after a navigation this page's
+  // element is blank even though the user was mid-song. If the session
+  // has a recent track, surface it in the Now Playing bar in a paused
+  // "resume from here" state: autoplay policy forbids starting playback
+  // without a gesture, so one tap on the play control restarts the track
+  // (from the local cache copy whenever one exists) at the saved position.
+  // The favorite may have been removed since - a missing record just
+  // leaves the bar hidden.
+  if (!npAudio._npCurrentId) {
+    const saved = loadPlaybackState();
+    const savedFav = saved ? getFavorites()[saved.id] : null;
+    if (saved && savedFav) {
+      npAudio._npCurrentId = saved.id;
+      npAudio._npCurrentTitle = savedFav.title || savedFav.title_unicode || "Unknown";
+      npAudio._npCurrentArtist = savedFav.artist || savedFav.artist_unicode || "";
+      npAudio._sessionResumeAt = saved.position;
+      if (npTitle) npTitle.textContent = npAudio._npCurrentTitle;
+      if (npArtist) npArtist.textContent = npAudio._npCurrentArtist;
+      npPlayBtn.innerHTML = playSVG();
+      nowPlayingBar.style.display = "flex";
+    }
+  }
+
   // Reconcile the freshly-rendered favorite cards with the singleton audio.
   // renderList() can replace the DOM node for the current song while playback
   // is still alive; never let the detached node remain the active UI owner.
@@ -1064,6 +1178,7 @@ export function showFavoritesPanel() {
   // ── View switching ───────────────────────────────────────
   function setView(showSettings) {
     settingsOpen = showSettings;
+    persistPanelState();
     toolbar.style.display = showSettings ? "none" : "flex";
     if (showSettings) closeFilterMenu();
     listEl.style.display = showSettings ? "none" : "block";
@@ -1753,6 +1868,33 @@ export function showFavoritesPanel() {
   // binding intact, which destroying and reopening the panel does not.
   panel._osuFavRefresh = renderList;
   renderList();
+  // Apply the cross-page session state that depends on rendered content:
+  // the saved view (list vs settings), the search box text, and the scroll
+  // offset. renderList() already ran with the restored sort/filters from
+  // the session block at the top, so the list height exists to scroll into.
+  if (_session) {
+    if (searchQuery) searchInput.value = searchQuery;
+    if (settingsOpen) setView(true);
+    if (_sessionScrollTop > 0) {
+      // The list renders in chunks over rAF; scroll only sticks once the
+      // content is tall enough, so retry on each chunk pass until it fits
+      // (same trick renderList uses for its own within-view restore).
+      const trySessionScroll = () => {
+        if (panel._osuFavRenderCount && listEl.scrollHeight - listEl.clientHeight >= _sessionScrollTop) {
+          listEl.scrollTop = _sessionScrollTop;
+        } else if (panel._osuFavRenderCount < 20) {
+          requestAnimationFrame(trySessionScroll);
+        }
+      };
+      requestAnimationFrame(trySessionScroll);
+    }
+  }
+  // Save the view on every user-driven change, throttled where events fire
+  // continuously (scroll), and once more on pagehide - a save scheduled
+  // by the throttles could still be pending when navigation starts.
+  listEl.addEventListener("scroll", _throttledPersistPanelState, { passive: true });
+  flushOnPageHide(persistPanelState);
+  persistPanelState();
   updateFooterStatus();
       updateMobileSearchBar();
 
