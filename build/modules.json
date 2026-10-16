@@ -37,6 +37,7 @@
     "ui/filters.js",
     "ui/collections-menu.js",
     "api/gist-backup.js",
+    "api/rate-pool.js",
     "api/osu-api.js",
     "data/beatmap-extraction.js",
     "data/favorite-detection.js",

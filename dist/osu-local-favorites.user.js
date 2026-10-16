@@ -50,24 +50,25 @@
  *   18. ui/filters.js               (src/ui/filters.js)
  *   19. ui/collections-menu.js      (src/ui/collections-menu.js)
  *   20. api/gist-backup.js          (src/api/gist-backup.js)
- *   21. api/osu-api.js              (src/api/osu-api.js)
- *   22. data/beatmap-extraction.js  (src/data/beatmap-extraction.js)
- *   23. data/favorite-detection.js  (src/data/favorite-detection.js)
- *   24. ui/heart-visual.js          (src/ui/heart-visual.js)
- *   25. data/enrichment.js          (src/data/enrichment.js)
- *   26. data/reenrichment.js        (src/data/reenrichment.js)
- *   27. data/toggle-favorite.js     (src/data/toggle-favorite.js)
- *   28. ui/copy-all-button.js       (src/ui/copy-all-button.js)
- *   29. ui/floating-heart.js        (src/ui/floating-heart.js)
- *   30. ui/settings.js              (src/ui/settings.js)
- *   31. ui/main-panel.js            (src/ui/main-panel.js)
- *   32. ui/menu-commands.js         (src/ui/menu-commands.js)
- *   33. ui/guest-fallback.js        (src/ui/guest-fallback.js)
- *   34. ui/guest-downloads.js       (src/ui/guest-downloads.js)
- *   35. core/toast.js               (src/core/toast.js)
- *   36. data/version-check.js       (src/data/version-check.js)
- *   37. ui/update-prompt.js         (src/ui/update-prompt.js)
- *   38. core/init.js                (src/core/init.js)
+ *   21. api/rate-pool.js            (src/api/rate-pool.js)
+ *   22. api/osu-api.js              (src/api/osu-api.js)
+ *   23. data/beatmap-extraction.js  (src/data/beatmap-extraction.js)
+ *   24. data/favorite-detection.js  (src/data/favorite-detection.js)
+ *   25. ui/heart-visual.js          (src/ui/heart-visual.js)
+ *   26. data/enrichment.js          (src/data/enrichment.js)
+ *   27. data/reenrichment.js        (src/data/reenrichment.js)
+ *   28. data/toggle-favorite.js     (src/data/toggle-favorite.js)
+ *   29. ui/copy-all-button.js       (src/ui/copy-all-button.js)
+ *   30. ui/floating-heart.js        (src/ui/floating-heart.js)
+ *   31. ui/settings.js              (src/ui/settings.js)
+ *   32. ui/main-panel.js            (src/ui/main-panel.js)
+ *   33. ui/menu-commands.js         (src/ui/menu-commands.js)
+ *   34. ui/guest-fallback.js        (src/ui/guest-fallback.js)
+ *   35. ui/guest-downloads.js       (src/ui/guest-downloads.js)
+ *   36. core/toast.js               (src/core/toast.js)
+ *   37. data/version-check.js       (src/data/version-check.js)
+ *   38. ui/update-prompt.js         (src/ui/update-prompt.js)
+ *   39. core/init.js                (src/core/init.js)
  */
 (() => {
   "use strict";
@@ -3030,6 +3031,160 @@
     const parts = trimmed.split(/[/?#]/).filter(Boolean);
     return parts.length ? parts[parts.length - 1] : trimmed;
   }
+  // ━━━━━━━━━━ src/api/rate-pool.js ━━━━━━━━━━
+
+  const POOL_CHANNEL_NAME = "osu-local-favorites-api-pool";
+  const POOL_LOCK_NAME = "osu-lof-api-leader";
+  const RPC_TIMEOUT_MS = 30000;
+  const RPC_TIMEOUT_RECENT_429_MS = 65000;
+  const RPC_PROBE_MS = 3000;
+
+  let _channel = null;
+  let _isLeader = false;
+  const _pending = new Map();
+  let _leaderExecute = null;
+  let _electionStarted = false;
+
+  function channel() {
+    if (_channel) return _channel;
+    if (typeof BroadcastChannel !== "function") return null;
+    try {
+      _channel = new BroadcastChannel(POOL_CHANNEL_NAME);
+      if (typeof _channel.unref === "function") _channel.unref();
+    } catch (e) {
+      _channel = null;
+    }
+    return _channel;
+  }
+
+  function _onPoolMessage(e) {
+    const msg = e && e.data;
+    if (!msg || typeof msg !== "object") return;
+    if (msg.kind === "req") {
+      if (!_isLeader || !_leaderExecute) return;
+      const reply = (payload) => {
+        try {
+          _channel.postMessage({
+            kind: "res",
+            id: msg.id,
+            to: msg.from,
+            payload,
+          });
+        } catch (e2) {  }
+      };
+      Promise.resolve()
+        .then(() => _leaderExecute(msg.path))
+        .then(
+          (data) => reply({ ok: true, data }),
+          (err) => reply({
+            ok: false,
+            error: String((err && err.message) || err),
+            rateLimited: !!(err && err.rateLimited),
+          }),
+        );
+      return;
+    }
+    if (msg.kind === "res") {
+      const entry = _pending.get(msg.id);
+      if (!entry || msg.to !== _pageId) return;
+      clearTimeout(entry.timer);
+      _pending.delete(msg.id);
+      if (msg.payload && msg.payload.ok) entry.resolve(msg.payload.data);
+      else {
+        const err = new Error((msg.payload && msg.payload.error) || "api pool rpc failed");
+        if (msg.payload && msg.payload.rateLimited) err.rateLimited = true;
+        entry.reject(err);
+      }
+      return;
+    }
+    if (msg.kind === "hello") {
+      if (!_isLeader && msg.from !== _pageId) _leaderSeenId = msg.from;
+    }
+  }
+
+  const _pageId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  let _leaderSeenId = "";
+
+  function tryBecomeLeader(execute) {
+    if (_electionStarted) return;
+    _electionStarted = true;
+    const ch = channel();
+    if (!ch) return;
+    if (typeof navigator === "undefined" || !navigator.locks || typeof navigator.locks.request !== "function") return;
+    ch.addEventListener("message", _onPoolMessage);
+    ch._lofListens = true;
+    try {
+      navigator.locks.request(
+        POOL_LOCK_NAME,
+        { ifAvailable: true },
+        (lock) => {
+          if (!lock) return;
+          _isLeader = true;
+          _leaderSeenId = _pageId;
+          _leaderExecute = execute;
+          return new Promise(() => { });
+        },
+      ).catch(() => {  });
+    } catch (e) {  }
+  }
+
+  function retryElection(execute) {
+    if (_isLeader || !channel()) return;
+    const ch = channel();
+    const previousLeader = _leaderSeenId;
+    _electionStarted = false;
+    _leaderSeenId = "";
+    tryBecomeLeader(execute);
+    _leaderSeenId = _leaderSeenId || previousLeader;
+  }
+
+  function requestViaPool(path, execute, hint) {
+    if (_isLeader) return Promise.resolve(null);
+    const ch = channel();
+    if (!ch) return Promise.resolve(null);
+    if (typeof _channel.addEventListener === "function" && !_channel._lofListens) {
+      _channel._lofListens = true;
+      _channel.addEventListener("message", _onPoolMessage);
+    }
+    const probing = !_leaderSeenId;
+    const timeoutMs = probing
+      ? RPC_PROBE_MS
+      : ((hint && hint.rateLimited) ? RPC_TIMEOUT_RECENT_429_MS : RPC_TIMEOUT_MS);
+    const id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        if (_pending.has(id)) {
+          _pending.delete(id);
+          retryElection(execute);
+          resolve(null);
+        }
+      }, timeoutMs);
+      _pending.set(id, {
+        resolve: (data) => resolve(data),
+        reject: (err) => resolve(err && err.rateLimited ? err : null),
+        timer,
+      });
+      try {
+        ch.postMessage({ kind: "req", id, from: _pageId, path });
+      } catch (e) {
+        clearTimeout(timer);
+        _pending.delete(id);
+        resolve(null);
+      }
+    });
+  }
+
+  function announceLeadership() {
+    const ch = channel();
+    if (!_isLeader || !ch) return;
+    try {
+      ch.postMessage({ kind: "hello", from: _pageId });
+    } catch (e) {  }
+  }
+
+  function registerPool(execute) {
+    tryBecomeLeader(execute);
+  }
   // ━━━━━━━━━━ src/api/osu-api.js ━━━━━━━━━━
 
   function osuApiIsConfigured() {
@@ -3229,7 +3384,7 @@
         }),
       );
 
-    return _osuApiGate(() => attempt(false)).catch((err) => {
+    const dispatchLocal = () => _osuApiGate(() => attempt(false)).catch((err) => {
       if (err && err.rateLimited) {
         return _osuApiGate(() => attempt(true)).then((data) => {
           _osuApiCacheSet(cleanPath, data);
@@ -3239,6 +3394,7 @@
       throw err;
     }).then((data) => {
       _osuApiCacheSet(cleanPath, data);
+      announceLeadership();
       return data;
     }).catch((err) => {
       const stale = _osuApiStaleStoreEntry(cleanPath);
@@ -3248,7 +3404,20 @@
       }
       throw err;
     });
+
+    return requestViaPool(cleanPath, dispatchLocal).then((poolResult) => {
+      if (poolResult && poolResult.rateLimited) {
+        return _osuApiGate(() => attempt(true)).then((data) => {
+          _osuApiCacheSet(cleanPath, data);
+          return data;
+        });
+      }
+      if (poolResult) return poolResult;
+      return dispatchLocal();
+    });
   }
+
+  registerPool((path) => osuApiGet("/" + path));
 
   function _osuApiStaleStoreEntry(path) {
     const store = _osuApiReadStore();

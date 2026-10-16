@@ -1,6 +1,7 @@
 import { GH_AUTO_BACKUP_KEY, GH_GIST_ID_KEY, GH_GIST_URL_KEY, GH_LAST_SYNC_KEY, GH_PRIVACY_KEY, GH_TOKEN_KEY, OSU_API_CLIENT_ID_KEY, OSU_API_CLIENT_SECRET_KEY, OSU_API_REDIRECT_URI, OSU_API_STATE_KEY, OSU_API_TOKEN_KEY, OSU_API_USERNAME_KEY, ghAdoptGist, ghCreateGist, ghGistVisibility, ghUpdateGist } from "./gist-backup.js";
 import { reportError } from "../core/errors.js";
 import { GM_getValue, GM_setValue, gmStorageIsNative } from "../core/gm-shim.js";
+import { announceLeadership, registerPool, requestViaPool } from "./rate-pool.js";
 import { showOsuFavToast } from "../core/toast.js";
 import { getFavorites } from "../data/storage.js";
 import { normalizeBeatmapset } from "../data/beatmap-extraction.js";
@@ -293,7 +294,12 @@ export function osuApiGet(path) {
       }),
     );
 
-  return _osuApiGate(() => attempt(false)).catch((err) => {
+  // The full gated pipeline (shared-cache write, 429 backoff, retry) in
+  // this page. The rate pool both executes requests for follower pages
+  // (leader side) and hands this page's own requests to a leader when one
+  // exists (follower side) - collapsing every open page's pacing queue
+  // into one. See api/rate-pool.js for the election and failure rules.
+  const dispatchLocal = () => _osuApiGate(() => attempt(false)).catch((err) => {
     // One transparent retry after a rate-limit wait has elapsed.
     if (err && err.rateLimited) {
       return _osuApiGate(() => attempt(true)).then((data) => {
@@ -304,6 +310,7 @@ export function osuApiGet(path) {
     throw err;
   }).then((data) => {
     _osuApiCacheSet(cleanPath, data);
+    announceLeadership(); // followers learn who leads from every completion
     return data;
   }).catch((err) => {
     // Last-resort: a network failure after a cache miss may still find a
@@ -318,7 +325,30 @@ export function osuApiGet(path) {
     }
     throw err;
   });
+
+  // Follower first: when another page leads, route through it. Resolves
+  // null (no leader / no channel / timeout) to dispatch here, or with a
+  // rateLimited error object to be retried after the shared wait - never
+  // with a silent duplicate dispatch.
+  return requestViaPool(cleanPath, dispatchLocal).then((poolResult) => {
+    if (poolResult && poolResult.rateLimited) {
+      // The leader's window is in the shared store; the same retry-after
+      // wait applies locally.
+      return _osuApiGate(() => attempt(true)).then((data) => {
+        _osuApiCacheSet(cleanPath, data);
+        return data;
+      });
+    }
+    if (poolResult) return poolResult;
+    return dispatchLocal();
+  });
 }
+
+// One pool registration per page: this page offers itself as the leader
+// (the Web Lock decides), and executes follower requests through the same
+// gated pipeline above. Registered lazily on module load; safe in every
+// environment because every primitive degrades to local dispatch.
+registerPool((path) => osuApiGet("/" + path));
 
 // A past-TTL copy straight from the shared store, bypassing freshness
 // entirely. Used only by the osuApiGet failure path: stale-but-plausible
