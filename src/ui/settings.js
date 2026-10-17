@@ -14,6 +14,7 @@ import { getFavorites, parseImportedFavorites, serializeFavorites, setFavorites 
 import { AUTO_UPDATE_CHECK_KEY, autoUpdateChecksEnabled, checkVersionUpdate, getCurrentVersion } from "../data/version-check.js";
 import { updateFloatingHeart } from "./floating-heart.js";
 import { THEME_ACCENT_KEY, THEME_ACTIVE_OPACITY_KEY, THEME_DEFAULTS, THEME_HEART_KEY, THEME_HOVER_DIM_KEY, THEME_IDLE_DIM_KEY, THEME_IDLE_OPACITY_KEY, applyTheme, getThemeSettings } from "./theme.js";
+import { hover } from "./hover.js";
 
 // Gist ids whose real visibility was already checked against GitHub this page
 // load (see the Gist visibility row) - keeps the autodetect to one request.
@@ -170,7 +171,7 @@ function hexToRgb(hex) {
   hex = String(hex).replace("#", "");
   if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
   const num = parseInt(hex, 16);
-  if (Number.isNaN(num)) return { r: 255, g: 102, b: 170 }; // falls back to the original #ff66aa-ish accent
+  if (Number.isNaN(num)) return { r: 255, g: 145, b: 187 }; // falls back to the v6 default accent #ff91bb
   return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
 }
 function rgbToHex(r, g, b) {
@@ -1143,9 +1144,7 @@ export function createSettingsView(deps) {
     hinaLink.target = "_blank";
     hinaLink.rel = "noopener";
     hinaLink.textContent = "mirror.hinamizawa.ai";
-    hinaLink.style.cssText = "color:var(--osu-fav-accent);text-decoration:none";
-    hinaLink.addEventListener("mouseenter", () => (hinaLink.style.textDecoration = "underline"));
-    hinaLink.addEventListener("mouseleave", () => (hinaLink.style.textDecoration = "none"));
+    hover.props(hinaLink, { textDecoration: "underline" }, { textDecoration: "none" });
     fullSongSubtitle.append("Streams from ", hinaLink);
     wrap.appendChild(settingsRow("Full-length previews", fullSongToggle, fullSongSubtitle));
 
@@ -1418,18 +1417,7 @@ export function createSettingsView(deps) {
     reenrichBtn.id = "osu-fav-reenrich-btn";
     reenrichBtn.style.cssText =
       "font-size:10px;padding:6px 10px;border:1px solid #333;border-radius:3px;background:transparent;color:#999;cursor:pointer;width:100%;box-sizing:border-box";
-    reenrichBtn.addEventListener("mouseenter", () => {
-      if (!isReenrichRunning()) {
-        reenrichBtn.style.borderColor = "var(--osu-fav-accent)";
-        reenrichBtn.style.color = "var(--osu-fav-accent)";
-      }
-    });
-    reenrichBtn.addEventListener("mouseleave", () => {
-      if (!isReenrichRunning()) {
-        reenrichBtn.style.borderColor = "#333";
-        reenrichBtn.style.color = "#999";
-      }
-    });
+    hover.accent(reenrichBtn, () => !isReenrichRunning());
     reenrichBtn.addEventListener("click", () => {
       if (isReenrichRunning()) cancelGlobalReenrichment();
       else runGlobalReenrichment();

@@ -13,8 +13,20 @@
 // call sites keeps calling GM_getValue/GM_setValue exactly as before -
 // shadowing the names here at the top of the IIFE is enough to redirect
 // all of them, no need to touch each call site individually.
-const _nativeGM_getValue = typeof GM_getValue === "function" ? GM_getValue : null;
-const _nativeGM_setValue = typeof GM_setValue === "function" ? GM_setValue : null;
+// Capture the manager's natives through globalThis, explicitly. In the
+// bundled userscript every module shares one function scope, and this
+// module declares its own GM_getValue/GM_setValue fallbacks - a plain
+// `typeof GM_getValue` inside that shared scope resolves to THOSE
+// (function declarations hoist to the top), so the probe below used to
+// capture the shim's own GM_setValue and call it while `_gmStorageWorks`
+// was still being initialized: TDZ ReferenceError, caught, probe returns
+// false - every install silently ran on the localStorage fallback and
+// native GM storage never actually worked. Going through globalThis only
+// ever sees the real manager-injected API (or undefined), never the shim's
+// own declarations, and stays correct in Node ESM too, where the named
+// exports shadow a bare lookup the same way.
+const _nativeGM_getValue = typeof globalThis.GM_getValue === "function" ? globalThis.GM_getValue : null;
+const _nativeGM_setValue = typeof globalThis.GM_setValue === "function" ? globalThis.GM_setValue : null;
 export const _GM_FALLBACK_LS_KEY = "__osu_local_favorites_gm_fallback__";
 // Cross-tab notification channel used when native GM storage works but the
 // userscript manager does not expose a working GM_addValueChangeListener.
@@ -88,6 +100,15 @@ const _gmStorageWorks = (() => {
     return false;
   }
 })();
+
+// True when GM storage is the real userscript-manager store: asynchronous,
+// chunked, and cheap to write. False in the localStorage fallback, where
+// every write re-serializes the entire store synchronously - callers use
+// this to skip high-frequency shared writes there (the favorites payload
+// already dominates that budget).
+export function gmStorageIsNative() {
+  return _gmStorageWorks;
+}
 
 export function GM_getValue(key, defaultValue) {
   if (_gmStorageWorks) {

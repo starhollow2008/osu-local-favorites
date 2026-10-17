@@ -15,16 +15,21 @@ export const THEME_HOVER_DIM_KEY = "osu_theme_hover_dim";
 export const THEME_ACTIVE_OPACITY_KEY = "osu_theme_active_opacity";
 
 export const THEME_DEFAULTS = {
-  accent: "#ff66aa",
-  heartColor: "#ff66aa",
+  // v6 palette: softer sakura accent and a deeper heart fill so favorited
+  // hearts read as a distinct "filled" state against the pastel accent.
+  // Both remain user-overridable in Settings; only the DEFAULTS changed -
+  // stored theme settings keep whatever the user picked.
+  accent: "#ff91bb",
+  heartColor: "#ce7698",
   idleOpacity: 0.15,
   idleDim: 0,
   hoverDim: 0.65,
   activeOpacity: 0.8,
 };
 
-// Simple hex darken for the accent's hover/pressed shade - mirrors the
-// original #ff66aa → #ff3377 relationship (roughly -25% lightness)
+// Simple hex darken for the accent's hover/pressed shade - keeps the same
+// ~-25% lightness relationship for any picked color (the original pair
+// was #ff66aa → #ff3377; the v6 default darkens equivalently).
 function darkenHex(hex, amount = 0.25) {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (!m) return hex;

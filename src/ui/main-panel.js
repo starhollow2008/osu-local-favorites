@@ -7,13 +7,15 @@ import { _blobUrlCache, cacheDurationMode, getKnownCachedBlob, hasFreshCachedCop
 import { resolveDefaultMirror } from "../data/mirrors.js";
 import { MUSIC_LOOP_KEY, MUSIC_SHUFFLE_KEY, musicLoopEnabled, musicShuffleEnabled } from "../data/playback-settings.js";
 import { favoriteCoverUrl, getFavorites, setFavorites } from "../data/storage.js";
+import { flushOnPageHide, loadPanelState, loadPlaybackState, savePanelState } from "../data/session-state.js";
 import { autoUpdateChecksEnabled, checkVersionUpdate, getCurrentVersion, isNewerVersion } from "../data/version-check.js";
-import { ensureAudio } from "./audio-player.js";
+import { ensureAudio, swapAudioSourceToCached } from "./audio-player.js";
 import { clearMediaSession, setMediaSessionMetadata } from "./media-session.js";
 import { showAddToCollectionMenu, showCollectionsMenu } from "./collections-menu.js";
 import { buildDownloadOptions, showDownloadMenu } from "./download-menu.js";
-import { clearFavoritesPanelAudio, updateFloatingHeart } from "./floating-heart.js";
 import { closeFilterMenu, showFilterMenu } from "./filter-menu.js";
+import { hover } from "./hover.js";
+import { clearFavoritesPanelAudio, updateFloatingHeart } from "./floating-heart.js";
 import { FILTER_CATEGORIES, buildFilterPlan, collectSectionsFor, countActiveFilterTerms, favMatchesPlan, makeEmptyFilterState } from "./filters.js";
 import { loopSVG, nextSVG, pauseSVG, playSVG, prevSVG, shuffleSVG } from "./theme.js";
 import { createSettingsView } from "./settings.js";
@@ -38,6 +40,67 @@ export function showFavoritesPanel() {
     // category in ui/filters.js (date, title, artist, status, genre).
     filterState = makeEmptyFilterState(),
     activeCollectionId = ""; // "" = no collection filter (show all)
+
+  // ── Cross-page session restore (see data/session-state.js) ────────
+  // Navigation on osu! is a full document load, which used to throw away
+  // the list view: reopening the panel on the next page restarted at the
+  // default sort with no filters and scroll at the top. Everything that
+  // defines the view is plain serializable state, so it is saved on every
+  // change (plus a throttled scroll save) and re-applied here on build.
+  const _session = loadPanelState();
+  if (_session) {
+    if (typeof _session.sort === "string" && _session.sort) currentSort = _session.sort;
+    sortAsc = !!_session.sortAsc;
+    if (typeof _session.search === "string") searchQuery = _session.search;
+    if (_session.filters && typeof _session.filters === "object") {
+      // Only copy categories the current filter model knows about, so a
+      // future layout change can't inject unknown keys into the state.
+      FILTER_CATEGORIES.forEach((cat) => {
+        const savedCat = _session.filters[cat.id];
+        if (savedCat && typeof savedCat === "object") {
+          Object.keys(savedCat).forEach((term) => {
+            const mode = savedCat[term];
+            if (mode === "include" || mode === "exclude") filterState[cat.id][term] = mode;
+          });
+        }
+      });
+    }
+    if (typeof _session.collectionId === "string") activeCollectionId = _session.collectionId;
+    settingsOpen = !!_session.settingsOpen;
+  }
+  // Kept out of the filter/sort restore above because it must be applied
+  // AFTER the first renderList() has laid out content (renderList itself
+  // restores within-view scroll once the view key matches).
+  const _sessionScrollTop = _session && Number(_session.scrollTop) > 0 ? Number(_session.scrollTop) : 0;
+
+  function persistPanelState() {
+    savePanelState({
+      sort: currentSort,
+      sortAsc,
+      search: searchQuery,
+      filters: filterState,
+      collectionId: activeCollectionId,
+      settingsOpen,
+      scrollTop: listEl ? listEl.scrollTop : 0,
+      // True for as long as THIS panel instance is mounted; the close
+      // handler flips it back so the next page load does not reopen a
+      // panel the user deliberately closed (see clearPanelOpenFlag).
+      panelOpen: true,
+    });
+  }
+
+  // Scroll fires continuously while the list is being dragged; one save
+  // per second of idle captures the final position without turning every
+  // pixel into a GM write. pagehide (registered at build time, below)
+  // catches whatever was still pending.
+  let _persistScrollTimer = null;
+  function _throttledPersistPanelState() {
+    if (_persistScrollTimer) return;
+    _persistScrollTimer = setTimeout(() => {
+      _persistScrollTimer = null;
+      persistPanelState();
+    }, 1000);
+  }
 
   // Inject shared styles once - covers scrollbar, slide-down banner, and slide-up prompt
   if (!document.getElementById("osu-fav-panel-style")) {
@@ -121,8 +184,7 @@ export function showFavoritesPanel() {
     accentClose.style.cssText =
       "background:none;border:none;color:#fff;cursor:pointer;font-size:13px;" +
       "font-weight:bold;padding:0 2px;opacity:0.8;flex-shrink:0";
-    accentClose.addEventListener("mouseenter", () => (accentClose.style.opacity = "1"));
-    accentClose.addEventListener("mouseleave", () => (accentClose.style.opacity = "0.8"));
+    hover.props(accentClose, { opacity: "1" }, { opacity: "0.8" });
     accentClose.addEventListener("click", () => {
       backdrop.remove();
       GM_setValue("osu_dismissed_version", latestVersion);
@@ -148,8 +210,11 @@ export function showFavoritesPanel() {
     laterBtn.style.cssText =
       "font-size:10px;padding:4px 10px;border:1px solid #333;border-radius:3px;" +
       "background:transparent;color:#888;cursor:pointer;font-weight:500";
-    laterBtn.addEventListener("mouseenter", () => { laterBtn.style.borderColor = "var(--osu-fav-accent)"; laterBtn.style.color = "var(--osu-fav-accent)"; });
-    laterBtn.addEventListener("mouseleave", () => { laterBtn.style.borderColor = "#333"; laterBtn.style.color = "#888"; });
+    hover.props(
+      laterBtn,
+      { borderColor: "var(--osu-fav-accent)", color: "var(--osu-fav-accent)" },
+      { borderColor: "#333", color: "#888" },
+    );
     laterBtn.addEventListener("click", () => {
       backdrop.remove();
       GM_setValue("osu_dismissed_version", latestVersion);
@@ -160,8 +225,7 @@ export function showFavoritesPanel() {
     updateBtn.style.cssText =
       "font-size:10px;padding:4px 10px;border:none;border-radius:3px;" +
       "background:var(--osu-fav-accent);color:#fff;cursor:pointer;font-weight:600";
-    updateBtn.addEventListener("mouseenter", () => (updateBtn.style.background = "var(--osu-fav-accent-dark)"));
-    updateBtn.addEventListener("mouseleave", () => (updateBtn.style.background = "var(--osu-fav-accent)"));
+    hover.props(updateBtn, { background: "var(--osu-fav-accent-dark)" }, { background: "var(--osu-fav-accent)" });
     updateBtn.addEventListener("click", () => {
       window.open(
         "https://github.com/starhollow2008/osu-local-favorites/raw/refs/heads/main/dist/osu-local-favorites.user.js",
@@ -204,7 +268,7 @@ export function showFavoritesPanel() {
   const countBadge = document.createElement("span");
   countBadge.id = "osu-fav-count";
   countBadge.style.cssText =
-    "color:var(--osu-fav-accent);background:rgba(255,102,170,.12);padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px";
+    "color:var(--osu-fav-accent);background:rgba(255,145,187,.12);padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px";
   titleEl.append("Local Favorites", countBadge);
 
   const settingsBtn = document.createElement("button");
@@ -213,18 +277,7 @@ export function showFavoritesPanel() {
   settingsBtn.setAttribute("aria-label", "Settings");
   settingsBtn.style.cssText =
     "background:none;border:1px solid #333;color:#999;cursor:pointer;width:34px;height:34px;min-width:34px;min-height:34px;max-width:34px;max-height:34px;padding:0;border-radius:3px;font-size:13px;flex:0 0 34px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;line-height:1";
-  settingsBtn.addEventListener("mouseenter", () => {
-    if (!settingsOpen) {
-      settingsBtn.style.borderColor = "var(--osu-fav-accent)";
-      settingsBtn.style.color = "var(--osu-fav-accent)";
-    }
-  });
-  settingsBtn.addEventListener("mouseleave", () => {
-    if (!settingsOpen) {
-      settingsBtn.style.borderColor = "#333";
-      settingsBtn.style.color = "#999";
-    }
-  });
+  hover.accent(settingsBtn, () => !settingsOpen);
   settingsBtn.addEventListener("click", () => setView(!settingsOpen));
 
   const closeBtn = document.createElement("button");
@@ -237,6 +290,8 @@ export function showFavoritesPanel() {
     closeFilterMenu();
     clearFavoritesPanelAudio();
     panel.remove();
+    // A deliberate close must not be reopened by the next page load.
+    savePanelState(Object.assign(loadPanelState() || {}, { panelOpen: false, at: Date.now() }));
   });
 
   headerTop.append(logoImg, titleEl, settingsBtn, closeBtn);
@@ -267,6 +322,7 @@ export function showFavoritesPanel() {
     searchRenderTimer = setTimeout(() => {
       searchRenderTimer = null;
       renderList();
+      persistPanelState();
     }, 150);
   });
 
@@ -280,7 +336,7 @@ export function showFavoritesPanel() {
 
     githubBanner = document.createElement("div");
     githubBanner.style.cssText =
-      "display:flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(255,102,170,.1);" +
+      "display:flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(255,145,187,.1);" +
       "border-bottom:1px solid var(--osu-fav-accent);flex-shrink:0;animation:osuFavSlideDown 0.3s ease-out";
 
     const starIcon = document.createElement("span");
@@ -294,16 +350,14 @@ export function showFavoritesPanel() {
     starLink.textContent = "Enjoying Local Favorites? Star it on GitHub";
     starLink.style.cssText =
       "flex:1;color:#ddd;text-decoration:none;font-size:11px;line-height:1.4";
-    starLink.addEventListener("mouseenter", () => (starLink.style.color = "var(--osu-fav-accent)"));
-    starLink.addEventListener("mouseleave", () => (starLink.style.color = "#ddd"));
+    hover.props(starLink, { color: "var(--osu-fav-accent)" }, { color: "#ddd" });
 
     const dismissBtn = document.createElement("button");
     dismissBtn.textContent = "\u2715";
     dismissBtn.title = "Dismiss";
     dismissBtn.style.cssText =
       "background:none;border:none;color:#888;cursor:pointer;font-size:12px;padding:2px 4px;flex-shrink:0;line-height:1";
-    dismissBtn.addEventListener("mouseenter", () => (dismissBtn.style.color = "var(--osu-fav-accent)"));
-    dismissBtn.addEventListener("mouseleave", () => (dismissBtn.style.color = "#888"));
+    hover.props(dismissBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
     dismissBtn.addEventListener("click", () => githubBanner.remove());
 
     githubBanner.append(starIcon, starLink, dismissBtn);
@@ -358,6 +412,7 @@ export function showFavoritesPanel() {
                 sortAsc = asc;
                 updateFilterBtns();
                 renderList();
+                persistPanelState();
               }
             : undefined,
         },
@@ -367,6 +422,7 @@ export function showFavoritesPanel() {
           updateFilterBtn(cat.id);
           updateClearAllRow();
           renderList();
+          persistPanelState();
         },
       );
     });
@@ -409,19 +465,9 @@ export function showFavoritesPanel() {
     const btn = document.createElement("button");
     btn.textContent = label;
     btn.style.cssText = `font-size:10px;padding:3px 7px;border:1px solid #333;border-radius:3px;background:transparent;color:#999;cursor:pointer;${extraStyle}`;
-    btn.addEventListener("mouseenter", () => {
-      btn.style.borderColor = "var(--osu-fav-accent)";
-      btn.style.color = "var(--osu-fav-accent)";
-    });
-    btn.addEventListener("mouseleave", () => {
-      btn.style.borderColor = "#333";
-      btn.style.color = "#999";
-    });
+    hover.accent(btn);
     return btn;
   }
-
-  // Collections is a filter too, so it shares the filter row's last cell -
-  // but it keeps its own popover, which also creates and deletes playlists.
   const collectionsBtn = document.createElement("button");
   collectionsBtn.type = "button";
   collectionsBtn.title = "Filter by collection";
@@ -452,6 +498,7 @@ export function showFavoritesPanel() {
       updateCollectionsBtn();
       updateClearAllRow();
       renderList();
+      persistPanelState();
     });
   });
   filterRow.appendChild(collectionsBtn);
@@ -466,8 +513,7 @@ export function showFavoritesPanel() {
   clearAllBtn.style.cssText =
     "width:100%;box-sizing:border-box;font-size:10px;padding:3px 6px;border:1px solid #333;" +
     "border-radius:3px;background:transparent;color:#888;cursor:pointer";
-  clearAllBtn.addEventListener("mouseenter", () => (clearAllBtn.style.color = "var(--osu-fav-accent)"));
-  clearAllBtn.addEventListener("mouseleave", () => (clearAllBtn.style.color = "#888"));
+  hover.props(clearAllBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
   clearAllBtn.addEventListener("click", () => {
     closeFilterMenu();
     filterState = makeEmptyFilterState();
@@ -476,6 +522,7 @@ export function showFavoritesPanel() {
     updateCollectionsBtn();
     updateClearAllRow();
     renderList();
+    persistPanelState();
   });
   clearAllRow.appendChild(clearAllBtn);
 
@@ -527,8 +574,7 @@ export function showFavoritesPanel() {
   footer.style.cssText =
     "width:100%;height:29px;min-height:29px;max-height:29px;box-sizing:border-box;padding:6px 14px;border-top:1px solid #333;background:#1a1a1a;font-size:10px;line-height:15px;color:#555;text-align:center;cursor:pointer;user-select:none;overflow:hidden";
   footer.addEventListener("click", () => setView(true));
-  footer.addEventListener("mouseenter", () => (footer.style.color = "var(--osu-fav-accent)"));
-  footer.addEventListener("mouseleave", () => (footer.style.color = "#555"));
+  hover.props(footer, { color: "var(--osu-fav-accent)" }, { color: "#555" });
 
   function updateFooterStatus() {
     const token = GM_getValue(GH_TOKEN_KEY, "");
@@ -620,12 +666,7 @@ export function showFavoritesPanel() {
     b.style.cssText =
       "background:rgba(17,17,17,.46);border:1px solid #333;border-radius:3px;color:#999;cursor:pointer;" +
       "padding:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0";
-    b.addEventListener("mouseenter", () => {
-      if (!b._active) { b.style.borderColor = "var(--osu-fav-accent)"; b.style.color = "var(--osu-fav-accent)"; }
-    });
-    b.addEventListener("mouseleave", () => {
-      if (!b._active) { b.style.borderColor = "#333"; b.style.color = "#999"; }
-    });
+    hover.accent(b, () => !b._active);
     return b;
   }
 
@@ -657,7 +698,18 @@ export function showFavoritesPanel() {
   npNextBtn.addEventListener("click", () => queueAdvance(1));
   npPlayBtn.addEventListener("click", () => {
     const audio = window._osuFavAudio;
-    if (!audio || !audio.src) return;
+    if (!audio) return;
+    // Cross-page session restore: the bar shows a saved track that this
+    // page's element has no source for yet. The tap IS the user gesture,
+    // so use it to start the track from the saved position.
+    if (audio._npCurrentId && !audio.src) {
+      const fav = getFavorites()[audio._npCurrentId];
+      if (fav) {
+        startPlayback(audio._npCurrentId, fav, {});
+        return;
+      }
+    }
+    if (!audio.src) return;
     // The current track's source is still being decided (cache lookup in
     // flight), so audio.src is whatever played before: play/pause here would
     // act on that instead. The pending request starts playback by itself.
@@ -855,6 +907,22 @@ export function showFavoritesPanel() {
       audio.src = audio._activePreviewUrl;
       audio.load();
 
+      // Session resume (see the restore block near the NP wiring): this
+      // track was started by the cross-page resume tap, which stamps the
+      // saved position here. Seeking needs metadata, so it happens on
+      // loadedmetadata; one-shot - the flag is cleared immediately so
+      // later reloads of the same source start at the top like any other
+      // play.
+      if (audio._sessionResumeAt > 0) {
+        const seekTo = audio._sessionResumeAt;
+        audio._sessionResumeAt = null;
+        audio.addEventListener("loadedmetadata", () => {
+          try {
+            if (Number.isFinite(seekTo) && seekTo < (audio.duration || Infinity)) audio.currentTime = seekTo;
+          } catch (e) { /* seeking unsupported for this blob - start from top */ }
+        }, { once: true });
+      }
+
       if (audio._usingFullSongSource) {
         fetchHinaiSong(id).then((song) => {
           if (!song) return;
@@ -931,7 +999,24 @@ export function showFavoritesPanel() {
           // Range request for the remainder (see startStreamingCacheWrite).
           hasFreshCachedCopy(previewUrl).then((alreadyCached) => {
             if (alreadyCached || !stillWanted()) return;
-            startStreamingCacheWrite(previewUrl, { isStillWanted: stillWanted });
+            // Cache-overtake swap: the writer runs at full network speed
+            // while the element's own request is paced by playback, so on
+            // anything but the slowest connections the local copy completes
+            // while the song is still playing. Once it has, swap the
+            // element over to the cached blob and drop the network
+            // connection - gaplessly, via a shadow element that bridges
+            // the handoff (see swapAudioSourceToCached in audio-player).
+            startStreamingCacheWrite(previewUrl, { isStillWanted: stillWanted })
+              .then((stored) => {
+                if (!stored) return;
+                // The user may have skipped away, or the source may have
+                // already fallen back, in the time the download took.
+                if (audio._npCurrentId !== id || audio._usingBlobCache) return;
+                if (audio._sourceFallbackAttempted) return;
+                if (audio.ended) return;
+                swapAudioSourceToCached(audio, previewUrl);
+              })
+              .catch(() => { /* a failed swap just keeps the network source */ });
           });
         };
         if (audio.paused) audio.addEventListener("play", startStreamCache, { once: true });
@@ -999,6 +1084,30 @@ export function showFavoritesPanel() {
   npAudio._npBg = npBg;
   npAudio._queueAdvance = queueAdvance;
 
+  // ── Cross-page playback restore ─────────────────────────────────
+  // The audio element is per-page, so after a navigation this page's
+  // element is blank even though the user was mid-song. If the session
+  // has a recent track, surface it in the Now Playing bar in a paused
+  // "resume from here" state: autoplay policy forbids starting playback
+  // without a gesture, so one tap on the play control restarts the track
+  // (from the local cache copy whenever one exists) at the saved position.
+  // The favorite may have been removed since - a missing record just
+  // leaves the bar hidden.
+  if (!npAudio._npCurrentId) {
+    const saved = loadPlaybackState();
+    const savedFav = saved ? getFavorites()[saved.id] : null;
+    if (saved && savedFav) {
+      npAudio._npCurrentId = saved.id;
+      npAudio._npCurrentTitle = savedFav.title || savedFav.title_unicode || "Unknown";
+      npAudio._npCurrentArtist = savedFav.artist || savedFav.artist_unicode || "";
+      npAudio._sessionResumeAt = saved.position;
+      if (npTitle) npTitle.textContent = npAudio._npCurrentTitle;
+      if (npArtist) npArtist.textContent = npAudio._npCurrentArtist;
+      npPlayBtn.innerHTML = playSVG();
+      nowPlayingBar.style.display = "flex";
+    }
+  }
+
   // Reconcile the freshly-rendered favorite cards with the singleton audio.
   // renderList() can replace the DOM node for the current song while playback
   // is still alive; never let the detached node remain the active UI owner.
@@ -1064,6 +1173,7 @@ export function showFavoritesPanel() {
   // ── View switching ───────────────────────────────────────
   function setView(showSettings) {
     settingsOpen = showSettings;
+    persistPanelState();
     toolbar.style.display = showSettings ? "none" : "flex";
     if (showSettings) closeFilterMenu();
     listEl.style.display = showSettings ? "none" : "block";
@@ -1266,11 +1376,7 @@ export function showFavoritesPanel() {
       card.dataset.favId = id;
       card.style.cssText =
         "display:flex;gap:8px;padding:8px 14px;border-bottom:1px solid #1e1e1e;align-items:center";
-      card.addEventListener(
-        "mouseenter",
-        () => (card.style.background = "#1a1a1a"),
-      );
-      card.addEventListener("mouseleave", () => (card.style.background = ""));
+      hover(card, () => (card.style.background = "#1a1a1a"), () => (card.style.background = ""));
 
       // Cover
       const coverUrl = favoriteCoverUrl(f, id);
@@ -1435,14 +1541,7 @@ export function showFavoritesPanel() {
       openLink.textContent = "Open";
       openLink.style.cssText =
         "font-size:10px;padding:4px 8px;border:1px solid #333;border-radius:2px;color:#999;text-decoration:none;text-align:center;display:block;white-space:nowrap";
-      openLink.addEventListener("mouseenter", () => {
-        openLink.style.borderColor = "var(--osu-fav-accent)";
-        openLink.style.color = "var(--osu-fav-accent)";
-      });
-      openLink.addEventListener("mouseleave", () => {
-        openLink.style.borderColor = "#333";
-        openLink.style.color = "#999";
-      });
+      hover.accent(openLink);
 
       // If a default mirror is configured (Settings → Download Mirrors)
       // and it's actually usable right now (mirror still enabled, or
@@ -1490,27 +1589,18 @@ export function showFavoritesPanel() {
         });
       }
       downloadLink.style.cssText = downloadStyle;
-      downloadLink.addEventListener("mouseenter", () => {
-        downloadLink.style.borderColor = "var(--osu-fav-accent)";
-        downloadLink.style.color = "var(--osu-fav-accent)";
-      });
-      downloadLink.addEventListener("mouseleave", () => {
-        downloadLink.style.borderColor = "#333";
-        downloadLink.style.color = "#999";
-      });
+      hover.accent(downloadLink);
 
       const removeBtn = document.createElement("button");
       removeBtn.textContent = "Remove";
       removeBtn.style.cssText =
         "font-size:10px;padding:4px 8px;border:1px solid #333;border-radius:2px;background:none;color:#999;cursor:pointer;white-space:nowrap";
-      removeBtn.addEventListener("mouseenter", () => {
-        removeBtn.style.borderColor = "#e55";
-        removeBtn.style.color = "#e55";
-      });
-      removeBtn.addEventListener("mouseleave", () => {
-        removeBtn.style.borderColor = "#333";
-        removeBtn.style.color = "#999";
-      });
+      // Remove is the one destructive control - red hover, not accent.
+      hover.props(
+        removeBtn,
+        { borderColor: "#e55", color: "#e55" },
+        { borderColor: "#333", color: "#999" },
+      );
       removeBtn.addEventListener("click", () => {
         const favs = getFavorites();
         delete favs[id];
@@ -1547,20 +1637,26 @@ export function showFavoritesPanel() {
         "background:none;color:#999;cursor:pointer;text-align:center;line-height:1;" +
         "opacity:var(--osu-fav-idle-opacity, 0.15);transition:opacity 0.15s";
 
-      // Show/hide button on cover hover; restore original border/color on hover
-      coverEl.addEventListener("mouseenter", () => {
-        previewBtn.style.opacity = "var(--osu-fav-active-opacity, 0.8)";
-        dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-hover-dim, 0.65))";
-        if (!previewBtn._playing) { previewBtn.style.borderColor = "var(--osu-fav-accent)"; previewBtn.style.color = "var(--osu-fav-accent)"; }
-      });
-      coverEl.addEventListener("mouseleave", () => {
-        if (!previewBtn._playing) {
-          previewBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
-          previewBtn.style.borderColor = "#333";
-          previewBtn.style.color = "#999";
-          dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-idle-dim, 0))";
-        }
-      });
+      // Show/hide button on cover hover; restore the resting look on leave.
+      // Deliberately asymmetric: enter applies even while a track plays from
+      // this row (the pause icon keeps its active styling), but leave only
+      // restores when idle.
+      hover(
+        coverEl,
+        () => {
+          previewBtn.style.opacity = "var(--osu-fav-active-opacity, 0.8)";
+          dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-hover-dim, 0.65))";
+          if (!previewBtn._playing) { previewBtn.style.borderColor = "var(--osu-fav-accent)"; previewBtn.style.color = "var(--osu-fav-accent)"; }
+        },
+        () => {
+          if (!previewBtn._playing) {
+            previewBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
+            previewBtn.style.borderColor = "#333";
+            previewBtn.style.color = "#999";
+            dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-idle-dim, 0))";
+          }
+        },
+      );
 
       previewBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -1753,6 +1849,33 @@ export function showFavoritesPanel() {
   // binding intact, which destroying and reopening the panel does not.
   panel._osuFavRefresh = renderList;
   renderList();
+  // Apply the cross-page session state that depends on rendered content:
+  // the saved view (list vs settings), the search box text, and the scroll
+  // offset. renderList() already ran with the restored sort/filters from
+  // the session block at the top, so the list height exists to scroll into.
+  if (_session) {
+    if (searchQuery) searchInput.value = searchQuery;
+    if (settingsOpen) setView(true);
+    if (_sessionScrollTop > 0) {
+      // The list renders in chunks over rAF; scroll only sticks once the
+      // content is tall enough, so retry on each chunk pass until it fits
+      // (same trick renderList uses for its own within-view restore).
+      const trySessionScroll = () => {
+        if (panel._osuFavRenderCount && listEl.scrollHeight - listEl.clientHeight >= _sessionScrollTop) {
+          listEl.scrollTop = _sessionScrollTop;
+        } else if (panel._osuFavRenderCount < 20) {
+          requestAnimationFrame(trySessionScroll);
+        }
+      };
+      requestAnimationFrame(trySessionScroll);
+    }
+  }
+  // Save the view on every user-driven change, throttled where events fire
+  // continuously (scroll), and once more on pagehide - a save scheduled
+  // by the throttles could still be pending when navigation starts.
+  listEl.addEventListener("scroll", _throttledPersistPanelState, { passive: true });
+  flushOnPageHide(persistPanelState);
+  persistPanelState();
   updateFooterStatus();
       updateMobileSearchBar();
 

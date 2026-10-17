@@ -1,6 +1,7 @@
 import { GM_getValue } from "../core/gm-shim.js";
 import { DL_SOURCE_PREF_KEY, DL_VIDEO_PREF_KEY, MIRRORS, isLoggedIn, isMirrorEnabled } from "../data/mirrors.js";
 import { createPopupMenu } from "./popup-menu.js";
+import { hover } from "./hover.js";
 
 export function buildDownloadOptions(id) {
   const videoPref = GM_getValue(DL_VIDEO_PREF_KEY, "video");
@@ -56,14 +57,11 @@ export function showDownloadMenu(anchorEl, beatmapId) {
       row.style.cssText =
         "display:block;padding:6px 10px;font-size:11px;color:#ddd;text-decoration:none;" +
         "border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
-      row.addEventListener("mouseenter", () => {
-        row.style.background = "var(--osu-fav-accent)";
-        row.style.color = "#fff";
-      });
-      row.addEventListener("mouseleave", () => {
-        row.style.background = "transparent";
-        row.style.color = "#ddd";
-      });
+      hover.props(
+        row,
+        { background: "var(--osu-fav-accent)", color: "#fff" },
+        { background: "transparent", color: "#ddd" },
+      );
       row.addEventListener("click", cleanup);
       menu.appendChild(row);
     });
