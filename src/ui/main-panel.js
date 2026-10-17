@@ -13,8 +13,9 @@ import { ensureAudio, swapAudioSourceToCached } from "./audio-player.js";
 import { clearMediaSession, setMediaSessionMetadata } from "./media-session.js";
 import { showAddToCollectionMenu, showCollectionsMenu } from "./collections-menu.js";
 import { buildDownloadOptions, showDownloadMenu } from "./download-menu.js";
-import { clearFavoritesPanelAudio, updateFloatingHeart } from "./floating-heart.js";
 import { closeFilterMenu, showFilterMenu } from "./filter-menu.js";
+import { hover } from "./hover.js";
+import { clearFavoritesPanelAudio, updateFloatingHeart } from "./floating-heart.js";
 import { FILTER_CATEGORIES, buildFilterPlan, collectSectionsFor, countActiveFilterTerms, favMatchesPlan, makeEmptyFilterState } from "./filters.js";
 import { loopSVG, nextSVG, pauseSVG, playSVG, prevSVG, shuffleSVG } from "./theme.js";
 import { createSettingsView } from "./settings.js";
@@ -81,6 +82,10 @@ export function showFavoritesPanel() {
       collectionId: activeCollectionId,
       settingsOpen,
       scrollTop: listEl ? listEl.scrollTop : 0,
+      // True for as long as THIS panel instance is mounted; the close
+      // handler flips it back so the next page load does not reopen a
+      // panel the user deliberately closed (see clearPanelOpenFlag).
+      panelOpen: true,
     });
   }
 
@@ -179,8 +184,7 @@ export function showFavoritesPanel() {
     accentClose.style.cssText =
       "background:none;border:none;color:#fff;cursor:pointer;font-size:13px;" +
       "font-weight:bold;padding:0 2px;opacity:0.8;flex-shrink:0";
-    accentClose.addEventListener("mouseenter", () => (accentClose.style.opacity = "1"));
-    accentClose.addEventListener("mouseleave", () => (accentClose.style.opacity = "0.8"));
+    hover.props(accentClose, { opacity: "1" }, { opacity: "0.8" });
     accentClose.addEventListener("click", () => {
       backdrop.remove();
       GM_setValue("osu_dismissed_version", latestVersion);
@@ -206,8 +210,11 @@ export function showFavoritesPanel() {
     laterBtn.style.cssText =
       "font-size:10px;padding:4px 10px;border:1px solid #333;border-radius:3px;" +
       "background:transparent;color:#888;cursor:pointer;font-weight:500";
-    laterBtn.addEventListener("mouseenter", () => { laterBtn.style.borderColor = "var(--osu-fav-accent)"; laterBtn.style.color = "var(--osu-fav-accent)"; });
-    laterBtn.addEventListener("mouseleave", () => { laterBtn.style.borderColor = "#333"; laterBtn.style.color = "#888"; });
+    hover.props(
+      laterBtn,
+      { borderColor: "var(--osu-fav-accent)", color: "var(--osu-fav-accent)" },
+      { borderColor: "#333", color: "#888" },
+    );
     laterBtn.addEventListener("click", () => {
       backdrop.remove();
       GM_setValue("osu_dismissed_version", latestVersion);
@@ -218,8 +225,7 @@ export function showFavoritesPanel() {
     updateBtn.style.cssText =
       "font-size:10px;padding:4px 10px;border:none;border-radius:3px;" +
       "background:var(--osu-fav-accent);color:#fff;cursor:pointer;font-weight:600";
-    updateBtn.addEventListener("mouseenter", () => (updateBtn.style.background = "var(--osu-fav-accent-dark)"));
-    updateBtn.addEventListener("mouseleave", () => (updateBtn.style.background = "var(--osu-fav-accent)"));
+    hover.props(updateBtn, { background: "var(--osu-fav-accent-dark)" }, { background: "var(--osu-fav-accent)" });
     updateBtn.addEventListener("click", () => {
       window.open(
         "https://github.com/starhollow2008/osu-local-favorites/raw/refs/heads/main/dist/osu-local-favorites.user.js",
@@ -262,7 +268,7 @@ export function showFavoritesPanel() {
   const countBadge = document.createElement("span");
   countBadge.id = "osu-fav-count";
   countBadge.style.cssText =
-    "color:var(--osu-fav-accent);background:rgba(255,102,170,.12);padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px";
+    "color:var(--osu-fav-accent);background:rgba(255,145,187,.12);padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px";
   titleEl.append("Local Favorites", countBadge);
 
   const settingsBtn = document.createElement("button");
@@ -271,18 +277,7 @@ export function showFavoritesPanel() {
   settingsBtn.setAttribute("aria-label", "Settings");
   settingsBtn.style.cssText =
     "background:none;border:1px solid #333;color:#999;cursor:pointer;width:34px;height:34px;min-width:34px;min-height:34px;max-width:34px;max-height:34px;padding:0;border-radius:3px;font-size:13px;flex:0 0 34px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;line-height:1";
-  settingsBtn.addEventListener("mouseenter", () => {
-    if (!settingsOpen) {
-      settingsBtn.style.borderColor = "var(--osu-fav-accent)";
-      settingsBtn.style.color = "var(--osu-fav-accent)";
-    }
-  });
-  settingsBtn.addEventListener("mouseleave", () => {
-    if (!settingsOpen) {
-      settingsBtn.style.borderColor = "#333";
-      settingsBtn.style.color = "#999";
-    }
-  });
+  hover.accent(settingsBtn, () => !settingsOpen);
   settingsBtn.addEventListener("click", () => setView(!settingsOpen));
 
   const closeBtn = document.createElement("button");
@@ -295,6 +290,8 @@ export function showFavoritesPanel() {
     closeFilterMenu();
     clearFavoritesPanelAudio();
     panel.remove();
+    // A deliberate close must not be reopened by the next page load.
+    savePanelState(Object.assign(loadPanelState() || {}, { panelOpen: false, at: Date.now() }));
   });
 
   headerTop.append(logoImg, titleEl, settingsBtn, closeBtn);
@@ -339,7 +336,7 @@ export function showFavoritesPanel() {
 
     githubBanner = document.createElement("div");
     githubBanner.style.cssText =
-      "display:flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(255,102,170,.1);" +
+      "display:flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(255,145,187,.1);" +
       "border-bottom:1px solid var(--osu-fav-accent);flex-shrink:0;animation:osuFavSlideDown 0.3s ease-out";
 
     const starIcon = document.createElement("span");
@@ -353,16 +350,14 @@ export function showFavoritesPanel() {
     starLink.textContent = "Enjoying Local Favorites? Star it on GitHub";
     starLink.style.cssText =
       "flex:1;color:#ddd;text-decoration:none;font-size:11px;line-height:1.4";
-    starLink.addEventListener("mouseenter", () => (starLink.style.color = "var(--osu-fav-accent)"));
-    starLink.addEventListener("mouseleave", () => (starLink.style.color = "#ddd"));
+    hover.props(starLink, { color: "var(--osu-fav-accent)" }, { color: "#ddd" });
 
     const dismissBtn = document.createElement("button");
     dismissBtn.textContent = "\u2715";
     dismissBtn.title = "Dismiss";
     dismissBtn.style.cssText =
       "background:none;border:none;color:#888;cursor:pointer;font-size:12px;padding:2px 4px;flex-shrink:0;line-height:1";
-    dismissBtn.addEventListener("mouseenter", () => (dismissBtn.style.color = "var(--osu-fav-accent)"));
-    dismissBtn.addEventListener("mouseleave", () => (dismissBtn.style.color = "#888"));
+    hover.props(dismissBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
     dismissBtn.addEventListener("click", () => githubBanner.remove());
 
     githubBanner.append(starIcon, starLink, dismissBtn);
@@ -470,19 +465,9 @@ export function showFavoritesPanel() {
     const btn = document.createElement("button");
     btn.textContent = label;
     btn.style.cssText = `font-size:10px;padding:3px 7px;border:1px solid #333;border-radius:3px;background:transparent;color:#999;cursor:pointer;${extraStyle}`;
-    btn.addEventListener("mouseenter", () => {
-      btn.style.borderColor = "var(--osu-fav-accent)";
-      btn.style.color = "var(--osu-fav-accent)";
-    });
-    btn.addEventListener("mouseleave", () => {
-      btn.style.borderColor = "#333";
-      btn.style.color = "#999";
-    });
+    hover.accent(btn);
     return btn;
   }
-
-  // Collections is a filter too, so it shares the filter row's last cell -
-  // but it keeps its own popover, which also creates and deletes playlists.
   const collectionsBtn = document.createElement("button");
   collectionsBtn.type = "button";
   collectionsBtn.title = "Filter by collection";
@@ -528,8 +513,7 @@ export function showFavoritesPanel() {
   clearAllBtn.style.cssText =
     "width:100%;box-sizing:border-box;font-size:10px;padding:3px 6px;border:1px solid #333;" +
     "border-radius:3px;background:transparent;color:#888;cursor:pointer";
-  clearAllBtn.addEventListener("mouseenter", () => (clearAllBtn.style.color = "var(--osu-fav-accent)"));
-  clearAllBtn.addEventListener("mouseleave", () => (clearAllBtn.style.color = "#888"));
+  hover.props(clearAllBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
   clearAllBtn.addEventListener("click", () => {
     closeFilterMenu();
     filterState = makeEmptyFilterState();
@@ -590,8 +574,7 @@ export function showFavoritesPanel() {
   footer.style.cssText =
     "width:100%;height:29px;min-height:29px;max-height:29px;box-sizing:border-box;padding:6px 14px;border-top:1px solid #333;background:#1a1a1a;font-size:10px;line-height:15px;color:#555;text-align:center;cursor:pointer;user-select:none;overflow:hidden";
   footer.addEventListener("click", () => setView(true));
-  footer.addEventListener("mouseenter", () => (footer.style.color = "var(--osu-fav-accent)"));
-  footer.addEventListener("mouseleave", () => (footer.style.color = "#555"));
+  hover.props(footer, { color: "var(--osu-fav-accent)" }, { color: "#555" });
 
   function updateFooterStatus() {
     const token = GM_getValue(GH_TOKEN_KEY, "");
@@ -683,12 +666,7 @@ export function showFavoritesPanel() {
     b.style.cssText =
       "background:rgba(17,17,17,.46);border:1px solid #333;border-radius:3px;color:#999;cursor:pointer;" +
       "padding:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0";
-    b.addEventListener("mouseenter", () => {
-      if (!b._active) { b.style.borderColor = "var(--osu-fav-accent)"; b.style.color = "var(--osu-fav-accent)"; }
-    });
-    b.addEventListener("mouseleave", () => {
-      if (!b._active) { b.style.borderColor = "#333"; b.style.color = "#999"; }
-    });
+    hover.accent(b, () => !b._active);
     return b;
   }
 
@@ -1398,11 +1376,7 @@ export function showFavoritesPanel() {
       card.dataset.favId = id;
       card.style.cssText =
         "display:flex;gap:8px;padding:8px 14px;border-bottom:1px solid #1e1e1e;align-items:center";
-      card.addEventListener(
-        "mouseenter",
-        () => (card.style.background = "#1a1a1a"),
-      );
-      card.addEventListener("mouseleave", () => (card.style.background = ""));
+      hover(card, () => (card.style.background = "#1a1a1a"), () => (card.style.background = ""));
 
       // Cover
       const coverUrl = favoriteCoverUrl(f, id);
@@ -1567,14 +1541,7 @@ export function showFavoritesPanel() {
       openLink.textContent = "Open";
       openLink.style.cssText =
         "font-size:10px;padding:4px 8px;border:1px solid #333;border-radius:2px;color:#999;text-decoration:none;text-align:center;display:block;white-space:nowrap";
-      openLink.addEventListener("mouseenter", () => {
-        openLink.style.borderColor = "var(--osu-fav-accent)";
-        openLink.style.color = "var(--osu-fav-accent)";
-      });
-      openLink.addEventListener("mouseleave", () => {
-        openLink.style.borderColor = "#333";
-        openLink.style.color = "#999";
-      });
+      hover.accent(openLink);
 
       // If a default mirror is configured (Settings → Download Mirrors)
       // and it's actually usable right now (mirror still enabled, or
@@ -1622,27 +1589,18 @@ export function showFavoritesPanel() {
         });
       }
       downloadLink.style.cssText = downloadStyle;
-      downloadLink.addEventListener("mouseenter", () => {
-        downloadLink.style.borderColor = "var(--osu-fav-accent)";
-        downloadLink.style.color = "var(--osu-fav-accent)";
-      });
-      downloadLink.addEventListener("mouseleave", () => {
-        downloadLink.style.borderColor = "#333";
-        downloadLink.style.color = "#999";
-      });
+      hover.accent(downloadLink);
 
       const removeBtn = document.createElement("button");
       removeBtn.textContent = "Remove";
       removeBtn.style.cssText =
         "font-size:10px;padding:4px 8px;border:1px solid #333;border-radius:2px;background:none;color:#999;cursor:pointer;white-space:nowrap";
-      removeBtn.addEventListener("mouseenter", () => {
-        removeBtn.style.borderColor = "#e55";
-        removeBtn.style.color = "#e55";
-      });
-      removeBtn.addEventListener("mouseleave", () => {
-        removeBtn.style.borderColor = "#333";
-        removeBtn.style.color = "#999";
-      });
+      // Remove is the one destructive control - red hover, not accent.
+      hover.props(
+        removeBtn,
+        { borderColor: "#e55", color: "#e55" },
+        { borderColor: "#333", color: "#999" },
+      );
       removeBtn.addEventListener("click", () => {
         const favs = getFavorites();
         delete favs[id];
@@ -1679,20 +1637,26 @@ export function showFavoritesPanel() {
         "background:none;color:#999;cursor:pointer;text-align:center;line-height:1;" +
         "opacity:var(--osu-fav-idle-opacity, 0.15);transition:opacity 0.15s";
 
-      // Show/hide button on cover hover; restore original border/color on hover
-      coverEl.addEventListener("mouseenter", () => {
-        previewBtn.style.opacity = "var(--osu-fav-active-opacity, 0.8)";
-        dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-hover-dim, 0.65))";
-        if (!previewBtn._playing) { previewBtn.style.borderColor = "var(--osu-fav-accent)"; previewBtn.style.color = "var(--osu-fav-accent)"; }
-      });
-      coverEl.addEventListener("mouseleave", () => {
-        if (!previewBtn._playing) {
-          previewBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
-          previewBtn.style.borderColor = "#333";
-          previewBtn.style.color = "#999";
-          dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-idle-dim, 0))";
-        }
-      });
+      // Show/hide button on cover hover; restore the resting look on leave.
+      // Deliberately asymmetric: enter applies even while a track plays from
+      // this row (the pause icon keeps its active styling), but leave only
+      // restores when idle.
+      hover(
+        coverEl,
+        () => {
+          previewBtn.style.opacity = "var(--osu-fav-active-opacity, 0.8)";
+          dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-hover-dim, 0.65))";
+          if (!previewBtn._playing) { previewBtn.style.borderColor = "var(--osu-fav-accent)"; previewBtn.style.color = "var(--osu-fav-accent)"; }
+        },
+        () => {
+          if (!previewBtn._playing) {
+            previewBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
+            previewBtn.style.borderColor = "#333";
+            previewBtn.style.color = "#999";
+            dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-idle-dim, 0))";
+          }
+        },
+      );
 
       previewBtn.addEventListener("click", (e) => {
         e.stopPropagation();

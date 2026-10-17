@@ -1,4 +1,5 @@
 import { GM_getValue, GM_setValue } from "../core/gm-shim.js";
+import { hover } from "./hover.js";
 
 // ═══ Update prompt UI ═══
 // Shown on page load when a new version is detected and the panel isn't open.
@@ -57,8 +58,7 @@ export function showUpdatePrompt(latestVersion) {
   accentClose.style.cssText =
     "background:none;border:none;color:#fff;cursor:pointer;font-size:12px;" +
     "opacity:0.8;font-weight:bold;padding:0 2px;flex-shrink:0";
-  accentClose.addEventListener("mouseenter", () => (accentClose.style.opacity = "1"));
-  accentClose.addEventListener("mouseleave", () => (accentClose.style.opacity = "0.8"));
+  hover.props(accentClose, { opacity: "1" }, { opacity: "0.8" });
   accentClose.addEventListener("click", () => {
     modal.remove();
     GM_setValue("osu_dismissed_version", latestVersion);
@@ -84,14 +84,11 @@ export function showUpdatePrompt(latestVersion) {
   laterBtn.style.cssText =
     "font-size:10px;padding:4px 10px;border:1px solid #333;border-radius:3px;" +
     "background:transparent;color:#888;cursor:pointer;font-weight:500";
-  laterBtn.addEventListener("mouseenter", () => {
-    laterBtn.style.borderColor = "var(--osu-fav-accent)";
-    laterBtn.style.color = "var(--osu-fav-accent)";
-  });
-  laterBtn.addEventListener("mouseleave", () => {
-    laterBtn.style.borderColor = "#333";
-    laterBtn.style.color = "#888";
-  });
+  hover.props(
+    laterBtn,
+    { borderColor: "var(--osu-fav-accent)", color: "var(--osu-fav-accent)" },
+    { borderColor: "#333", color: "#888" },
+  );
   laterBtn.addEventListener("click", () => {
     modal.remove();
     GM_setValue("osu_dismissed_version", latestVersion);
@@ -103,8 +100,7 @@ export function showUpdatePrompt(latestVersion) {
   updateBtn.style.cssText =
     "font-size:10px;padding:4px 10px;border:none;border-radius:3px;" +
     "background:var(--osu-fav-accent);color:#fff;cursor:pointer;font-weight:600;transition:background 0.2s";
-  updateBtn.addEventListener("mouseenter", () => (updateBtn.style.background = "var(--osu-fav-accent-dark)"));
-  updateBtn.addEventListener("mouseleave", () => (updateBtn.style.background = "var(--osu-fav-accent)"));
+  hover.props(updateBtn, { background: "var(--osu-fav-accent-dark)" }, { background: "var(--osu-fav-accent)" });
   updateBtn.addEventListener("click", () => {
     window.open(
       "https://github.com/starhollow2008/osu-local-favorites/raw/refs/heads/main/dist/osu-local-favorites.user.js",

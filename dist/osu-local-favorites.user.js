@@ -3,7 +3,7 @@
 // @namespace    https://github.com/starhollow2008/osu-local-favorites
 // @updateURL    https://github.com/starhollow2008/osu-local-favorites/raw/refs/heads/main/dist/osu-local-favorites.user.js
 // @downloadURL  https://github.com/starhollow2008/osu-local-favorites/raw/refs/heads/main/dist/osu-local-favorites.user.js
-// @version      5.9.3
+// @version      6.0.0
 // @icon         https://github.com/starhollow2008/osu-local-favorites/blob/main/icons/icon48.png?raw=true
 // @description  Store osu! beatmap favorites locally instead of on osu!'s servers. Works without sign-in.
 // @author       Starhollow2008 | FlareonGhh
@@ -36,39 +36,40 @@
  *    4. data/storage.js             (src/data/storage.js)
  *    5. data/collections.js         (src/data/collections.js)
  *    6. ui/theme.js                 (src/ui/theme.js)
- *    7. data/mirrors.js             (src/data/mirrors.js)
- *    8. api/previews.js             (src/api/previews.js)
- *    9. data/playback-settings.js   (src/data/playback-settings.js)
- *   10. data/media-cache-db.js      (src/data/media-cache-db.js)
- *   11. data/session-state.js       (src/data/session-state.js)
- *   12. ui/media-session.js         (src/ui/media-session.js)
- *   13. ui/audio-player.js          (src/ui/audio-player.js)
- *   14. ui/popup-menu.js            (src/ui/popup-menu.js)
- *   15. ui/download-menu.js         (src/ui/download-menu.js)
- *   16. ui/genre-filter.js          (src/ui/genre-filter.js)
- *   17. ui/filter-menu.js           (src/ui/filter-menu.js)
- *   18. ui/filters.js               (src/ui/filters.js)
- *   19. ui/collections-menu.js      (src/ui/collections-menu.js)
- *   20. api/gist-backup.js          (src/api/gist-backup.js)
- *   21. api/rate-pool.js            (src/api/rate-pool.js)
- *   22. api/osu-api.js              (src/api/osu-api.js)
- *   23. data/beatmap-extraction.js  (src/data/beatmap-extraction.js)
- *   24. data/favorite-detection.js  (src/data/favorite-detection.js)
- *   25. ui/heart-visual.js          (src/ui/heart-visual.js)
- *   26. data/enrichment.js          (src/data/enrichment.js)
- *   27. data/reenrichment.js        (src/data/reenrichment.js)
- *   28. data/toggle-favorite.js     (src/data/toggle-favorite.js)
- *   29. ui/copy-all-button.js       (src/ui/copy-all-button.js)
- *   30. ui/floating-heart.js        (src/ui/floating-heart.js)
- *   31. ui/settings.js              (src/ui/settings.js)
- *   32. ui/main-panel.js            (src/ui/main-panel.js)
- *   33. ui/menu-commands.js         (src/ui/menu-commands.js)
- *   34. ui/guest-fallback.js        (src/ui/guest-fallback.js)
- *   35. ui/guest-downloads.js       (src/ui/guest-downloads.js)
- *   36. core/toast.js               (src/core/toast.js)
- *   37. data/version-check.js       (src/data/version-check.js)
- *   38. ui/update-prompt.js         (src/ui/update-prompt.js)
- *   39. core/init.js                (src/core/init.js)
+ *    7. ui/hover.js                 (src/ui/hover.js)
+ *    8. data/mirrors.js             (src/data/mirrors.js)
+ *    9. api/previews.js             (src/api/previews.js)
+ *   10. data/playback-settings.js   (src/data/playback-settings.js)
+ *   11. data/media-cache-db.js      (src/data/media-cache-db.js)
+ *   12. data/session-state.js       (src/data/session-state.js)
+ *   13. ui/media-session.js         (src/ui/media-session.js)
+ *   14. ui/audio-player.js          (src/ui/audio-player.js)
+ *   15. ui/popup-menu.js            (src/ui/popup-menu.js)
+ *   16. ui/download-menu.js         (src/ui/download-menu.js)
+ *   17. ui/genre-filter.js          (src/ui/genre-filter.js)
+ *   18. ui/filter-menu.js           (src/ui/filter-menu.js)
+ *   19. ui/filters.js               (src/ui/filters.js)
+ *   20. ui/collections-menu.js      (src/ui/collections-menu.js)
+ *   21. api/gist-backup.js          (src/api/gist-backup.js)
+ *   22. api/rate-pool.js            (src/api/rate-pool.js)
+ *   23. api/osu-api.js              (src/api/osu-api.js)
+ *   24. data/beatmap-extraction.js  (src/data/beatmap-extraction.js)
+ *   25. data/favorite-detection.js  (src/data/favorite-detection.js)
+ *   26. ui/heart-visual.js          (src/ui/heart-visual.js)
+ *   27. data/enrichment.js          (src/data/enrichment.js)
+ *   28. data/reenrichment.js        (src/data/reenrichment.js)
+ *   29. data/toggle-favorite.js     (src/data/toggle-favorite.js)
+ *   30. ui/copy-all-button.js       (src/ui/copy-all-button.js)
+ *   31. ui/floating-heart.js        (src/ui/floating-heart.js)
+ *   32. ui/settings.js              (src/ui/settings.js)
+ *   33. ui/main-panel.js            (src/ui/main-panel.js)
+ *   34. ui/menu-commands.js         (src/ui/menu-commands.js)
+ *   35. ui/guest-fallback.js        (src/ui/guest-fallback.js)
+ *   36. ui/guest-downloads.js       (src/ui/guest-downloads.js)
+ *   37. core/toast.js               (src/core/toast.js)
+ *   38. data/version-check.js       (src/data/version-check.js)
+ *   39. ui/update-prompt.js         (src/ui/update-prompt.js)
+ *   40. core/init.js                (src/core/init.js)
  */
 (() => {
   "use strict";
@@ -608,8 +609,8 @@
   const THEME_ACTIVE_OPACITY_KEY = "osu_theme_active_opacity";
 
   const THEME_DEFAULTS = {
-    accent: "#ff66aa",
-    heartColor: "#ff66aa",
+    accent: "#ff91bb",
+    heartColor: "#ce7698",
     idleOpacity: 0.15,
     idleDim: 0,
     hoverDim: 0.65,
@@ -675,6 +676,31 @@
   function loopSVG(size = 14) {
     return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-label="loop"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg>`;
   }
+  // ━━━━━━━━━━ src/ui/hover.js ━━━━━━━━━━
+
+  function hover(el, over, out) {
+    el.addEventListener("mouseenter", () => over(el));
+    el.addEventListener("mouseleave", () => out(el));
+    return el;
+  }
+
+  hover.props = function props(el, over, out) {
+    return hover(
+      el,
+      () => { for (const k in over) el.style[k] = over[k]; },
+      () => {
+        for (const k in over) el.style[k] = (out && k in out) ? out[k] : "";
+      },
+    );
+  };
+
+  hover.accent = function accent(el, guard) {
+    return hover(
+      el,
+      () => { if (!guard || guard()) { el.style.borderColor = "var(--osu-fav-accent)"; el.style.color = "var(--osu-fav-accent)"; } },
+      () => { if (!guard || guard()) { el.style.borderColor = "#333"; el.style.color = "#999"; } },
+    );
+  };
   // ━━━━━━━━━━ src/data/mirrors.js ━━━━━━━━━━
 
   const MIRRORS = [
@@ -1613,6 +1639,11 @@
     } catch (e) {  }
   }
 
+  function wasPanelOpen() {
+    const s = loadPanelState();
+    return !!(s && s.panelOpen);
+  }
+
   function loadPlaybackState() {
     try {
       const s = GM_getValue(PLAYBACK_STATE_KEY, null);
@@ -2277,14 +2308,11 @@
         row.style.cssText =
           "display:block;padding:6px 10px;font-size:11px;color:#ddd;text-decoration:none;" +
           "border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
-        row.addEventListener("mouseenter", () => {
-          row.style.background = "var(--osu-fav-accent)";
-          row.style.color = "#fff";
-        });
-        row.addEventListener("mouseleave", () => {
-          row.style.background = "transparent";
-          row.style.color = "#ddd";
-        });
+        hover.props(
+          row,
+          { background: "var(--osu-fav-accent)", color: "#fff" },
+          { background: "transparent", color: "#ddd" },
+        );
         row.addEventListener("click", cleanup);
         menu.appendChild(row);
       });
@@ -2509,9 +2537,7 @@
       clearBtn.textContent = config.clearLabel || "Clear this filter";
       clearBtn.style.cssText =
         "display:block;width:100%;text-align:center;padding:5px 8px;font-size:10px;box-sizing:border-box;" +
-        "border:1px solid #333;border-radius:3px;background:transparent;color:#888;cursor:pointer";
-      clearBtn.addEventListener("mouseenter", () => (clearBtn.style.color = "var(--osu-fav-accent)"));
-      clearBtn.addEventListener("mouseleave", () => (clearBtn.style.color = "#888"));
+      hover.props(clearBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
       clearBtn.addEventListener("click", () => {
         Object.keys(state).forEach((k) => delete state[k]);
         onApply({});
@@ -2817,9 +2843,7 @@
       allRow.style.cssText =
         `display:block;width:100%;text-align:left;padding:6px 10px;margin-bottom:2px;font-size:11px;border:none;` +
         `border-radius:3px;cursor:pointer;box-sizing:border-box;` +
-        `background:${activeId ? "transparent" : "var(--osu-fav-accent)"};color:${activeId ? "#ddd" : "#fff"}`;
-      allRow.addEventListener("mouseenter", () => { if (activeId) allRow.style.background = "#242424"; });
-      allRow.addEventListener("mouseleave", () => { if (activeId) allRow.style.background = "transparent"; });
+      hover(allRow, () => { if (activeId) allRow.style.background = "#242424"; }, () => { if (activeId) allRow.style.background = "transparent"; });
       allRow.addEventListener("click", () => { onSelect(""); cleanup(); });
       menu.appendChild(allRow);
 
@@ -2844,8 +2868,7 @@
           `flex:1;min-width:0;text-align:left;padding:6px 10px;font-size:11px;border:none;border-radius:3px;` +
           `cursor:pointer;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;` +
           `background:${activeId === id ? "var(--osu-fav-accent)" : "transparent"};color:${activeId === id ? "#fff" : "#ddd"}`;
-        selectBtn.addEventListener("mouseenter", () => { if (activeId !== id) selectBtn.style.background = "#242424"; });
-        selectBtn.addEventListener("mouseleave", () => { if (activeId !== id) selectBtn.style.background = "transparent"; });
+        hover(selectBtn, () => { if (activeId !== id) selectBtn.style.background = "#242424"; }, () => { if (activeId !== id) selectBtn.style.background = "transparent"; });
         selectBtn.addEventListener("click", () => { onSelect(activeId === id ? "" : id); cleanup(); });
 
         const delBtn = document.createElement("button");
@@ -2942,8 +2965,7 @@
             "display:flex;align-items:center;gap:6px;width:100%;text-align:left;padding:6px 10px;" +
             "font-size:11px;color:#ddd;background:transparent;border:none;border-radius:3px;cursor:pointer;" +
             "white-space:nowrap;box-sizing:border-box";
-          row.addEventListener("mouseenter", () => (row.style.background = "#242424"));
-          row.addEventListener("mouseleave", () => (row.style.background = "transparent"));
+          hover(row, () => (row.style.background = "#242424"), () => (row.style.background = "transparent"));
 
           const check = document.createElement("span");
           check.textContent = inCol ? "\u2713" : "";
@@ -4856,7 +4878,7 @@
     hex = String(hex).replace("#", "");
     if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
     const num = parseInt(hex, 16);
-    if (Number.isNaN(num)) return { r: 255, g: 102, b: 170 };
+    if (Number.isNaN(num)) return { r: 255, g: 145, b: 187 };
     return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
   }
   function rgbToHex(r, g, b) {
@@ -5752,9 +5774,7 @@
       hinaLink.target = "_blank";
       hinaLink.rel = "noopener";
       hinaLink.textContent = "mirror.hinamizawa.ai";
-      hinaLink.style.cssText = "color:var(--osu-fav-accent);text-decoration:none";
-      hinaLink.addEventListener("mouseenter", () => (hinaLink.style.textDecoration = "underline"));
-      hinaLink.addEventListener("mouseleave", () => (hinaLink.style.textDecoration = "none"));
+      hover.props(hinaLink, { textDecoration: "underline" }, { textDecoration: "none" });
       fullSongSubtitle.append("Streams from ", hinaLink);
       wrap.appendChild(settingsRow("Full-length previews", fullSongToggle, fullSongSubtitle));
 
@@ -6021,18 +6041,7 @@
       reenrichBtn.id = "osu-fav-reenrich-btn";
       reenrichBtn.style.cssText =
         "font-size:10px;padding:6px 10px;border:1px solid #333;border-radius:3px;background:transparent;color:#999;cursor:pointer;width:100%;box-sizing:border-box";
-      reenrichBtn.addEventListener("mouseenter", () => {
-        if (!isReenrichRunning()) {
-          reenrichBtn.style.borderColor = "var(--osu-fav-accent)";
-          reenrichBtn.style.color = "var(--osu-fav-accent)";
-        }
-      });
-      reenrichBtn.addEventListener("mouseleave", () => {
-        if (!isReenrichRunning()) {
-          reenrichBtn.style.borderColor = "#333";
-          reenrichBtn.style.color = "#999";
-        }
-      });
+      hover.accent(reenrichBtn, () => !isReenrichRunning());
       reenrichBtn.addEventListener("click", () => {
         if (isReenrichRunning()) cancelGlobalReenrichment();
         else runGlobalReenrichment();
@@ -6151,6 +6160,7 @@
         collectionId: activeCollectionId,
         settingsOpen,
         scrollTop: listEl ? listEl.scrollTop : 0,
+        panelOpen: true,
       });
     }
 
@@ -6240,8 +6250,7 @@
       accentClose.style.cssText =
         "background:none;border:none;color:#fff;cursor:pointer;font-size:13px;" +
         "font-weight:bold;padding:0 2px;opacity:0.8;flex-shrink:0";
-      accentClose.addEventListener("mouseenter", () => (accentClose.style.opacity = "1"));
-      accentClose.addEventListener("mouseleave", () => (accentClose.style.opacity = "0.8"));
+      hover.props(accentClose, { opacity: "1" }, { opacity: "0.8" });
       accentClose.addEventListener("click", () => {
         backdrop.remove();
         GM_setValue("osu_dismissed_version", latestVersion);
@@ -6265,8 +6274,11 @@
       laterBtn.style.cssText =
         "font-size:10px;padding:4px 10px;border:1px solid #333;border-radius:3px;" +
         "background:transparent;color:#888;cursor:pointer;font-weight:500";
-      laterBtn.addEventListener("mouseenter", () => { laterBtn.style.borderColor = "var(--osu-fav-accent)"; laterBtn.style.color = "var(--osu-fav-accent)"; });
-      laterBtn.addEventListener("mouseleave", () => { laterBtn.style.borderColor = "#333"; laterBtn.style.color = "#888"; });
+      hover.props(
+        laterBtn,
+        { borderColor: "var(--osu-fav-accent)", color: "var(--osu-fav-accent)" },
+        { borderColor: "#333", color: "#888" },
+      );
       laterBtn.addEventListener("click", () => {
         backdrop.remove();
         GM_setValue("osu_dismissed_version", latestVersion);
@@ -6277,8 +6289,7 @@
       updateBtn.style.cssText =
         "font-size:10px;padding:4px 10px;border:none;border-radius:3px;" +
         "background:var(--osu-fav-accent);color:#fff;cursor:pointer;font-weight:600";
-      updateBtn.addEventListener("mouseenter", () => (updateBtn.style.background = "var(--osu-fav-accent-dark)"));
-      updateBtn.addEventListener("mouseleave", () => (updateBtn.style.background = "var(--osu-fav-accent)"));
+      hover.props(updateBtn, { background: "var(--osu-fav-accent-dark)" }, { background: "var(--osu-fav-accent)" });
       updateBtn.addEventListener("click", () => {
         window.open(
           "https://github.com/starhollow2008/osu-local-favorites/raw/refs/heads/main/dist/osu-local-favorites.user.js",
@@ -6320,7 +6331,7 @@
     const countBadge = document.createElement("span");
     countBadge.id = "osu-fav-count";
     countBadge.style.cssText =
-      "color:var(--osu-fav-accent);background:rgba(255,102,170,.12);padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px";
+      "color:var(--osu-fav-accent);background:rgba(255,145,187,.12);padding:2px 8px;border-radius:10px;font-size:11px;margin-left:6px";
     titleEl.append("Local Favorites", countBadge);
 
     const settingsBtn = document.createElement("button");
@@ -6329,18 +6340,7 @@
     settingsBtn.setAttribute("aria-label", "Settings");
     settingsBtn.style.cssText =
       "background:none;border:1px solid #333;color:#999;cursor:pointer;width:34px;height:34px;min-width:34px;min-height:34px;max-width:34px;max-height:34px;padding:0;border-radius:3px;font-size:13px;flex:0 0 34px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;line-height:1";
-    settingsBtn.addEventListener("mouseenter", () => {
-      if (!settingsOpen) {
-        settingsBtn.style.borderColor = "var(--osu-fav-accent)";
-        settingsBtn.style.color = "var(--osu-fav-accent)";
-      }
-    });
-    settingsBtn.addEventListener("mouseleave", () => {
-      if (!settingsOpen) {
-        settingsBtn.style.borderColor = "#333";
-        settingsBtn.style.color = "#999";
-      }
-    });
+    hover.accent(settingsBtn, () => !settingsOpen);
     settingsBtn.addEventListener("click", () => setView(!settingsOpen));
 
     const closeBtn = document.createElement("button");
@@ -6353,6 +6353,7 @@
       closeFilterMenu();
       clearFavoritesPanelAudio();
       panel.remove();
+      savePanelState(Object.assign(loadPanelState() || {}, { panelOpen: false, at: Date.now() }));
     });
 
     headerTop.append(logoImg, titleEl, settingsBtn, closeBtn);
@@ -6390,7 +6391,7 @@
 
       githubBanner = document.createElement("div");
       githubBanner.style.cssText =
-        "display:flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(255,102,170,.1);" +
+        "display:flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(255,145,187,.1);" +
         "border-bottom:1px solid var(--osu-fav-accent);flex-shrink:0;animation:osuFavSlideDown 0.3s ease-out";
 
       const starIcon = document.createElement("span");
@@ -6404,16 +6405,14 @@
       starLink.textContent = "Enjoying Local Favorites? Star it on GitHub";
       starLink.style.cssText =
         "flex:1;color:#ddd;text-decoration:none;font-size:11px;line-height:1.4";
-      starLink.addEventListener("mouseenter", () => (starLink.style.color = "var(--osu-fav-accent)"));
-      starLink.addEventListener("mouseleave", () => (starLink.style.color = "#ddd"));
+      hover.props(starLink, { color: "var(--osu-fav-accent)" }, { color: "#ddd" });
 
       const dismissBtn = document.createElement("button");
       dismissBtn.textContent = "\u2715";
       dismissBtn.title = "Dismiss";
       dismissBtn.style.cssText =
         "background:none;border:none;color:#888;cursor:pointer;font-size:12px;padding:2px 4px;flex-shrink:0;line-height:1";
-      dismissBtn.addEventListener("mouseenter", () => (dismissBtn.style.color = "var(--osu-fav-accent)"));
-      dismissBtn.addEventListener("mouseleave", () => (dismissBtn.style.color = "#888"));
+      hover.props(dismissBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
       dismissBtn.addEventListener("click", () => githubBanner.remove());
 
       githubBanner.append(starIcon, starLink, dismissBtn);
@@ -6506,17 +6505,9 @@
       const btn = document.createElement("button");
       btn.textContent = label;
       btn.style.cssText = `font-size:10px;padding:3px 7px;border:1px solid #333;border-radius:3px;background:transparent;color:#999;cursor:pointer;${extraStyle}`;
-      btn.addEventListener("mouseenter", () => {
-        btn.style.borderColor = "var(--osu-fav-accent)";
-        btn.style.color = "var(--osu-fav-accent)";
-      });
-      btn.addEventListener("mouseleave", () => {
-        btn.style.borderColor = "#333";
-        btn.style.color = "#999";
-      });
+      hover.accent(btn);
       return btn;
     }
-
     const collectionsBtn = document.createElement("button");
     collectionsBtn.type = "button";
     collectionsBtn.title = "Filter by collection";
@@ -6560,8 +6551,7 @@
     clearAllBtn.style.cssText =
       "width:100%;box-sizing:border-box;font-size:10px;padding:3px 6px;border:1px solid #333;" +
       "border-radius:3px;background:transparent;color:#888;cursor:pointer";
-    clearAllBtn.addEventListener("mouseenter", () => (clearAllBtn.style.color = "var(--osu-fav-accent)"));
-    clearAllBtn.addEventListener("mouseleave", () => (clearAllBtn.style.color = "#888"));
+    hover.props(clearAllBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
     clearAllBtn.addEventListener("click", () => {
       closeFilterMenu();
       filterState = makeEmptyFilterState();
@@ -6613,8 +6603,7 @@
     footer.style.cssText =
       "width:100%;height:29px;min-height:29px;max-height:29px;box-sizing:border-box;padding:6px 14px;border-top:1px solid #333;background:#1a1a1a;font-size:10px;line-height:15px;color:#555;text-align:center;cursor:pointer;user-select:none;overflow:hidden";
     footer.addEventListener("click", () => setView(true));
-    footer.addEventListener("mouseenter", () => (footer.style.color = "var(--osu-fav-accent)"));
-    footer.addEventListener("mouseleave", () => (footer.style.color = "#555"));
+    hover.props(footer, { color: "var(--osu-fav-accent)" }, { color: "#555" });
 
     function updateFooterStatus() {
       const token = GM_getValue(GH_TOKEN_KEY, "");
@@ -6698,12 +6687,7 @@
       b.style.cssText =
         "background:rgba(17,17,17,.46);border:1px solid #333;border-radius:3px;color:#999;cursor:pointer;" +
         "padding:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0";
-      b.addEventListener("mouseenter", () => {
-        if (!b._active) { b.style.borderColor = "var(--osu-fav-accent)"; b.style.color = "var(--osu-fav-accent)"; }
-      });
-      b.addEventListener("mouseleave", () => {
-        if (!b._active) { b.style.borderColor = "#333"; b.style.color = "#999"; }
-      });
+      hover.accent(b, () => !b._active);
       return b;
     }
 
@@ -7217,11 +7201,7 @@
         card.dataset.favId = id;
         card.style.cssText =
           "display:flex;gap:8px;padding:8px 14px;border-bottom:1px solid #1e1e1e;align-items:center";
-        card.addEventListener(
-          "mouseenter",
-          () => (card.style.background = "#1a1a1a"),
-        );
-        card.addEventListener("mouseleave", () => (card.style.background = ""));
+        hover(card, () => (card.style.background = "#1a1a1a"), () => (card.style.background = ""));
 
         const coverUrl = favoriteCoverUrl(f, id);
         const coverEl = document.createElement("div");
@@ -7364,14 +7344,7 @@
         openLink.textContent = "Open";
         openLink.style.cssText =
           "font-size:10px;padding:4px 8px;border:1px solid #333;border-radius:2px;color:#999;text-decoration:none;text-align:center;display:block;white-space:nowrap";
-        openLink.addEventListener("mouseenter", () => {
-          openLink.style.borderColor = "var(--osu-fav-accent)";
-          openLink.style.color = "var(--osu-fav-accent)";
-        });
-        openLink.addEventListener("mouseleave", () => {
-          openLink.style.borderColor = "#333";
-          openLink.style.color = "#999";
-        });
+        hover.accent(openLink);
 
         const defaultMirror = resolveDefaultMirror(id);
         let soleOption = null;
@@ -7405,27 +7378,17 @@
           });
         }
         downloadLink.style.cssText = downloadStyle;
-        downloadLink.addEventListener("mouseenter", () => {
-          downloadLink.style.borderColor = "var(--osu-fav-accent)";
-          downloadLink.style.color = "var(--osu-fav-accent)";
-        });
-        downloadLink.addEventListener("mouseleave", () => {
-          downloadLink.style.borderColor = "#333";
-          downloadLink.style.color = "#999";
-        });
+        hover.accent(downloadLink);
 
         const removeBtn = document.createElement("button");
         removeBtn.textContent = "Remove";
         removeBtn.style.cssText =
           "font-size:10px;padding:4px 8px;border:1px solid #333;border-radius:2px;background:none;color:#999;cursor:pointer;white-space:nowrap";
-        removeBtn.addEventListener("mouseenter", () => {
-          removeBtn.style.borderColor = "#e55";
-          removeBtn.style.color = "#e55";
-        });
-        removeBtn.addEventListener("mouseleave", () => {
-          removeBtn.style.borderColor = "#333";
-          removeBtn.style.color = "#999";
-        });
+        hover.props(
+          removeBtn,
+          { borderColor: "#e55", color: "#e55" },
+          { borderColor: "#333", color: "#999" },
+        );
         removeBtn.addEventListener("click", () => {
           const favs = getFavorites();
           delete favs[id];
@@ -7454,19 +7417,22 @@
           "background:none;color:#999;cursor:pointer;text-align:center;line-height:1;" +
           "opacity:var(--osu-fav-idle-opacity, 0.15);transition:opacity 0.15s";
 
-        coverEl.addEventListener("mouseenter", () => {
-          previewBtn.style.opacity = "var(--osu-fav-active-opacity, 0.8)";
-          dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-hover-dim, 0.65))";
-          if (!previewBtn._playing) { previewBtn.style.borderColor = "var(--osu-fav-accent)"; previewBtn.style.color = "var(--osu-fav-accent)"; }
-        });
-        coverEl.addEventListener("mouseleave", () => {
-          if (!previewBtn._playing) {
-            previewBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
-            previewBtn.style.borderColor = "#333";
-            previewBtn.style.color = "#999";
-            dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-idle-dim, 0))";
-          }
-        });
+        hover(
+          coverEl,
+          () => {
+            previewBtn.style.opacity = "var(--osu-fav-active-opacity, 0.8)";
+            dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-hover-dim, 0.65))";
+            if (!previewBtn._playing) { previewBtn.style.borderColor = "var(--osu-fav-accent)"; previewBtn.style.color = "var(--osu-fav-accent)"; }
+          },
+          () => {
+            if (!previewBtn._playing) {
+              previewBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
+              previewBtn.style.borderColor = "#333";
+              previewBtn.style.color = "#999";
+              dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-idle-dim, 0))";
+            }
+          },
+        );
 
         previewBtn.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -8092,8 +8058,7 @@
     accentClose.style.cssText =
       "background:none;border:none;color:#fff;cursor:pointer;font-size:12px;" +
       "opacity:0.8;font-weight:bold;padding:0 2px;flex-shrink:0";
-    accentClose.addEventListener("mouseenter", () => (accentClose.style.opacity = "1"));
-    accentClose.addEventListener("mouseleave", () => (accentClose.style.opacity = "0.8"));
+    hover.props(accentClose, { opacity: "1" }, { opacity: "0.8" });
     accentClose.addEventListener("click", () => {
       modal.remove();
       GM_setValue("osu_dismissed_version", latestVersion);
@@ -8117,14 +8082,11 @@
     laterBtn.style.cssText =
       "font-size:10px;padding:4px 10px;border:1px solid #333;border-radius:3px;" +
       "background:transparent;color:#888;cursor:pointer;font-weight:500";
-    laterBtn.addEventListener("mouseenter", () => {
-      laterBtn.style.borderColor = "var(--osu-fav-accent)";
-      laterBtn.style.color = "var(--osu-fav-accent)";
-    });
-    laterBtn.addEventListener("mouseleave", () => {
-      laterBtn.style.borderColor = "#333";
-      laterBtn.style.color = "#888";
-    });
+    hover.props(
+      laterBtn,
+      { borderColor: "var(--osu-fav-accent)", color: "var(--osu-fav-accent)" },
+      { borderColor: "#333", color: "#888" },
+    );
     laterBtn.addEventListener("click", () => {
       modal.remove();
       GM_setValue("osu_dismissed_version", latestVersion);
@@ -8135,8 +8097,7 @@
     updateBtn.style.cssText =
       "font-size:10px;padding:4px 10px;border:none;border-radius:3px;" +
       "background:var(--osu-fav-accent);color:#fff;cursor:pointer;font-weight:600;transition:background 0.2s";
-    updateBtn.addEventListener("mouseenter", () => (updateBtn.style.background = "var(--osu-fav-accent-dark)"));
-    updateBtn.addEventListener("mouseleave", () => (updateBtn.style.background = "var(--osu-fav-accent)"));
+    hover.props(updateBtn, { background: "var(--osu-fav-accent-dark)" }, { background: "var(--osu-fav-accent)" });
     updateBtn.addEventListener("click", () => {
       window.open(
         "https://github.com/starhollow2008/osu-local-favorites/raw/refs/heads/main/dist/osu-local-favorites.user.js",
@@ -8502,6 +8463,10 @@
     setTimeout(enableGuestDownloads, 2200);
     setTimeout(injectMirrorButtons, 1000);
     setTimeout(injectMirrorButtons, 2200);
+
+    if (wasPanelOpen() && !document.getElementById("osu-local-fav-panel")) {
+      showFavoritesPanel();
+    }
   }
 
   if (document.readyState === "loading") {

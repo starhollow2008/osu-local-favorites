@@ -3,6 +3,7 @@ import { _GM_CROSS_TAB_CHANNEL, _GM_CROSS_TAB_SYNC_KEY } from "./gm-shim.js";
 import { injectInterceptor } from "./interceptor.js";
 import { COLLECTIONS_KEY, getCollections, invalidateCollectionsCache } from "../data/collections.js";
 import { addManyToEnrichQueue, ensureEnrichDrainerRunning, getEnrichQueue } from "../data/enrichment.js";
+import { wasPanelOpen } from "../data/session-state.js";
 import { invalidateLoginCache } from "../data/mirrors.js";
 import { STORAGE_KEY, favoritesFingerprint, getFavorites, invalidateFavoritesCache, onFavoritesChanged, reloadFavoritesQuietly } from "../data/storage.js";
 import { autoUpdateChecksEnabled, checkVersionUpdate, getCurrentVersion, isNewerVersion } from "../data/version-check.js";
@@ -547,6 +548,18 @@ function init() {
   setTimeout(enableGuestDownloads, 2200);
   setTimeout(injectMirrorButtons, 1000);
   setTimeout(injectMirrorButtons, 2200);
+
+  // ── Cross-page panel reopen (hard loads) ──────────────────────────
+  // Soft navigations are handled above (panelWasOpenAtLastUrl +
+  // restorePanelAfterNavigation), but a full page load destroys the panel
+  // node outright. The session state records whether the panel was open
+  // when the previous page went away (main-panel's persistPanelState and
+  // its close-button flip); reopen here so browsing keeps the panel up.
+  // The panel itself rebuilds the rest of the view state (sort, filters,
+  // scroll) from the same blob - this is only the "should it exist" bit.
+  if (wasPanelOpen() && !document.getElementById("osu-local-fav-panel")) {
+    showFavoritesPanel();
+  }
 }
 
 if (document.readyState === "loading") {

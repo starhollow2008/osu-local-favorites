@@ -32,9 +32,12 @@ export const PLAYBACK_STATE_MAX_AGE_MS = 30 * 60 * 1000;
 // Shape: {
 //   v: 1, at: savedAt,
 //   sort: "date", sortAsc: false, search: "",
-//   filters: { [categoryId]: { [termKey]: "include"|"exclude" } },
+//   filters: { [categoryId]: { [termKey]: "include" | "exclude" } },
 //   collectionId: "", settingsOpen: false, scrollTop: 0,
+//   panelOpen: true,
 // }
+// panelOpen is read once per hard page load by core/init.js to reopen the
+// panel automatically; the panel itself maintains every other field.
 
 export function loadPanelState() {
   try {
@@ -51,6 +54,14 @@ export function savePanelState(state) {
   try {
     GM_setValue(PANEL_STATE_KEY, Object.assign({ v: 1, at: Date.now() }, state));
   } catch (e) { /* session restore is a nicety, never a requirement */ }
+}
+
+// Whether the panel was open when the last osu! page went away. Kept in
+// the same blob (same freshness window) rather than its own key, so a
+// stale "open" from hours ago expires together with the rest of the view.
+export function wasPanelOpen() {
+  const s = loadPanelState();
+  return !!(s && s.panelOpen);
 }
 
 // ── Playback state ──────────────────────────────────────────────────

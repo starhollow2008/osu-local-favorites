@@ -1,4 +1,5 @@
 import { createPopupMenu } from "./popup-menu.js";
+import { hover } from "./hover.js";
 
 // ── Generic filter popover ──
 // One popover implementation shared by every toolbar filter (Date, Title,
@@ -214,9 +215,7 @@ export function showFilterMenu(anchorEl, config, currentState, onApply) {
     clearBtn.textContent = config.clearLabel || "Clear this filter";
     clearBtn.style.cssText =
       "display:block;width:100%;text-align:center;padding:5px 8px;font-size:10px;box-sizing:border-box;" +
-      "border:1px solid #333;border-radius:3px;background:transparent;color:#888;cursor:pointer";
-    clearBtn.addEventListener("mouseenter", () => (clearBtn.style.color = "var(--osu-fav-accent)"));
-    clearBtn.addEventListener("mouseleave", () => (clearBtn.style.color = "#888"));
+    hover.props(clearBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
     clearBtn.addEventListener("click", () => {
       Object.keys(state).forEach((k) => delete state[k]);
       onApply({});

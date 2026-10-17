@@ -23,6 +23,7 @@
     "data/storage.js",
     "data/collections.js",
     "ui/theme.js",
+    "ui/hover.js",
     "data/mirrors.js",
     "api/previews.js",
     "data/playback-settings.js",

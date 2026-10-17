@@ -1,5 +1,6 @@
 import { createCollection, deleteCollection, getCollections, toggleMapInCollection } from "../data/collections.js";
 import { createPopupMenu } from "./popup-menu.js";
+import { hover } from "./hover.js";
 
 export function showCollectionsMenu(anchorEl, activeId, onSelect) {
   const popup = createPopupMenu(anchorEl, "osu-fav-cols-menu", "min-width:190px;max-width:240px;max-height:320px;overflow-y:auto;");
@@ -15,9 +16,7 @@ export function showCollectionsMenu(anchorEl, activeId, onSelect) {
     allRow.style.cssText =
       `display:block;width:100%;text-align:left;padding:6px 10px;margin-bottom:2px;font-size:11px;border:none;` +
       `border-radius:3px;cursor:pointer;box-sizing:border-box;` +
-      `background:${activeId ? "transparent" : "var(--osu-fav-accent)"};color:${activeId ? "#ddd" : "#fff"}`;
-    allRow.addEventListener("mouseenter", () => { if (activeId) allRow.style.background = "#242424"; });
-    allRow.addEventListener("mouseleave", () => { if (activeId) allRow.style.background = "transparent"; });
+    hover(allRow, () => { if (activeId) allRow.style.background = "#242424"; }, () => { if (activeId) allRow.style.background = "transparent"; });
     allRow.addEventListener("click", () => { onSelect(""); cleanup(); });
     menu.appendChild(allRow);
 
@@ -42,8 +41,7 @@ export function showCollectionsMenu(anchorEl, activeId, onSelect) {
         `flex:1;min-width:0;text-align:left;padding:6px 10px;font-size:11px;border:none;border-radius:3px;` +
         `cursor:pointer;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;` +
         `background:${activeId === id ? "var(--osu-fav-accent)" : "transparent"};color:${activeId === id ? "#fff" : "#ddd"}`;
-      selectBtn.addEventListener("mouseenter", () => { if (activeId !== id) selectBtn.style.background = "#242424"; });
-      selectBtn.addEventListener("mouseleave", () => { if (activeId !== id) selectBtn.style.background = "transparent"; });
+      hover(selectBtn, () => { if (activeId !== id) selectBtn.style.background = "#242424"; }, () => { if (activeId !== id) selectBtn.style.background = "transparent"; });
       selectBtn.addEventListener("click", () => { onSelect(activeId === id ? "" : id); cleanup(); });
 
       const delBtn = document.createElement("button");
@@ -143,8 +141,7 @@ export function showAddToCollectionMenu(anchorEl, mapId, onChange) {
           "display:flex;align-items:center;gap:6px;width:100%;text-align:left;padding:6px 10px;" +
           "font-size:11px;color:#ddd;background:transparent;border:none;border-radius:3px;cursor:pointer;" +
           "white-space:nowrap;box-sizing:border-box";
-        row.addEventListener("mouseenter", () => (row.style.background = "#242424"));
-        row.addEventListener("mouseleave", () => (row.style.background = "transparent"));
+        hover(row, () => (row.style.background = "#242424"), () => (row.style.background = "transparent"));
 
         const check = document.createElement("span");
         check.textContent = inCol ? "\u2713" : "";
