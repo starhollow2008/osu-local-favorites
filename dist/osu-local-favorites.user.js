@@ -2129,17 +2129,12 @@
       audio._activePreviewUrl = localUrl;
     };
 
-    const directSwap = () => {
-      applyState();
-      audio.src = localUrl;
-      audio.load();
-      return Promise.resolve(true);
-    };
-
     if (audio.paused || audio.ended) {
       const resumeAt = audio.currentTime;
+      try { audio.preload = "auto"; } catch {}
+      applyState();
       audio.src = localUrl;
-      audio.load();
+      try { audio.load(); } catch {}
       audio.addEventListener("loadedmetadata", () => {
         try {
           if (Number.isFinite(resumeAt) && resumeAt > 0 && resumeAt < (audio.duration || Infinity)) {
@@ -2147,71 +2142,108 @@
           }
         } catch (e) {  }
       }, { once: true });
-      applyState();
       return Promise.resolve(true);
     }
 
     return new Promise((resolve) => {
       let settled = false;
       let shadow = null;
-      let watchdog = null;
-      const finish = (ok) => {
+      let shadowWatchdog = null;
+      let mainMetaWatchdog = null;
+      const cleanupShadow = () => {
+        if (!shadow) return;
+        try { shadow.pause(); } catch {}
+        try { shadow.src = ""; } catch {}
+        shadow = null;
+      };
+      const finishNoop = () => {
         if (settled) return;
         settled = true;
-        clearTimeout(watchdog);
-        if (shadow) {
-          try { shadow.pause(); } catch (e) {  }
-          try { shadow.src = ""; } catch (e) {  }
-          shadow = null;
-        }
-        resolve(ok);
+        clearTimeout(shadowWatchdog);
+        clearTimeout(mainMetaWatchdog);
+        cleanupShadow();
+        resolve(false);
+      };
+      const finishOk = () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(shadowWatchdog);
+        clearTimeout(mainMetaWatchdog);
+        cleanupShadow();
+        resolve(true);
       };
 
-      const beginHandoff = () => {
-        const handoffAt = shadow.currentTime;
-        applyState();
-        audio.src = localUrl;
-        audio.load();
-        audio.addEventListener("canplay", () => {
-          try {
-            audio.currentTime = handoffAt + (shadow.currentTime - handoffAt);
-          } catch (e) {  }
-          const p = audio.play();
-          if (p && typeof p.catch === "function") p.catch(() => {  });
-          audio.addEventListener("playing", () => finish(true), { once: true });
-          setTimeout(() => finish(true), 800);
-        }, { once: true });
-      };
+      shadowWatchdog = setTimeout(finishNoop, 1500);
 
       try {
         shadow = new Audio(localUrl);
         shadow.preload = "auto";
+        shadow.addEventListener("error", finishNoop, { once: true });
         shadow.addEventListener("canplay", () => {
-          try {
-            shadow.currentTime = audio.currentTime;
-          } catch (e) {  }
+          try { shadow.currentTime = audio.currentTime; } catch {}
           const sp = shadow.play();
-          if (sp && typeof sp.catch === "function") {
-            sp.then(beginHandoff).catch(() => {
-              finish(false);
-              if (!settled) {  }
-              directSwap();
-              resolve(true);
-            });
+          if (sp && typeof sp.then === "function") {
+            sp.then(() => {
+              clearTimeout(shadowWatchdog);
+              beginMainHandoff();
+            }).catch(finishNoop);
           } else {
-            beginHandoff();
+            clearTimeout(shadowWatchdog);
+            beginMainHandoff();
           }
         }, { once: true });
-        watchdog = setTimeout(() => {
-          if (!settled) {
-            finish(false);
-            directSwap();
-          }
-        }, 1500);
-      } catch (e) {
-        finish(false);
-        directSwap();
+      } catch {
+        finishNoop();
+        return;
       }
+
+      const beginMainHandoff = () => {
+        try { audio.preload = "auto"; } catch {}
+        applyState();
+
+        let metaDone = false;
+        const onMeta = () => {
+          if (metaDone) return;
+          metaDone = true;
+          clearTimeout(mainMetaWatchdog);
+          try {
+            const t = shadow ? shadow.currentTime : audio.currentTime;
+            const dur = audio.duration;
+            if (Number.isFinite(t) && t > 0 && (!Number.isFinite(dur) || t < dur)) {
+              audio.currentTime = t;
+            }
+          } catch {}
+          const p = audio.play();
+          if (p && typeof p.then === "function") {
+            p.then(() => {
+              const onPlaying = () => {
+                try {
+                  const t2 = shadow ? shadow.currentTime : audio.currentTime;
+                  if (Number.isFinite(t2) && Math.abs(audio.currentTime - t2) > 0.15) audio.currentTime = t2;
+                } catch {}
+                finishOk();
+              };
+              audio.addEventListener("playing", onPlaying, { once: true });
+              setTimeout(onPlaying, 400);
+            }).catch(() => {
+              try { if (shadow) shadow.pause(); } catch {}
+              finishOk();
+            });
+          } else {
+            setTimeout(finishOk, 100);
+          }
+        };
+
+        audio.addEventListener("loadedmetadata", onMeta, { once: true });
+        mainMetaWatchdog = setTimeout(() => {
+          if (!metaDone) {
+            audio.removeEventListener("loadedmetadata", onMeta);
+            onMeta();
+          }
+        }, 1200);
+        audio.src = localUrl;
+        try { audio.load(); } catch {}
+      };
     });
   }
 
@@ -7093,29 +7125,11 @@
       return d.toLocaleDateString();
     }
 
-    function renderList() {
-      panel._osuFavRenderCount = (panel._osuFavRenderCount || 0) + 1;
-      const favs = getFavorites();
-      let entries = Object.entries(favs);
-
-      const viewKey = JSON.stringify([
-        currentSort,
-        sortAsc,
-        searchQuery.trim().toLowerCase(),
-        filterState,
-        activeCollectionId,
-      ]);
-      const sameView = viewKey === renderList._viewKey;
-      renderList._viewKey = viewKey;
-      const savedScroll = sameView ? listEl.scrollTop : 0;
-
-      const cBadge = panel.querySelector("#osu-fav-count");
-
-      const _collCounts = buildCollectionCountIndex();
-
+    function applyViewFilters(entries) {
+      let out = entries;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        entries = entries.filter(
+        out = out.filter(
           ([, f]) =>
             (f.title || "").toLowerCase().includes(q) ||
             (f.artist || "").toLowerCase().includes(q) ||
@@ -7125,19 +7139,14 @@
             (f.id || "").includes(q),
         );
       }
-
       const filterPlan = buildFilterPlan(filterState);
-      if (filterPlan.length) entries = entries.filter(([, f]) => favMatchesPlan(f, filterPlan));
-
+      if (filterPlan.length) out = out.filter(([, f]) => favMatchesPlan(f, filterPlan));
       if (activeCollectionId) {
         const col = getCollections()[activeCollectionId];
         const idSet = new Set(col && Array.isArray(col.ids) ? col.ids : []);
-        entries = entries.filter(([id]) => idSet.has(id));
+        out = out.filter(([id]) => idSet.has(id));
       }
-
-      if (cBadge) cBadge.textContent = entries.length;
-
-      entries.sort(([idA, a], [idB, b]) => {
+      out.sort(([idA, a], [idB, b]) => {
         let cmp = 0;
         if (currentSort === "date")
           cmp = (a.favourited_at || "").localeCompare(b.favourited_at || "");
@@ -7152,6 +7161,127 @@
         if (cmp === 0) cmp = idB.localeCompare(idA);
         return sortAsc ? cmp : -cmp;
       });
+      return out;
+    }
+
+    function patchVisibleCards(displayed) {
+      const collCounts = buildCollectionCountIndex();
+      displayed.forEach(([id, f]) => {
+        const card = listEl.querySelector('[data-fav-id="' + id + '"]');
+        if (!card) return;
+
+        const titleDiv = card.querySelector(".osu-fav-title") || card.children[1] && card.children[1].children[0];
+        if (titleDiv) {
+          titleDiv.textContent = f.title || f.title_unicode || "Unknown";
+          if (f.nsfw) {
+            const badge = document.createElement("span");
+            badge.textContent = "EXPLICIT";
+            badge.style.cssText =
+              "font-size:7px;color:#f6c243;border:1px solid #f6c243;border-radius:2px;padding:0 3px;margin-left:4px;vertical-align:middle;font-weight:600";
+            titleDiv.appendChild(badge);
+          }
+        }
+
+        const infoDiv = card.children[1];
+        if (infoDiv) {
+          const artistDiv = infoDiv.children[1];
+          if (artistDiv) {
+            const artistText = artistDiv.children[0];
+            if (artistText) artistText.textContent = f.artist || f.artist_unicode || "";
+            const oldBadge = artistDiv.querySelector("span[style*='#66ccff']");
+            if (oldBadge) oldBadge.remove();
+            if (f.is_artist_featured) {
+              const faBadge = document.createElement("span");
+              faBadge.textContent = "FEATURED ARTIST";
+              faBadge.style.cssText =
+                "font-size:7px;color:#66ccff;border:1px solid #66ccff;border-radius:2px;padding:0 3px;vertical-align:middle;font-weight:600;flex-shrink:0";
+              artistDiv.appendChild(faBadge);
+            }
+          }
+
+          const metaDiv = infoDiv.children[2];
+          if (metaDiv) {
+            while (metaDiv.firstChild) metaDiv.firstChild.remove();
+            if (f.creator) {
+              const m = document.createElement("span");
+              m.style.cssText =
+                "font-size:10px;color:var(--osu-fav-accent);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px";
+              m.textContent = f.creator;
+              metaDiv.appendChild(m);
+            }
+            if (f.status) {
+              const st = document.createElement("span");
+              st.textContent = f.status.toUpperCase();
+              st.style.cssText = `font-size:8px;font-weight:700;letter-spacing:.3px;color:${statusColor(f.status)}`;
+              metaDiv.appendChild(st);
+            }
+            if (f.bpm) {
+              const bpm = document.createElement("span");
+              bpm.style.cssText = "font-size:9px;color:#555";
+              bpm.textContent = `${f.bpm} BPM`;
+              metaDiv.appendChild(bpm);
+            }
+          }
+        }
+
+        const coverDiv = card.children[0];
+        const img = coverDiv && coverDiv.querySelector("img");
+        if (img) {
+          const nextCover = favoriteCoverUrl(f, id);
+          if (nextCover && (img.src || img.dataset.src) !== nextCover) {
+            if (img.src) img.src = "";
+            img.dataset.src = nextCover;
+          }
+        }
+
+        const addToCollBtn = card.querySelector("button[title*='collection'], button[title*='Add to a collection']");
+        if (addToCollBtn) {
+          const n = collCounts.get(id) || 0;
+          addToCollBtn.textContent = n ? `\u2713 ${n}` : "+ Playlist";
+          addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "#333";
+          addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "#666";
+        }
+      });
+    }
+    function renderList() {
+      panel._osuFavRenderCount = (panel._osuFavRenderCount || 0) + 1;
+      const favs = getFavorites();
+      let entries = Object.entries(favs);
+
+      const viewKey = JSON.stringify([
+        currentSort,
+        sortAsc,
+        searchQuery.trim().toLowerCase(),
+        filterState,
+        activeCollectionId,
+      ]);
+      const sameView = viewKey === renderList._viewKey;
+      renderList._viewKey = viewKey;
+
+      const liveScroll = listEl.scrollTop;
+      if (!renderList._rebuilding && liveScroll > 0) renderList._lastGoodScroll = liveScroll;
+      const savedScroll = sameView
+        ? Math.max(liveScroll, renderList._lastGoodScroll || 0)
+        : 0;
+      if (sameView && renderList._builtOnce && Array.isArray(renderList._entries)) {
+        const displayed = applyViewFilters(entries);
+        const nextIds = displayed.map(([id]) => String(id)).join("|");
+        const prevIds = renderList._entries.map(([id]) => String(id)).join("|");
+        if (prevIds === nextIds) {
+          patchVisibleCards(displayed);
+          renderList._lastGoodScroll = listEl.scrollTop;
+          syncCurrentCardUI();
+          return;
+        }
+      }
+      renderList._builtOnce = true;
+      renderList._rebuilding = true;
+
+      const cBadge = panel.querySelector("#osu-fav-count");
+
+      entries = applyViewFilters(entries);
+
+      if (cBadge) cBadge.textContent = entries.length;
 
       renderList._entries = entries;
 
@@ -7512,6 +7642,10 @@
         listEl.appendChild(chunk);
         const finished = cursor >= entries.length;
         tryRestoreScroll(finished);
+        if (finished) {
+          renderList._rebuilding = false;
+          renderList._lastGoodScroll = listEl.scrollTop;
+        }
         if (!finished) requestAnimationFrame(renderChunk);
       };
       if (entries.length) requestAnimationFrame(renderChunk);

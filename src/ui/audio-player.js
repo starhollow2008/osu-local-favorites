@@ -433,28 +433,20 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
   }
 
   const applyState = () => {
-    // Same bookkeeping a cache-first play uses, so the decode-error path,
-    // stillWanted() and the fallback logic all treat the new source as
-    // "playing from cache" from here on.
     audio._usingBlobCache = true;
     audio._activePreviewUrl = localUrl;
-    // _activeCacheKey already points at the network URL the bytes are
-    // cached under - unchanged by the swap.
-  };
-
-  const directSwap = () => {
-    applyState();
-    audio.src = localUrl;
-    audio.load();
-    return Promise.resolve(true);
   };
 
   // Paused (or ended mid-swap): no sound to bridge. The paused position
   // survives via the seek below; a paused element reloads silently.
   if (audio.paused || audio.ended) {
     const resumeAt = audio.currentTime;
+    // Ensure metadata can load without requiring play() (Firefox Android
+    // creates the element with preload="none").
+    try { audio.preload = "auto"; } catch {}
+    applyState();
     audio.src = localUrl;
-    audio.load();
+    try { audio.load(); } catch {}
     audio.addEventListener("loadedmetadata", () => {
       try {
         if (Number.isFinite(resumeAt) && resumeAt > 0 && resumeAt < (audio.duration || Infinity)) {
@@ -462,85 +454,126 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
         }
       } catch (e) { /* unseekable blob - restart from the top */ }
     }, { once: true });
-    applyState();
     return Promise.resolve(true);
   }
 
-  // Playing: bridge with a shadow element. Bounded hard - a shadow that
-  // cannot start within the budget falls back to the direct swap (gap, but
-  // correct) rather than stalling the live track.
+  // Playing: bridge with a shadow element so the re-src gap is inaudible.
+  // Every failure BEFORE the main element is re-srced aborts with NO-OP
+  // (network source keeps playing untouched) instead of killing playback.
+  // After the main element is re-srced, failures leave it paused at the
+  // correct position with the blob source, so one tap resumes.
   return new Promise((resolve) => {
     let settled = false;
     let shadow = null;
-    let watchdog = null;
-    const finish = (ok) => {
+    let shadowWatchdog = null;
+    let mainMetaWatchdog = null;
+    const cleanupShadow = () => {
+      if (!shadow) return;
+      try { shadow.pause(); } catch {}
+      try { shadow.src = ""; } catch {}
+      shadow = null;
+    };
+    const finishNoop = () => {
       if (settled) return;
       settled = true;
-      clearTimeout(watchdog);
-      if (shadow) {
-        try { shadow.pause(); } catch (e) { /* already gone */ }
-        try { shadow.src = ""; } catch (e) { /* same */ }
-        shadow = null;
-      }
-      resolve(ok);
+      clearTimeout(shadowWatchdog);
+      clearTimeout(mainMetaWatchdog);
+      cleanupShadow();
+      resolve(false);
+    };
+    const finishOk = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(shadowWatchdog);
+      clearTimeout(mainMetaWatchdog);
+      cleanupShadow();
+      resolve(true);
     };
 
-    const beginHandoff = () => {
-      // The shadow has reached the live position and is covering. Warm the
-      // main element's pipeline; it was paused? No - it is still playing its
-      // network source. Re-point it at the blob now: its old request aborts,
-      // and while it re-decodes (fast: fully local), the shadow covers.
-      const handoffAt = shadow.currentTime;
-      applyState();
-      audio.src = localUrl;
-      audio.load();
-      audio.addEventListener("canplay", () => {
-        try {
-          audio.currentTime = handoffAt + (shadow.currentTime - handoffAt);
-        } catch (e) { /* stay wherever the decode landed */ }
-        const p = audio.play();
-        if (p && typeof p.catch === "function") p.catch(() => { /* kept paused; user taps play */ });
-        // Stop the shadow the moment the main element is actually sounding,
-        // so the two never overlap and no content replays.
-        audio.addEventListener("playing", () => finish(true), { once: true });
-        // Safety net: if "playing" never fires (exotic autoplay rejection),
-        // finish anyway - the shadow would otherwise double-run forever.
-        setTimeout(() => finish(true), 800);
-      }, { once: true });
-    };
+    shadowWatchdog = setTimeout(finishNoop, 1500);
 
     try {
       shadow = new Audio(localUrl);
       shadow.preload = "auto";
+      shadow.addEventListener("error", finishNoop, { once: true });
       shadow.addEventListener("canplay", () => {
-        try {
-          shadow.currentTime = audio.currentTime;
-        } catch (e) { /* cannot seek - the direct-swap watchdog covers us */ }
+        try { shadow.currentTime = audio.currentTime; } catch {}
         const sp = shadow.play();
-        if (sp && typeof sp.catch === "function") {
-          sp.then(beginHandoff).catch(() => {
-            // Shadow cannot start (autoplay edge mid-session): the bridge is
-            // unavailable; take the small gap instead of risking a stall.
-            finish(false);
-            if (!settled) { /* direct swap */ }
-            directSwap();
-            resolve(true);
-          });
+        if (sp && typeof sp.then === "function") {
+          sp.then(() => {
+            clearTimeout(shadowWatchdog);
+            beginMainHandoff();
+          }).catch(finishNoop);
         } else {
-          beginHandoff();
+          clearTimeout(shadowWatchdog);
+          beginMainHandoff();
         }
       }, { once: true });
-      watchdog = setTimeout(() => {
-        // Blob decode should take tens of ms; at 1.5s something is wrong.
-        if (!settled) {
-          finish(false);
-          directSwap();
-        }
-      }, 1500);
-    } catch (e) {
-      finish(false);
-      directSwap();
+    } catch {
+      finishNoop();
+      return;
     }
+
+    const beginMainHandoff = () => {
+      // Shadow is now audible and covering at the live position.
+      try { audio.preload = "auto"; } catch {}
+      applyState();
+
+      let metaDone = false;
+      const onMeta = () => {
+        if (metaDone) return;
+        metaDone = true;
+        clearTimeout(mainMetaWatchdog);
+        try {
+          const t = shadow ? shadow.currentTime : audio.currentTime;
+          const dur = audio.duration;
+          if (Number.isFinite(t) && t > 0 && (!Number.isFinite(dur) || t < dur)) {
+            audio.currentTime = t;
+          }
+        } catch {}
+        const p = audio.play();
+        if (p && typeof p.then === "function") {
+          p.then(() => {
+            // Main is now sounding. Sync final drift and cut the shadow
+            // in the same tick as the playing event so they never overlap
+            // audibly and no content replays.
+            const onPlaying = () => {
+              try {
+                const t2 = shadow ? shadow.currentTime : audio.currentTime;
+                if (Number.isFinite(t2) && Math.abs(audio.currentTime - t2) > 0.15) audio.currentTime = t2;
+              } catch {}
+              finishOk();
+            };
+            // play() resolved already implies playing, but listen once for
+            // the event to get the most accurate timing before cutting shadow
+            audio.addEventListener("playing", onPlaying, { once: true });
+            // Fallback if playing never fires (shouldn't happen after resolve)
+            setTimeout(onPlaying, 400);
+          }).catch(() => {
+            // Play rejected (autoplay stale). The blob source is already
+            // staged at the correct position but paused. Pause the cover
+            // shadow too so UI (paused) matches reality and one tap resumes.
+            // This is strictly better than the old directSwap which left
+            // the element paused at 0 with no position restore.
+            try { if (shadow) shadow.pause(); } catch {}
+            finishOk();
+          });
+        } else {
+          // No promise (older browser) - assume playing shortly
+          setTimeout(finishOk, 100);
+        }
+      };
+
+      audio.addEventListener("loadedmetadata", onMeta, { once: true });
+      mainMetaWatchdog = setTimeout(() => {
+        if (!metaDone) {
+          audio.removeEventListener("loadedmetadata", onMeta);
+          onMeta();
+        }
+      }, 1200);
+      audio.src = localUrl;
+      try { audio.load(); } catch {}
+    };
   });
 }
 

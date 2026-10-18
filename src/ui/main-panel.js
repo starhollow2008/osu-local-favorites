@@ -1230,41 +1230,16 @@ export function showFavoritesPanel() {
     return d.toLocaleDateString();
   }
 
-  // ── Render list ────────────────────────────────────────
-  function renderList() {
-    panel._osuFavRenderCount = (panel._osuFavRenderCount || 0) + 1;
-    const favs = getFavorites();
-    let entries = Object.entries(favs);
 
-    // Scroll preservation. renderList() empties the list node and rebuilds
-    // it, which throws away scrollTop - so a refresh triggered by anything
-    // other than the user (a tab regaining focus, a cross-tab write, an
-    // enrichment pass finishing) used to fling the list back to the top.
-    // The position is only worth keeping while the *same* view is on screen;
-    // changing the sort, search or any filter should land at the top, which
-    // is what comparing a view key gives us for free.
-    const viewKey = JSON.stringify([
-      currentSort,
-      sortAsc,
-      searchQuery.trim().toLowerCase(),
-      filterState,
-      activeCollectionId,
-    ]);
-    const sameView = viewKey === renderList._viewKey;
-    renderList._viewKey = viewKey;
-    const savedScroll = sameView ? listEl.scrollTop : 0;
-
-    const cBadge = panel.querySelector("#osu-fav-count");
-
-    // Collection membership counts for the "+ Playlist" badges - one pass
-    // over all collections per render instead of O(collections x ids) per
-    // card (see buildCollectionCountIndex).
-    const _collCounts = buildCollectionCountIndex();
-
-    // Filter
+  // Search + category filters + collection filter + sort. One definition
+  // shared by the full render and the metadata-only fast path inside
+  // renderList, so the two can never disagree about what is visible or in
+  // what order.
+  function applyViewFilters(entries) {
+    let out = entries;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      entries = entries.filter(
+      out = out.filter(
         ([, f]) =>
           (f.title || "").toLowerCase().includes(q) ||
           (f.artist || "").toLowerCase().includes(q) ||
@@ -1274,28 +1249,14 @@ export function showFavoritesPanel() {
           (f.id || "").includes(q),
       );
     }
-
-    // Category filters (date / title / artist / status / genre). Terms are
-    // lowercase keys; within a category the "include" terms are OR'd and any
-    // "exclude" term always drops the entry, even if it also matched an
-    // include. Across categories the surviving sets are AND'd. The plan is
-    // flattened once per render rather than per row - see ui/filters.js.
     const filterPlan = buildFilterPlan(filterState);
-    if (filterPlan.length) entries = entries.filter(([, f]) => favMatchesPlan(f, filterPlan));
-
-    // Collection filter
+    if (filterPlan.length) out = out.filter(([, f]) => favMatchesPlan(f, filterPlan));
     if (activeCollectionId) {
       const col = getCollections()[activeCollectionId];
       const idSet = new Set(col && Array.isArray(col.ids) ? col.ids : []);
-      entries = entries.filter(([id]) => idSet.has(id));
+      out = out.filter(([id]) => idSet.has(id));
     }
-
-    // The badge reflects the visible result set after search, genre/tag,
-    // and collection filters, rather than always showing the library total.
-    if (cBadge) cBadge.textContent = entries.length;
-
-    // Sort
-    entries.sort(([idA, a], [idB, b]) => {
+    out.sort(([idA, a], [idB, b]) => {
       let cmp = 0;
       if (currentSort === "date")
         cmp = (a.favourited_at || "").localeCompare(b.favourited_at || "");
@@ -1310,6 +1271,170 @@ export function showFavoritesPanel() {
       if (cmp === 0) cmp = idB.localeCompare(idA);
       return sortAsc ? cmp : -cmp;
     });
+    return out;
+  }
+
+  // In-place metadata patch for the renderList fast path. Patches exactly
+  // the fields enrichment fills in (title/artist/creator/status/bpm/nsfw/
+  // featured/cover) on the ALREADY-MOUNTED rows; no card is created or
+  // removed, so there is no teardown flash and the scroll offset is not
+  // touched. Rows whose card DOM cannot be found (shouldn't happen - the
+  // visible id set was identical - are skipped, not rebuilt.
+  function patchVisibleCards(displayed) {
+    const collCounts = buildCollectionCountIndex();
+    displayed.forEach(([id, f]) => {
+      const card = listEl.querySelector('[data-fav-id="' + id + '"]');
+      if (!card) return;
+
+      // Title (with optional EXPLICIT badge, rebuilt the same way
+      // buildCard builds it - the badge is a child span, not part of the
+      // text node).
+      const titleDiv = card.querySelector(".osu-fav-title") || card.children[1] && card.children[1].children[0];
+      if (titleDiv) {
+        titleDiv.textContent = f.title || f.title_unicode || "Unknown";
+        if (f.nsfw) {
+          const badge = document.createElement("span");
+          badge.textContent = "EXPLICIT";
+          badge.style.cssText =
+            "font-size:7px;color:#f6c243;border:1px solid #f6c243;border-radius:2px;padding:0 3px;margin-left:4px;vertical-align:middle;font-weight:600";
+          titleDiv.appendChild(badge);
+        }
+      }
+
+      // Artist row: text span + optional FEATURED ARTIST badge.
+      const infoDiv = card.children[1];
+      if (infoDiv) {
+        const artistDiv = infoDiv.children[1];
+        if (artistDiv) {
+          const artistText = artistDiv.children[0];
+          if (artistText) artistText.textContent = f.artist || f.artist_unicode || "";
+          // Badge is index 1 when present; rebuild deterministically.
+          const oldBadge = artistDiv.querySelector("span[style*='#66ccff']");
+          if (oldBadge) oldBadge.remove();
+          if (f.is_artist_featured) {
+            const faBadge = document.createElement("span");
+            faBadge.textContent = "FEATURED ARTIST";
+            faBadge.style.cssText =
+              "font-size:7px;color:#66ccff;border:1px solid #66ccff;border-radius:2px;padding:0 3px;vertical-align:middle;font-weight:600;flex-shrink:0";
+            artistDiv.appendChild(faBadge);
+          }
+        }
+
+        // Meta row: creator / status / bpm chips. Rebuild the row's
+        // children - they are plain spans, nothing stateful inside.
+        const metaDiv = infoDiv.children[2];
+        if (metaDiv) {
+          while (metaDiv.firstChild) metaDiv.firstChild.remove();
+          if (f.creator) {
+            const m = document.createElement("span");
+            m.style.cssText =
+              "font-size:10px;color:var(--osu-fav-accent);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px";
+            m.textContent = f.creator;
+            metaDiv.appendChild(m);
+          }
+          if (f.status) {
+            const st = document.createElement("span");
+            st.textContent = f.status.toUpperCase();
+            st.style.cssText = `font-size:8px;font-weight:700;letter-spacing:.3px;color:${statusColor(f.status)}`;
+            metaDiv.appendChild(st);
+          }
+          if (f.bpm) {
+            const bpm = document.createElement("span");
+            bpm.style.cssText = "font-size:9px;color:#555";
+            bpm.textContent = `${f.bpm} BPM`;
+            metaDiv.appendChild(bpm);
+          }
+        }
+      }
+
+      // Cover: only swap when the URL genuinely changed (placeholder rows
+      // get their first real cover here). dataset.src is still lazy-loaded
+      // by the observer when the row is on screen.
+      const coverDiv = card.children[0];
+      const img = coverDiv && coverDiv.querySelector("img");
+      if (img) {
+        const nextCover = favoriteCoverUrl(f, id);
+        if (nextCover && (img.src || img.dataset.src) !== nextCover) {
+          if (img.src) img.src = "";
+          img.dataset.src = nextCover;
+        }
+      }
+
+      // "+ Playlist" count badge reflects live collection membership.
+      const addToCollBtn = card.querySelector("button[title*='collection'], button[title*='Add to a collection']");
+      if (addToCollBtn) {
+        const n = collCounts.get(id) || 0;
+        addToCollBtn.textContent = n ? `\u2713 ${n}` : "+ Playlist";
+        addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "#333";
+        addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "#666";
+      }
+    });
+  }
+  // ── Render list ────────────────────────────────────────
+  function renderList() {
+    panel._osuFavRenderCount = (panel._osuFavRenderCount || 0) + 1;
+    const favs = getFavorites();
+    let entries = Object.entries(favs);
+
+    // The position is only worth keeping while the *same* view is on
+    // screen; changing sort/search/filters/collection should land at
+    // the top, which is what comparing a view key gives us for free.
+    const viewKey = JSON.stringify([
+      currentSort,
+      sortAsc,
+      searchQuery.trim().toLowerCase(),
+      filterState,
+      activeCollectionId,
+    ]);
+    const sameView = viewKey === renderList._viewKey;
+    renderList._viewKey = viewKey;
+
+    // Scroll preservation, across BOTH the same-view rebuild and the
+    // rapid-rebuild burst. `listEl.scrollTop` reads 0 once a previous
+    // render's teardown has already emptied the node - so a second render
+    // launched before the first finished restoring (favorite a song:
+    // membership rebuild, then its enrichment completes seconds later:
+    // metadata rebuild) used to inherit 0 and fling the list to the top.
+    // The last-known-good offset survives teardowns and is consulted
+    // whenever the live one reads zero; only a live, settled position
+    // promotes a new value into it.
+    const liveScroll = listEl.scrollTop;
+    if (!renderList._rebuilding && liveScroll > 0) renderList._lastGoodScroll = liveScroll;
+    const savedScroll = sameView
+      ? Math.max(liveScroll, renderList._lastGoodScroll || 0)
+      : 0;
+    // ── Fast path: metadata-only refresh ───────────────────────────
+    // Enrichment fills in fields for maps that are ALREADY listed. The
+    // visible rows don't change identity or order; only their text,
+    // badges and cover differ. Rebuilding the whole list for that
+    // remounts hundreds of cards (a visible flash on phone AND desktop,
+    // and it can zero the scroll offset mid-restore) - so patch the
+    // affected rows in place instead. Only a change in the visible id
+    // set, order, or the view itself falls through to a real rebuild.
+    if (sameView && renderList._builtOnce && Array.isArray(renderList._entries)) {
+      const displayed = applyViewFilters(entries);
+      const nextIds = displayed.map(([id]) => String(id)).join("|");
+      const prevIds = renderList._entries.map(([id]) => String(id)).join("|");
+      if (prevIds === nextIds) {
+        patchVisibleCards(displayed);
+        renderList._lastGoodScroll = listEl.scrollTop;
+        syncCurrentCardUI();
+        return;
+      }
+    }
+    renderList._builtOnce = true;
+    renderList._rebuilding = true;
+
+    const cBadge = panel.querySelector("#osu-fav-count");
+
+    // applyViewFilters does search, category filters, collection filter and
+    // sort - the identical pipeline the full render uses, so the fast path
+    // and the rebuild can never disagree about what is visible.
+    entries = applyViewFilters(entries);
+
+    // The badge reflects the visible result set after search, genre/tag,
+    // and collection filters, rather than always showing the library total.
+    if (cBadge) cBadge.textContent = entries.length;
 
     // Snapshot for the Now Playing bar's Back/Next/shuffle - always the
     // currently visible, filtered/sorted order.
@@ -1770,6 +1895,13 @@ export function showFavoritesPanel() {
       listEl.appendChild(chunk);
       const finished = cursor >= entries.length;
       tryRestoreScroll(finished);
+      if (finished) {
+        // The rebuild is done and the offset restored: a live scrollTop is
+        // the user's position again (and may update the last-known-good
+        // value), while the teardown's own jump to 0 no longer applies.
+        renderList._rebuilding = false;
+        renderList._lastGoodScroll = listEl.scrollTop;
+      }
       if (!finished) requestAnimationFrame(renderChunk);
     };
     if (entries.length) requestAnimationFrame(renderChunk);
