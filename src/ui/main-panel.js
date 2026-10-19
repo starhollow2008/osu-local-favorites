@@ -1274,6 +1274,23 @@ export function showFavoritesPanel() {
     return out;
   }
 
+  // Loads a cover URL into an <img> through the media cache and assigns the
+  // resolved URL directly. Each call bumps a per-image sequence number so a
+  // slower, older lookup can never overwrite a newer cover.
+  function loadCoverInto(img, url) {
+    img.dataset.coverUrl = url;
+    delete img.dataset.src;
+    const seq = (img._coverSeq = (img._coverSeq || 0) + 1);
+    const stillCurrent = () => img._coverSeq === seq && img.dataset.coverUrl === url;
+    resolveCachedMediaUrl(url)
+      .then((resolved) => {
+        if (stillCurrent()) img.src = resolved;
+      })
+      .catch(() => {
+        if (stillCurrent()) img.src = url;
+      });
+  }
+
   // In-place metadata patch for the renderList fast path. Patches exactly
   // the fields enrichment fills in (title/artist/creator/status/bpm/nsfw/
   // featured/cover) on the ALREADY-MOUNTED rows; no card is created or
@@ -1308,11 +1325,13 @@ export function showFavoritesPanel() {
         if (artistDiv) {
           const artistText = artistDiv.children[0];
           if (artistText) artistText.textContent = f.artist || f.artist_unicode || "";
-          // Badge is index 1 when present; rebuild deterministically.
-          const oldBadge = artistDiv.querySelector("span[style*='#66ccff']");
-          if (oldBadge) oldBadge.remove();
+          // Rebuild deterministically. Match by class: browsers rewrite
+          // inline colors to rgb(...), so a style*='#66ccff' selector never
+          // matched and every patch stacked another badge on the row.
+          artistDiv.querySelectorAll(".osu-fav-fa-badge").forEach((b) => b.remove());
           if (f.is_artist_featured) {
             const faBadge = document.createElement("span");
+            faBadge.className = "osu-fav-fa-badge";
             faBadge.textContent = "FEATURED ARTIST";
             faBadge.style.cssText =
               "font-size:7px;color:#66ccff;border:1px solid #66ccff;border-radius:2px;padding:0 3px;vertical-align:middle;font-weight:600;flex-shrink:0";
@@ -1352,12 +1371,38 @@ export function showFavoritesPanel() {
       // by the observer when the row is on screen.
       const coverDiv = card.children[0];
       const img = coverDiv && coverDiv.querySelector("img");
+      const nextCover = favoriteCoverUrl(f, id);
       if (img) {
-        const nextCover = favoriteCoverUrl(f, id);
-        if (nextCover && (img.src || img.dataset.src) !== nextCover) {
-          if (img.src) img.src = "";
-          img.dataset.src = nextCover;
+        // Compare against the logical cover URL, not img.src (which holds a
+        // resolved blob URL once loaded and would never equal nextCover).
+        const curCover = img.dataset.coverUrl || img.dataset.src || "";
+        if (nextCover && curCover !== nextCover) {
+          img.dataset.coverUrl = nextCover;
+          if (img.dataset.src) {
+            // Not loaded yet: the observer will pick up the new URL.
+            img.dataset.src = nextCover;
+          } else {
+            // Already loaded (observer unobserved it): reload directly,
+            // keeping the old image visible until the new one resolves.
+            loadCoverInto(img, nextCover);
+          }
         }
+      } else if (coverDiv && nextCover) {
+        // Placeholder row ("?") gets its first real cover.
+        const ph = Array.from(coverDiv.childNodes).find((n) => n.nodeType === 3);
+        if (ph) ph.remove();
+        coverDiv.style.fontSize = "";
+        coverDiv.style.color = "";
+        const nimg = document.createElement("img");
+        nimg.style.cssText = "width:100%;height:100%;object-fit:cover;display:block";
+        nimg.addEventListener("error", () => {
+          nimg.remove();
+          coverDiv.style.fontSize = "16px";
+          coverDiv.style.color = "#444";
+          coverDiv.insertBefore(document.createTextNode("?"), coverDiv.firstChild);
+        });
+        coverDiv.insertBefore(nimg, coverDiv.firstChild);
+        loadCoverInto(nimg, nextCover);
       }
 
       // "+ Playlist" count badge reflects live collection membership.
@@ -1398,11 +1443,18 @@ export function showFavoritesPanel() {
     // The last-known-good offset survives teardowns and is consulted
     // whenever the live one reads zero; only a live, settled position
     // promotes a new value into it.
+    // Outside a rebuild the live value is authoritative, INCLUDING zero
+    // (scroll down, return to the top, remove a favorite must not restore
+    // the old offset). Only while a rebuild is in flight can a zero be a
+    // teardown artifact, so only then is the last-known value consulted.
     const liveScroll = listEl.scrollTop;
-    if (!renderList._rebuilding && liveScroll > 0) renderList._lastGoodScroll = liveScroll;
-    const savedScroll = sameView
-      ? Math.max(liveScroll, renderList._lastGoodScroll || 0)
-      : 0;
+    if (!sameView) renderList._lastGoodScroll = 0;
+    else if (!renderList._rebuilding) renderList._lastGoodScroll = liveScroll;
+    const savedScroll = !sameView
+      ? 0
+      : renderList._rebuilding
+        ? Math.max(liveScroll, renderList._lastGoodScroll || 0)
+        : liveScroll;
     // ── Fast path: metadata-only refresh ───────────────────────────
     // Enrichment fills in fields for maps that are ALREADY listed. The
     // visible rows don't change identity or order; only their text,
@@ -1417,7 +1469,7 @@ export function showFavoritesPanel() {
       const prevIds = renderList._entries.map(([id]) => String(id)).join("|");
       if (prevIds === nextIds) {
         patchVisibleCards(displayed);
-        renderList._lastGoodScroll = listEl.scrollTop;
+        if (!renderList._rebuilding) renderList._lastGoodScroll = listEl.scrollTop;
         syncCurrentCardUI();
         return;
       }
@@ -1466,15 +1518,11 @@ export function showFavoritesPanel() {
           const img = entry.target;
           obs.unobserve(img);
           if (img.dataset.src) {
-            const url = img.dataset.src;
-            delete img.dataset.src;
             // IndexedDB lookup is local and fast, so it's fine to wait for
             // it before assigning src - avoids a network fetch now and a
             // second, cached-copy swap-in moments later (which would
             // otherwise cause a visible flicker on every card).
-            resolveCachedMediaUrl(url).then((resolvedUrl) => {
-              img.src = resolvedUrl;
-            });
+            loadCoverInto(img, img.dataset.src);
           }
         });
       },
@@ -1482,14 +1530,25 @@ export function showFavoritesPanel() {
     );
     renderList._imgObserver = imgObserver;
 
+    // Empty states: nothing to restore, so the scroll state is explicitly
+    // zero and the rebuild is over (no chunk will ever clear the flag).
+    const settleEmpty = (html) => {
+      listEl.innerHTML = html;
+      listEl.scrollTop = 0;
+      lastListScrollTop = 0;
+      renderList._lastGoodScroll = 0;
+      renderList._rebuilding = false;
+    };
     if (Object.keys(favs).length === 0) {
-      listEl.innerHTML =
-        '<p style="text-align:center;color:#666;padding:40px 20px;font-size:12px">No favorites yet.</p>';
+      settleEmpty(
+        '<p style="text-align:center;color:#666;padding:40px 20px;font-size:12px">No favorites yet.</p>',
+      );
       return;
     }
     if (entries.length === 0) {
-      listEl.innerHTML =
-        '<p style="text-align:center;color:#666;padding:40px 20px;font-size:12px">No matches.</p>';
+      settleEmpty(
+        '<p style="text-align:center;color:#666;padding:40px 20px;font-size:12px">No matches.</p>',
+      );
       return;
     }
 
@@ -1514,6 +1573,7 @@ export function showFavoritesPanel() {
         // Don't set src yet - the IntersectionObserver will do it when the row
         // scrolls within 100px of the list viewport
         img.dataset.src = coverUrl;
+        img.dataset.coverUrl = coverUrl;
         img.style.cssText = "width:100%;height:100%;object-fit:cover;display:block";
         img.addEventListener("error", () => {
           img.remove();
@@ -1562,6 +1622,7 @@ export function showFavoritesPanel() {
       artistDiv.appendChild(artistText);
       if (f.is_artist_featured) {
         const faBadge = document.createElement("span");
+        faBadge.className = "osu-fav-fa-badge";
         faBadge.textContent = "FEATURED ARTIST";
         faBadge.style.cssText =
           "font-size:7px;color:#66ccff;border:1px solid #66ccff;border-radius:2px;padding:0 3px;vertical-align:middle;font-weight:600;flex-shrink:0";

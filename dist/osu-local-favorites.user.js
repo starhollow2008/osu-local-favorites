@@ -2147,9 +2147,13 @@
 
     return new Promise((resolve) => {
       let settled = false;
+      let handoffStarted = false;
       let shadow = null;
       let shadowWatchdog = null;
       let mainMetaWatchdog = null;
+      const startedActive = audio._activePreviewUrl;
+      const superseded = () =>
+        handoffStarted ? audio._activePreviewUrl !== localUrl : audio._activePreviewUrl !== startedActive;
       const cleanupShadow = () => {
         if (!shadow) return;
         try { shadow.pause(); } catch {}
@@ -2178,18 +2182,23 @@
       try {
         shadow = new Audio(localUrl);
         shadow.preload = "auto";
-        shadow.addEventListener("error", finishNoop, { once: true });
+        shadow.addEventListener("error", () => { if (!handoffStarted) finishNoop(); }, { once: true });
         shadow.addEventListener("canplay", () => {
-          try { shadow.currentTime = audio.currentTime; } catch {}
-          const sp = shadow.play();
-          if (sp && typeof sp.then === "function") {
-            sp.then(() => {
-              clearTimeout(shadowWatchdog);
-              beginMainHandoff();
-            }).catch(finishNoop);
-          } else {
+          if (settled || handoffStarted) return;
+          if (superseded()) { finishNoop(); return; }
+          const sh = shadow;
+          try { sh.currentTime = audio.currentTime; } catch {}
+          const sp = sh.play();
+          const proceed = () => {
+            if (settled || handoffStarted) return;
             clearTimeout(shadowWatchdog);
+            if (superseded()) { finishNoop(); return; }
             beginMainHandoff();
+          };
+          if (sp && typeof sp.then === "function") {
+            sp.then(proceed).catch(finishNoop);
+          } else {
+            proceed();
           }
         }, { once: true });
       } catch {
@@ -2198,6 +2207,12 @@
       }
 
       const beginMainHandoff = () => {
+        if (settled || handoffStarted) return;
+        handoffStarted = true;
+        let resumeFrom = 0;
+        try {
+          resumeFrom = shadow ? shadow.currentTime : audio.currentTime;
+        } catch {}
         try { audio.preload = "auto"; } catch {}
         applyState();
 
@@ -2206,31 +2221,43 @@
           if (metaDone) return;
           metaDone = true;
           clearTimeout(mainMetaWatchdog);
+          if (settled || superseded()) { finishNoop(); return; }
           try {
-            const t = shadow ? shadow.currentTime : audio.currentTime;
+            const t = shadow ? shadow.currentTime : resumeFrom;
             const dur = audio.duration;
             if (Number.isFinite(t) && t > 0 && (!Number.isFinite(dur) || t < dur)) {
               audio.currentTime = t;
             }
           } catch {}
+          let bridgeDone = false;
+          let bridgeFallback = null;
+          const finishBridge = () => {
+            if (bridgeDone) return;
+            bridgeDone = true;
+            clearTimeout(bridgeFallback);
+            audio.removeEventListener("playing", finishBridge);
+            if (settled || superseded()) { finishNoop(); return; }
+            try {
+              const t2 = shadow ? shadow.currentTime : audio.currentTime;
+              if (Number.isFinite(t2) && Math.abs(audio.currentTime - t2) > 0.15) audio.currentTime = t2;
+            } catch {}
+            finishOk();
+          };
+          audio.addEventListener("playing", finishBridge);
           const p = audio.play();
           if (p && typeof p.then === "function") {
             p.then(() => {
-              const onPlaying = () => {
-                try {
-                  const t2 = shadow ? shadow.currentTime : audio.currentTime;
-                  if (Number.isFinite(t2) && Math.abs(audio.currentTime - t2) > 0.15) audio.currentTime = t2;
-                } catch {}
-                finishOk();
-              };
-              audio.addEventListener("playing", onPlaying, { once: true });
-              setTimeout(onPlaying, 400);
+              finishBridge();
             }).catch(() => {
+              bridgeDone = true;
+              clearTimeout(bridgeFallback);
+              audio.removeEventListener("playing", finishBridge);
               try { if (shadow) shadow.pause(); } catch {}
               finishOk();
             });
+            bridgeFallback = setTimeout(finishBridge, 400);
           } else {
-            setTimeout(finishOk, 100);
+            bridgeFallback = setTimeout(finishBridge, 100);
           }
         };
 
@@ -7164,6 +7191,20 @@
       return out;
     }
 
+    function loadCoverInto(img, url) {
+      img.dataset.coverUrl = url;
+      delete img.dataset.src;
+      const seq = (img._coverSeq = (img._coverSeq || 0) + 1);
+      const stillCurrent = () => img._coverSeq === seq && img.dataset.coverUrl === url;
+      resolveCachedMediaUrl(url)
+        .then((resolved) => {
+          if (stillCurrent()) img.src = resolved;
+        })
+        .catch(() => {
+          if (stillCurrent()) img.src = url;
+        });
+    }
+
     function patchVisibleCards(displayed) {
       const collCounts = buildCollectionCountIndex();
       displayed.forEach(([id, f]) => {
@@ -7188,10 +7229,10 @@
           if (artistDiv) {
             const artistText = artistDiv.children[0];
             if (artistText) artistText.textContent = f.artist || f.artist_unicode || "";
-            const oldBadge = artistDiv.querySelector("span[style*='#66ccff']");
-            if (oldBadge) oldBadge.remove();
+            artistDiv.querySelectorAll(".osu-fav-fa-badge").forEach((b) => b.remove());
             if (f.is_artist_featured) {
               const faBadge = document.createElement("span");
+              faBadge.className = "osu-fav-fa-badge";
               faBadge.textContent = "FEATURED ARTIST";
               faBadge.style.cssText =
                 "font-size:7px;color:#66ccff;border:1px solid #66ccff;border-radius:2px;padding:0 3px;vertical-align:middle;font-weight:600;flex-shrink:0";
@@ -7226,12 +7267,32 @@
 
         const coverDiv = card.children[0];
         const img = coverDiv && coverDiv.querySelector("img");
+        const nextCover = favoriteCoverUrl(f, id);
         if (img) {
-          const nextCover = favoriteCoverUrl(f, id);
-          if (nextCover && (img.src || img.dataset.src) !== nextCover) {
-            if (img.src) img.src = "";
-            img.dataset.src = nextCover;
+          const curCover = img.dataset.coverUrl || img.dataset.src || "";
+          if (nextCover && curCover !== nextCover) {
+            img.dataset.coverUrl = nextCover;
+            if (img.dataset.src) {
+              img.dataset.src = nextCover;
+            } else {
+              loadCoverInto(img, nextCover);
+            }
           }
+        } else if (coverDiv && nextCover) {
+          const ph = Array.from(coverDiv.childNodes).find((n) => n.nodeType === 3);
+          if (ph) ph.remove();
+          coverDiv.style.fontSize = "";
+          coverDiv.style.color = "";
+          const nimg = document.createElement("img");
+          nimg.style.cssText = "width:100%;height:100%;object-fit:cover;display:block";
+          nimg.addEventListener("error", () => {
+            nimg.remove();
+            coverDiv.style.fontSize = "16px";
+            coverDiv.style.color = "#444";
+            coverDiv.insertBefore(document.createTextNode("?"), coverDiv.firstChild);
+          });
+          coverDiv.insertBefore(nimg, coverDiv.firstChild);
+          loadCoverInto(nimg, nextCover);
         }
 
         const addToCollBtn = card.querySelector("button[title*='collection'], button[title*='Add to a collection']");
@@ -7259,17 +7320,20 @@
       renderList._viewKey = viewKey;
 
       const liveScroll = listEl.scrollTop;
-      if (!renderList._rebuilding && liveScroll > 0) renderList._lastGoodScroll = liveScroll;
-      const savedScroll = sameView
-        ? Math.max(liveScroll, renderList._lastGoodScroll || 0)
-        : 0;
+      if (!sameView) renderList._lastGoodScroll = 0;
+      else if (!renderList._rebuilding) renderList._lastGoodScroll = liveScroll;
+      const savedScroll = !sameView
+        ? 0
+        : renderList._rebuilding
+          ? Math.max(liveScroll, renderList._lastGoodScroll || 0)
+          : liveScroll;
       if (sameView && renderList._builtOnce && Array.isArray(renderList._entries)) {
         const displayed = applyViewFilters(entries);
         const nextIds = displayed.map(([id]) => String(id)).join("|");
         const prevIds = renderList._entries.map(([id]) => String(id)).join("|");
         if (prevIds === nextIds) {
           patchVisibleCards(displayed);
-          renderList._lastGoodScroll = listEl.scrollTop;
+          if (!renderList._rebuilding) renderList._lastGoodScroll = listEl.scrollTop;
           syncCurrentCardUI();
           return;
         }
@@ -7304,11 +7368,7 @@
             const img = entry.target;
             obs.unobserve(img);
             if (img.dataset.src) {
-              const url = img.dataset.src;
-              delete img.dataset.src;
-              resolveCachedMediaUrl(url).then((resolvedUrl) => {
-                img.src = resolvedUrl;
-              });
+              loadCoverInto(img, img.dataset.src);
             }
           });
         },
@@ -7316,14 +7376,23 @@
       );
       renderList._imgObserver = imgObserver;
 
+      const settleEmpty = (html) => {
+        listEl.innerHTML = html;
+        listEl.scrollTop = 0;
+        lastListScrollTop = 0;
+        renderList._lastGoodScroll = 0;
+        renderList._rebuilding = false;
+      };
       if (Object.keys(favs).length === 0) {
-        listEl.innerHTML =
-          '<p style="text-align:center;color:#666;padding:40px 20px;font-size:12px">No favorites yet.</p>';
+        settleEmpty(
+          '<p style="text-align:center;color:#666;padding:40px 20px;font-size:12px">No favorites yet.</p>',
+        );
         return;
       }
       if (entries.length === 0) {
-        listEl.innerHTML =
-          '<p style="text-align:center;color:#666;padding:40px 20px;font-size:12px">No matches.</p>';
+        settleEmpty(
+          '<p style="text-align:center;color:#666;padding:40px 20px;font-size:12px">No matches.</p>',
+        );
         return;
       }
 
@@ -7341,6 +7410,7 @@
         if (coverUrl) {
           const img = document.createElement("img");
           img.dataset.src = coverUrl;
+          img.dataset.coverUrl = coverUrl;
           img.style.cssText = "width:100%;height:100%;object-fit:cover;display:block";
           img.addEventListener("error", () => {
             img.remove();
@@ -7384,6 +7454,7 @@
         artistDiv.appendChild(artistText);
         if (f.is_artist_featured) {
           const faBadge = document.createElement("span");
+          faBadge.className = "osu-fav-fa-badge";
           faBadge.textContent = "FEATURED ARTIST";
           faBadge.style.cssText =
             "font-size:7px;color:#66ccff;border:1px solid #66ccff;border-radius:2px;padding:0 3px;vertical-align:middle;font-weight:600;flex-shrink:0";

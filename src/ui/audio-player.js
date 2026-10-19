@@ -464,9 +464,18 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
   // correct position with the blob source, so one tap resumes.
   return new Promise((resolve) => {
     let settled = false;
+    let handoffStarted = false;
     let shadow = null;
     let shadowWatchdog = null;
     let mainMetaWatchdog = null;
+    // The track may change while the swap is in flight. Before the handoff
+    // the main element must still be on the source we started from; after
+    // it, still on the blob we staged. Anything else means a newer track
+    // owns the element and this swap must not touch it (a stale onMeta
+    // would otherwise seek the new song to the old song's position).
+    const startedActive = audio._activePreviewUrl;
+    const superseded = () =>
+      handoffStarted ? audio._activePreviewUrl !== localUrl : audio._activePreviewUrl !== startedActive;
     const cleanupShadow = () => {
       if (!shadow) return;
       try { shadow.pause(); } catch {}
@@ -495,18 +504,27 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
     try {
       shadow = new Audio(localUrl);
       shadow.preload = "auto";
-      shadow.addEventListener("error", finishNoop, { once: true });
+      // A shadow error only aborts BEFORE the handoff; afterwards the main
+      // element owns playback and the shadow is just a bridge.
+      shadow.addEventListener("error", () => { if (!handoffStarted) finishNoop(); }, { once: true });
       shadow.addEventListener("canplay", () => {
-        try { shadow.currentTime = audio.currentTime; } catch {}
-        const sp = shadow.play();
-        if (sp && typeof sp.then === "function") {
-          sp.then(() => {
-            clearTimeout(shadowWatchdog);
-            beginMainHandoff();
-          }).catch(finishNoop);
-        } else {
+        if (settled || handoffStarted) return;
+        if (superseded()) { finishNoop(); return; }
+        const sh = shadow;
+        try { sh.currentTime = audio.currentTime; } catch {}
+        const sp = sh.play();
+        const proceed = () => {
+          // The watchdog (or a track change) may have aborted while play()
+          // was pending: never start the handoff for a settled operation.
+          if (settled || handoffStarted) return;
           clearTimeout(shadowWatchdog);
+          if (superseded()) { finishNoop(); return; }
           beginMainHandoff();
+        };
+        if (sp && typeof sp.then === "function") {
+          sp.then(proceed).catch(finishNoop);
+        } else {
+          proceed();
         }
       }, { once: true });
     } catch {
@@ -515,7 +533,16 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
     }
 
     const beginMainHandoff = () => {
+      if (settled || handoffStarted) return;
+      handoffStarted = true;
       // Shadow is now audible and covering at the live position.
+      // Remember where we are: after load() the main element reports 0,
+      // so if the shadow is gone by then, this is the fallback position
+      // (reading audio.currentTime there restarted the song).
+      let resumeFrom = 0;
+      try {
+        resumeFrom = shadow ? shadow.currentTime : audio.currentTime;
+      } catch {}
       try { audio.preload = "auto"; } catch {}
       applyState();
 
@@ -524,43 +551,56 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
         if (metaDone) return;
         metaDone = true;
         clearTimeout(mainMetaWatchdog);
+        if (settled || superseded()) { finishNoop(); return; }
         try {
-          const t = shadow ? shadow.currentTime : audio.currentTime;
+          const t = shadow ? shadow.currentTime : resumeFrom;
           const dur = audio.duration;
           if (Number.isFinite(t) && t > 0 && (!Number.isFinite(dur) || t < dur)) {
             audio.currentTime = t;
           }
         } catch {}
+        // Register the "playing" listener BEFORE play(): the event can fire
+        // before the promise's fulfillment handler runs, and a listener
+        // added there would miss it and leave both players sounding until
+        // the fallback timer.
+        let bridgeDone = false;
+        let bridgeFallback = null;
+        const finishBridge = () => {
+          if (bridgeDone) return;
+          bridgeDone = true;
+          clearTimeout(bridgeFallback);
+          audio.removeEventListener("playing", finishBridge);
+          if (settled || superseded()) { finishNoop(); return; }
+          try {
+            const t2 = shadow ? shadow.currentTime : audio.currentTime;
+            if (Number.isFinite(t2) && Math.abs(audio.currentTime - t2) > 0.15) audio.currentTime = t2;
+          } catch {}
+          finishOk();
+        };
+        audio.addEventListener("playing", finishBridge);
         const p = audio.play();
         if (p && typeof p.then === "function") {
           p.then(() => {
-            // Main is now sounding. Sync final drift and cut the shadow
-            // in the same tick as the playing event so they never overlap
-            // audibly and no content replays.
-            const onPlaying = () => {
-              try {
-                const t2 = shadow ? shadow.currentTime : audio.currentTime;
-                if (Number.isFinite(t2) && Math.abs(audio.currentTime - t2) > 0.15) audio.currentTime = t2;
-              } catch {}
-              finishOk();
-            };
-            // play() resolved already implies playing, but listen once for
-            // the event to get the most accurate timing before cutting shadow
-            audio.addEventListener("playing", onPlaying, { once: true });
-            // Fallback if playing never fires (shouldn't happen after resolve)
-            setTimeout(onPlaying, 400);
+            // play() resolving means the element is sounding: cut the
+            // shadow now instead of waiting on the event or a timer.
+            finishBridge();
           }).catch(() => {
             // Play rejected (autoplay stale). The blob source is already
             // staged at the correct position but paused. Pause the cover
             // shadow too so UI (paused) matches reality and one tap resumes.
             // This is strictly better than the old directSwap which left
             // the element paused at 0 with no position restore.
+            bridgeDone = true;
+            clearTimeout(bridgeFallback);
+            audio.removeEventListener("playing", finishBridge);
             try { if (shadow) shadow.pause(); } catch {}
             finishOk();
           });
+          // Safety net if neither the promise nor the event settles.
+          bridgeFallback = setTimeout(finishBridge, 400);
         } else {
-          // No promise (older browser) - assume playing shortly
-          setTimeout(finishOk, 100);
+          // No promise (older browser) - the event or a short timer ends it
+          bridgeFallback = setTimeout(finishBridge, 100);
         }
       };
 
