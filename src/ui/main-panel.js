@@ -1439,6 +1439,7 @@ export function showFavoritesPanel() {
     // Snapshot for the Now Playing bar's Back/Next/shuffle - always the
     // currently visible, filtered/sorted order.
     renderList._entries = entries;
+    const _collCounts = buildCollectionCountIndex();
 
     listEl.innerHTML = "";
     // Emptying the node zeroes scrollTop in a browser, but say so explicitly:

@@ -7284,6 +7284,7 @@
       if (cBadge) cBadge.textContent = entries.length;
 
       renderList._entries = entries;
+      const _collCounts = buildCollectionCountIndex();
 
       listEl.innerHTML = "";
       if (savedScroll <= 0) {
