@@ -1,3 +1,6 @@
+> [!WARNING]
+> The script is currently unstable and may have weird problems.
+
 # osu! Local Favorites
 
 Store osu! beatmap favorites locally in your browser. No server-side limits, no account needed - with optional GitHub Gist backup if you want your list to follow you across devices.
