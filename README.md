@@ -121,12 +121,15 @@ Everything below lives behind the ⚙ **Settings** button in the side panel head
 - Purely local by default - favorites don't sync between devices unless you export/import or connect GitHub Gist backup
 - Gist backup requires a GitHub personal access token with `gist` scope, stored locally by Tampermonkey - treat it like any other credential. On userscript managers with a broken `GM_setValue`/`GM_getValue` implementation the script transparently falls back to `localStorage`, which — unlike GM storage — **is** readable by page scripts; the GitHub token and osu! API credentials then share that reduced isolation (see `src/core/gm-shim.js`)
 - Download mirrors (Beatconnect, NeriNyan, Sayobot, Mino) are third-party services, not affiliated with or endorsed by osu! - they're off by default except Beatconnect and NeriNyan; enable/disable them in Settings
-- Only works on `osu.ppy.sh` beatmap pages
+- Works on `osu.ppy.sh` and in future with [Local-osu!-profile](https://github.com/starhollow2008/osu-local-profiles/tree/main) pages
 - May need updates if osu! changes their page layout
 
-# AI And Quality Disclaimers: 
-
-This is an ai-assisted project written mostly with help of Claude Code, extension is being thoroughly tested by me with large loads since ver5.9.0 Versions before release(5.9.2) aren't sutable for proper use and were barely reviewed by me personally only parts that were rewiewed before that version were the ui quality and the request queve system, versions before 3-4.9 had entirely ai written ui thus resulting in near complete from scratch rewrite of ui by me and targetting of abysmall performance on load/opening with higher count of maps than 500+.
+> [!IMPORTANT]
+> AI And Quality Disclaimers:
+> This is an ai-assisted project written mostly with help of Claude Code, extension is being thoroughly tested by me with large loads since ver5.9.0 Versions before release(5.9.2) aren't sutable for proper
+> use and were barely reviewed by me personally only parts that were rewiewed before that version were the ui quality and the request queve system, versions before 3-4.9 had entirely ai written ui thus
+> resulting in near complete from scratch rewrite of ui by me and targetting of abysmall performance on load/opening with higher count of maps than 500+.
+> It also may have nonsensical bugs due to the usage of llm's for most of its backend
 
 ## License
 
