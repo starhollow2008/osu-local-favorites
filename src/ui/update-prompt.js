@@ -15,7 +15,7 @@ export function showUpdatePrompt(latestVersion) {
     s.id = "osu-fav-panel-style";
     s.textContent =
       "#osu-fav-list::-webkit-scrollbar{width:4px}" +
-      "#osu-fav-list::-webkit-scrollbar-thumb{background:#333;border-radius:2px}" +
+      "#osu-fav-list::-webkit-scrollbar-thumb{background:var(--osu-fav-border);border-radius:2px}" +
       "#osu-fav-list::-webkit-scrollbar-thumb:hover{background:var(--osu-fav-accent)}" +
       "@keyframes osuFavSlideDown{from{max-height:0;opacity:0;overflow:hidden}to{max-height:50px;opacity:1}}" +
       "@keyframes osuFavSlideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}";
@@ -24,17 +24,17 @@ export function showUpdatePrompt(latestVersion) {
 
   const modal = document.createElement("div");
   modal.id = "osu-local-update-prompt";
-  // Matches panel: dark #111 bg, #333 border, same font stack, same shadow
+  // Matches panel: dark var(--osu-fav-panel-bg) bg, var(--osu-fav-border) border, same font stack, same shadow
   Object.assign(modal.style, {
     position: "fixed",
     bottom: "20px",
     right: "20px",
     zIndex: "100002",
     width: "300px",
-    background: "#111",
-    border: "1px solid #333",
+    background: "var(--osu-fav-panel-bg)",
+    border: "1px solid var(--osu-fav-border)",
     borderRadius: "4px",
-    color: "#ddd",
+    color: "var(--osu-fav-text)",
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: "13px",
     boxShadow: "0 4px 24px rgba(0,0,0,0.6)",
@@ -68,26 +68,26 @@ export function showUpdatePrompt(latestVersion) {
 
   // Body - same text color and line-height as panel text
   const body = document.createElement("div");
-  body.style.cssText = "padding:12px 14px;line-height:1.5;font-size:12px;color:#bbb";
+  body.style.cssText = "padding:12px 14px;line-height:1.5;font-size:12px;color:var(--osu-fav-secondary-bright)";
   body.innerHTML =
-    `<b style="color:#ddd">osu! Local Favorites</b> has an update ready.<br>` +
+    `<b style="color:var(--osu-fav-text)">osu! Local Favorites</b> has an update ready.<br>` +
     `Install it now to get the latest fixes and features.`;
 
   // Footer buttons - mirror the toolbar makeBtn style from the panel
   const footer = document.createElement("div");
   footer.style.cssText =
     "display:flex;justify-content:flex-end;gap:6px;padding:8px 14px;" +
-    "border-top:1px solid #222;background:#1a1a1a";
+    "border-top:1px solid var(--osu-fav-divider);background:var(--osu-fav-surface)";
 
   const laterBtn = document.createElement("button");
   laterBtn.textContent = "Later";
   laterBtn.style.cssText =
-    "font-size:10px;padding:4px 10px;border:1px solid #333;border-radius:3px;" +
-    "background:transparent;color:#888;cursor:pointer;font-weight:500";
+    "font-size:10px;padding:4px 10px;border:1px solid var(--osu-fav-border);border-radius:3px;" +
+    "background:transparent;color:var(--osu-fav-muted-soft);cursor:pointer;font-weight:500";
   hover.props(
     laterBtn,
     { borderColor: "var(--osu-fav-accent)", color: "var(--osu-fav-accent)" },
-    { borderColor: "#333", color: "#888" },
+    { borderColor: "var(--osu-fav-border)", color: "var(--osu-fav-muted-soft)" },
   );
   laterBtn.addEventListener("click", () => {
     modal.remove();
