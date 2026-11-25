@@ -2061,6 +2061,10 @@
     });
 
     audio.addEventListener("ended", () => {
+      // Ignore an ended event queued by the old network source if load()
+      // has already replaced it with the cached Blob.
+      if (!audio.ended) return;
+
       if (musicLoopEnabled()) {
         audio.currentTime = 0;
         const looped = audio.play();
