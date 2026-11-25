@@ -619,41 +619,61 @@
     activeOpacity: 0.8,
   };
 
-  const THEME_PALETTES = {
+const THEME_PALETTES = {
     neo: {
       accent: "#ff91bb",
       heartColor: "#ce7698",
+      preview: ["#111", "#1a1a1a", "#242424", "#333", "#666", "#ff91bb", "#ddd"],
       colors: {
         "panel-bg": "#111", surface: "#1a1a1a", "surface-alt": "#242424",
         divider: "#222", border: "#333", "border-strong": "#444",
         "muted-strong": "#555", muted: "#666", "muted-soft": "#888",
         secondary: "#999", "secondary-soft": "#aaa", "secondary-bright": "#bbb",
         "text-soft": "#ccc", text: "#ddd", "text-bright": "#eee",
+        "header-bg": "#1a1a1a", "nav-bg": "#242424", "stats-bg": "#333",
+        "surface-soft": "#242424", "bio-box": "#1a1a1a", "mode-active": "#ff91bb",
+        "section-bar": "#444", heading: "#ff91bb", label: "#ddd",
+        "username-link": "#ff91bb", "login-link": "#ff91bb", "nav-text": "#ddd",
+        "chart-line": "#ff91bb", "rank-ss": "#ce7698",
       },
     },
     modern: {
-      accent: "#ff66aa",
-      heartColor: "#d94f91",
+      accent: "#ff66ab",
+      heartColor: "#ce1c9d",
+      preview: ["#1c1719", "#2a2226", "#382e32", "#46393f", "#3d2932", "#ff66ab", "#ffffff"],
       colors: {
-        "panel-bg": "#2b242c", surface: "#362b35", "surface-alt": "#443541",
-        divider: "#4c3a48", border: "#5b4856", "border-strong": "#70596a",
-        "muted-strong": "#977d90", muted: "#ae96a7", "muted-soft": "#c2afbd",
-        secondary: "#d0c0cc", "secondary-soft": "#dccfd9", "secondary-bright": "#e7dce5",
-        "text-soft": "#eee5ec", text: "#f5eff4", "text-bright": "#ffffff",
+        "panel-bg": "#1c1719", surface: "#2a2226", "surface-alt": "#382e32",
+        divider: "#3d2932", border: "#46393f", "border-strong": "#ff66ab",
+        "muted-strong": "#d9a6bd", muted: "#d9a6bd", "muted-soft": "#d9a6bd",
+        secondary: "#d9a6bd", "secondary-soft": "#d9a6bd", "secondary-bright": "#ffffff",
+        "text-soft": "#ffffff", text: "#ffffff", "text-bright": "#ffffff",
+        "header-bg": "#2e1f25", "nav-bg": "#3d2932", "stats-bg": "#382e32",
+        "surface-soft": "#382e32", "bio-box": "#2a2226", "mode-active": "#46393f",
+        "section-bar": "#46393f", heading: "#ff66ab", label: "#ffffff",
+        "username-link": "#ff66ab", "login-link": "#ff66ab", "nav-text": "#d9a6bd",
+        "chart-line": "#ff66ab", "rank-ss": "#ce1c9d",
       },
     },
     classic: {
-      accent: "#a64d83",
-      heartColor: "#8c3f70",
+      accent: "#ff5bac",
+      heartColor: "#a64d83",
+      preview: ["#a9a9ff", "#ffffff", "#f0ecfa", "#f5f2fe", "#e7e4fc", "#ffd6f3", "#5a539a"],
       colors: {
-        "panel-bg": "#f3f0fb", surface: "#ffffff", "surface-alt": "#ece8f7",
-        divider: "#d8d1e8", border: "#c6bddb", "border-strong": "#afa4cf",
-        "muted-strong": "#9388aa", muted: "#827795", "muted-soft": "#766b8e",
-        secondary: "#6b607f", "secondary-soft": "#5f5573", "secondary-bright": "#504762",
-        "text-soft": "#453c59", text: "#38304b", "text-bright": "#2e273f",
+        "panel-bg": "#a9a9ff", surface: "#ffffff", "surface-alt": "#f0ecfa",
+        divider: "#bea8f4", border: "#5a539a", "border-strong": "#5f5f5f",
+        "muted-strong": "#5f5f5f", muted: "#5a539a", "muted-soft": "#3843a6",
+        secondary: "#4e2151", "secondary-soft": "#3843a6", "secondary-bright": "#3366ff",
+        "text-soft": "#4e2151", text: "#4e2151", "text-bright": "#3843a6",
+        "header-bg": "#666cbc", "nav-bg": "#ffd6f3", "stats-bg": "#8588dd",
+        "surface-soft": "#f5f2fe", "bio-box": "#e7e4fc", "mode-active": "#bea8f4",
+        "section-bar": "#5f5f5f", heading: "#5a539a", label: "#3843a6",
+        "username-link": "#3366ff", "login-link": "#0f72ff", "nav-text": "#4e2151",
+        "chart-line": "#ff7f0e", "rank-ss": "#ff5bac",
       },
     },
   };
+
+
 
   function darkenHex(hex, amount = 0.25) {
     const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -671,8 +691,14 @@
     const palette = THEME_PALETTES[style];
     const storedAccent = GM_getValue(THEME_ACCENT_KEY, null);
     const storedHeartColor = GM_getValue(THEME_HEART_KEY, null);
+    const legacyPresetColors = {
+      accent: ["#ff66aa", "#a64d83"],
+      heartColor: ["#d94f91", "#8c3f70"],
+    };
     const isPresetColor = (value, key) =>
-      value == null || Object.values(THEME_PALETTES).some((preset) => preset[key] === value);
+      value == null ||
+      Object.values(THEME_PALETTES).some((preset) => preset[key] === value) ||
+      legacyPresetColors[key].includes(value);
     return {
       style,
       accent: isPresetColor(storedAccent, "accent") ? palette.accent : storedAccent,
@@ -5116,6 +5142,61 @@
     return wrap;
   }
 
+// Tall palette swatches for the Appearance style picker. Each preview
+  // shows the actual colors from its preset rather than another generic pill.
+  function makeStylePreviews(options, initial, onChange) {
+    const wrap = document.createElement("div");
+    wrap.style.cssText =
+      "display:flex;justify-content:center;align-items:center;gap:14px;width:100%;" +
+      "padding:12px 0 8px;box-sizing:border-box";
+    let current = initial;
+    const buttons = {};
+  
+    function paintButton(option) {
+      const btn = buttons[option.value];
+      const selected = option.value === current;
+      const colors = option.palette.preview;
+      const stops = colors.map((color, index) => {
+        const from = (index / colors.length) * 100;
+        const to = ((index + 1) / colors.length) * 100;
+        return `${color} ${from}% ${to}%`;
+      }).join(", ");
+      btn.style.border = `${selected ? 2 : 1}px solid ${selected ? option.palette.accent : option.palette.colors.border}`;
+      btn.style.background = `linear-gradient(to bottom, ${stops})`;
+      btn.setAttribute("aria-pressed", selected ? "true" : "false");
+    }
+  
+    options.forEach((option) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.title = `${option.label} appearance`;
+      btn.setAttribute("aria-label", `${option.label} appearance preview`);
+      btn.style.cssText =
+        "position:relative;display:flex;align-items:center;justify-content:center;" +
+        "box-sizing:border-box;width:48px;height:96px;min-width:48px;flex:0 0 48px;" +
+        "padding:0;border-radius:5px;overflow:hidden;cursor:pointer;box-shadow:none;" +
+        "transition:border-color .15s ease,transform .15s ease";
+      const label = document.createElement("span");
+      label.textContent = option.label;
+      label.style.cssText =
+        "display:block;width:100%;padding:5px 0;background:rgba(0,0,0,.58);" +
+        "color:#fff;font-size:9px;font-weight:700;letter-spacing:.1px;" +
+        "text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.65);pointer-events:none";
+      btn.appendChild(label);
+      btn.addEventListener("click", () => {
+        if (current === option.value) return;
+        current = option.value;
+        options.forEach(paintButton);
+        onChange(current);
+      });
+      buttons[option.value] = btn;
+      paintButton(option);
+      wrap.appendChild(btn);
+    });
+  
+    return wrap;
+  }
+
   function makeDropdown(options, initial, onChange) {
     const select = document.createElement("select");
     select.style.cssText =
@@ -6271,11 +6352,11 @@
       wrap.appendChild(sectionLabel("Appearance"));
       const theme = getThemeSettings();
 
-      const styleSelector = makeSegmented(
+      const styleSelector = makeStylePreviews(
         [
-          { value: "neo", label: "Neo" },
-          { value: "modern", label: "Modern" },
-          { value: "classic", label: "Classic" },
+          { value: "neo", label: "Neo", palette: THEME_PALETTES.neo },
+          { value: "modern", label: "Modern", palette: THEME_PALETTES.modern },
+          { value: "classic", label: "Classic", palette: THEME_PALETTES.classic },
         ],
         theme.style,
         (style) => {
@@ -6284,7 +6365,7 @@
           renderSettingsView();
         },
       );
-      wrap.appendChild(settingsRow("Style", styleSelector));
+      wrap.appendChild(styleSelector);
 
       const colorSwatch = makeColorInput(settingsView, theme.accent, (hex) => {
         GM_setValue(THEME_ACCENT_KEY, hex);
