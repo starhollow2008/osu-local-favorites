@@ -2114,7 +2114,7 @@
     stopPlayback(audio);
   }
 
-    function swapAudioSourceToCached(audio, sourceUrl) {
+  function swapAudioSourceToCached(audio, sourceUrl) {
     const cachedBlob = getKnownCachedBlob(sourceUrl);
     if (!cachedBlob) return Promise.resolve(false);
   
@@ -5066,7 +5066,7 @@
     return select;
   }
 
-    function makeSlider(initialPct, onChange) {
+  function makeSlider(initialPct, onChange) {
     const wrap = document.createElement("div");
     wrap.style.cssText = "display:flex;align-items:center;gap:8px;flex-shrink:0;width:150px";
     const slider = document.createElement("input");
