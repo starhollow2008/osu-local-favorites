@@ -29,7 +29,7 @@ export const THEME_DEFAULTS = {
   activeOpacity: 0.8,
 };
 
-const THEME_PALETTES = {
+export const THEME_PALETTES = {
   neo: {
     accent: "#ff91bb",
     heartColor: "#ce7698",
