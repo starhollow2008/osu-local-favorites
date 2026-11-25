@@ -3,7 +3,7 @@
 // @namespace    https://github.com/starhollow2008/osu-local-favorites
 // @updateURL    https://github.com/starhollow2008/osu-local-favorites/raw/refs/heads/main/dist/osu-local-favorites.user.js
 // @downloadURL  https://github.com/starhollow2008/osu-local-favorites/raw/refs/heads/main/dist/osu-local-favorites.user.js
-// @version      6.2.0
+// @version      6.3.0
 // @icon         https://github.com/starhollow2008/osu-local-favorites/blob/main/icons/icon48.png?raw=true
 // @description  Store osu! beatmap favorites locally instead of on osu!'s servers. Works without sign-in.
 // @author       Starhollow2008 | FlareonGhh
@@ -620,50 +620,49 @@
   };
 
 const THEME_PALETTES = {
-    neo: {
-      colors: {
-        "panel-bg": "#111", surface: "#1a1a1a", "surface-alt": "#242424", "floating-button-bg": "rgba(17,17,17,0.95)",
-        divider: "#222", border: "#333", "border-strong": "#444",
-        "muted-strong": "#555", muted: "#666", "muted-soft": "#888",
-        secondary: "#999", "secondary-soft": "#aaa", "secondary-bright": "#bbb",
-        "text-soft": "#ccc", text: "#ddd", "text-bright": "#eee",
-        "header-bg": "#1a1a1a", "header-bg-low": "#1a1a1a", "nav-bg": "#242424", "stats-bg": "#333",
-        "surface-soft": "#242424", "bio-box": "#1a1a1a", "mode-active": "#ff91bb",
-        "section-bar": "#444", heading: "#ff91bb", label: "#ddd",
-        "username-link": "#ff91bb", "login-link": "#ff91bb", "nav-text": "#ddd",
-        "chart-line": "#ff91bb", "rank-ss": "#ce7698",
-      },
+  neo: {
+    colors: {
+      "panel-bg": "#111", surface: "#1a1a1a", "surface-alt": "#242424", "floating-button-bg": "rgba(17,17,17,0.95)",
+      divider: "#222", border: "#333", "border-strong": "#444",
+      "muted-strong": "#555", muted: "#666", "muted-soft": "#888",
+      secondary: "#999", "secondary-soft": "#aaa", "secondary-bright": "#bbb",
+      "text-soft": "#ccc", text: "#ddd", "text-bright": "#eee",
+      "header-bg": "#1a1a1a", "header-bg-low": "#1a1a1a", "nav-bg": "#242424", "stats-bg": "#333",
+      "surface-soft": "#242424", "bio-box": "#1a1a1a", "mode-active": "#ff91bb",
+      "section-bar": "#444", heading: "#ff91bb", label: "#ddd",
+      "username-link": "#ff91bb", "login-link": "#ff91bb", "nav-text": "#ddd",
+      "chart-line": "#ff91bb", "rank-ss": "#ce7698",
     },
-    modern: {
-      colors: {
-        "panel-bg": "#2a2226", surface: "#1c1719", "surface-alt": "#382e32", "floating-button-bg": "#2a2226",
-        divider: "#3d2932", border: "#46393f", "border-strong": "#ff66ab",
-        "muted-strong": "#d9a6bd", muted: "#d9a6bd", "muted-soft": "#d9a6bd",
-        secondary: "#d9a6bd", "secondary-soft": "#d9a6bd", "secondary-bright": "#ffffff",
-        "text-soft": "#ffffff", text: "#ffffff", "text-bright": "#ffffff",
-        "header-bg": "#2e1f25", "header-bg-low": "#2e1f25", "nav-bg": "#3d2932", "stats-bg": "#382e32",
-        "surface-soft": "#382e32", "bio-box": "#2a2226", "mode-active": "#46393f",
-        "section-bar": "#46393f", heading: "#ff66ab", label: "#ffffff",
-        "username-link": "#ff66ab", "login-link": "#ff66ab", "nav-text": "#d9a6bd",
-        "chart-line": "#ff66ab", "rank-ss": "#ce1c9d",
-      },
+  },
+  modern: {
+    colors: {
+      "panel-bg": "#2a2226", surface: "#382e32", "surface-alt": "#46393f", "floating-button-bg": "#2a2226",
+      divider: "#2a2226", border: "#514047", "border-strong": "#6b505c",
+      "muted-strong": "#c8b8bf", muted: "#b8a8af", "muted-soft": "#a9959e",
+      secondary: "#d9a6bd", "secondary-soft": "#c8b8bf", "secondary-bright": "#ffffff",
+      "text-soft": "#ffffff", text: "#ffffff", "text-bright": "#ffffff",
+      "header-bg": "#2e1f25", "header-bg-low": "#2e1f25", "nav-bg": "#382e32", "stats-bg": "#46393f",
+      "surface-soft": "#46393f", "bio-box": "#382e32", "mode-active": "#514047",
+      "section-bar": "#514047", heading: "#ff66ab", label: "#ffffff",
+      "username-link": "#ff66ab", "login-link": "#ff66ab", "nav-text": "#e0d5da",
+      "chart-line": "#ff66ab", "rank-ss": "#ce1c9d",
     },
-    classic: {
-      colors: {
-        "panel-bg": "#f8f7fc", surface: "#e7e5f3", "surface-alt": "#efedf7", "floating-button-bg": "#5f5f5f",
-        divider: "#d5d1e3", border: "#b9b4d1", "border-strong": "#958eaf",
-        "muted-strong": "#77718f", muted: "#706a89", "muted-soft": "#8882a1",
-        secondary: "#514a70", "secondary-soft": "#6d6789", "secondary-bright": "#514b80",
-        "text-soft": "#4e486b", text: "#403a5b", "text-bright": "#5a5480",
-        "header-bg": "#777cae", "header-bg-low": "#9599c4", "nav-bg": "#eee5f0", "stats-bg": "#c9c8e4",
-        "surface-soft": "#f2f0f9", "bio-box": "#e8e5f3", "mode-active": "#d2cee7",
-        "section-bar": "#b4afcc", heading: "#625c91", label: "#625b8c",
-        "username-link": "#4c5f9c", "login-link": "#4c5f9c", "nav-text": "#514a6b",
-        "chart-line": "#c27b50", "rank-ss": "#bd6c9a",
-      },
-    }
-  };
-
+  },
+  classic: {
+    colors: {
+      "panel-bg": "#e9e7e9", surface: "#dedbdf", "surface-alt": "#e5e2e6", "floating-button-bg": "#5f5f5f",
+      divider: "#d5d1d6", border: "#c5c0c8", "border-strong": "#aaa2ad",
+      "muted-strong": "#77717a", muted: "#77717a", "muted-soft": "#918a94",
+      secondary: "#625966", "secondary-soft": "#756b79", "secondary-bright": "#514956",
+      "text-soft": "#5e5762", text: "#49434d", "text-bright": "#38333c",
+      "header-bg": "#817985", "header-bg-low": "#a29aa5", "nav-bg": "#e3dfe4", "stats-bg": "#d3ced5",
+      "surface-soft": "#e7e3e8", "bio-box": "#e2dee4", "mode-active": "#d4cdd7",
+      "section-bar": "#c9c2cc", heading: "#75647a", label: "#655b6b",
+      "username-link": "#625c78", "login-link": "#625c78", "nav-text": "#514a56",
+      "chart-line": "#a97863", "rank-ss": "#aa718c",
+    },
+  }
+};
 function darkenHex(hex, amount = 0.25) {
     const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     if (!m) return hex;
