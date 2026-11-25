@@ -60,16 +60,16 @@ export const THEME_PALETTES = {
   },
   classic: {
     colors: {
-      "panel-bg": "#ffffff", surface: "#a9a9ff", "surface-alt": "#f0ecfa", "floating-button-bg": "#5f5f5f",
-      divider: "#bea8f4", border: "#5a539a", "border-strong": "#5f5f5f",
-      "muted-strong": "#5f5f5f", muted: "#5a539a", "muted-soft": "#3843a6",
-      secondary: "#4e2151", "secondary-soft": "#3843a6", "secondary-bright": "#3366ff",
-      "text-soft": "#4e2151", text: "#4e2151", "text-bright": "#3843a6",
-      "header-bg": "#666cbc", "header-bg-low": "#888adf", "nav-bg": "#ffd6f3", "stats-bg": "#8588dd",
-      "surface-soft": "#f5f2fe", "bio-box": "#e7e4fc", "mode-active": "#bea8f4",
-      "section-bar": "#5f5f5f", heading: "#5a539a", label: "#3843a6",
-      "username-link": "#3366ff", "login-link": "#0f72ff", "nav-text": "#4e2151",
-      "chart-line": "#ff7f0e", "rank-ss": "#ff5bac",
+      "panel-bg": "#f8f7fc", surface: "#e7e5f3", "surface-alt": "#efedf7", "floating-button-bg": "#5f5f5f",
+      divider: "#d5d1e3", border: "#b9b4d1", "border-strong": "#958eaf",
+      "muted-strong": "#77718f", muted: "#706a89", "muted-soft": "#8882a1",
+      secondary: "#514a70", "secondary-soft": "#6d6789", "secondary-bright": "#514b80",
+      "text-soft": "#4e486b", text: "#403a5b", "text-bright": "#5a5480",
+      "header-bg": "#777cae", "header-bg-low": "#9599c4", "nav-bg": "#eee5f0", "stats-bg": "#c9c8e4",
+      "surface-soft": "#f2f0f9", "bio-box": "#e8e5f3", "mode-active": "#d2cee7",
+      "section-bar": "#b4afcc", heading: "#625c91", label: "#625b8c",
+      "username-link": "#5367a8", "login-link": "#5d70b7", "nav-text": "#514a6b",
+      "chart-line": "#c27b50", "rank-ss": "#bd6c9a",
     },
   },
 };
@@ -112,6 +112,7 @@ export function applyTheme() {
   for (const [name, value] of Object.entries(palette.colors)) {
     root.setProperty(`--osu-fav-${name}`, value);
   }
+  root.setProperty("--osu-fav-floating-button-bg", palette.colors["floating-button-bg"]);
   root.setProperty("--osu-fav-accent", t.accent);
   root.setProperty("--osu-fav-accent-dark", darkenHex(t.accent));
   root.setProperty("--osu-fav-heart-color", t.heartColor);
