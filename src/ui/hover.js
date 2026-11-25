@@ -10,7 +10,7 @@
 //                                   diffs keys of both, so `out` only needs
 //                                   the properties `over` touches)
 //   hover.accent(el, opts)        - the panel's standard button hover
-//                                   (accent border+text, #333/#999 resting)
+//                                   (accent border+text, var(--osu-fav-border)/var(--osu-fav-secondary) resting)
 //
 // Everything returns the element, so it composes at construction sites:
 //   hover.accent(makeBtn("Clear")).addEventListener("click", ...)
@@ -45,6 +45,6 @@ hover.accent = function accent(el, guard) {
   return hover(
     el,
     () => { if (!guard || guard()) { el.style.borderColor = "var(--osu-fav-accent)"; el.style.color = "var(--osu-fav-accent)"; } },
-    () => { if (!guard || guard()) { el.style.borderColor = "#333"; el.style.color = "#999"; } },
+    () => { if (!guard || guard()) { el.style.borderColor = "var(--osu-fav-border)"; el.style.color = "var(--osu-fav-secondary)"; } },
   );
 };
