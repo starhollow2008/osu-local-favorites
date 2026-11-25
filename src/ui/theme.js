@@ -13,8 +13,10 @@ export const THEME_IDLE_OPACITY_KEY = "osu_theme_idle_opacity";
 export const THEME_IDLE_DIM_KEY = "osu_theme_idle_dim";
 export const THEME_HOVER_DIM_KEY = "osu_theme_hover_dim";
 export const THEME_ACTIVE_OPACITY_KEY = "osu_theme_active_opacity";
+export const THEME_STYLE_KEY = "osu_theme_style";
 
 export const THEME_DEFAULTS = {
+  style: "neo",
   // v6 palette: softer sakura accent and a deeper heart fill so favorited
   // hearts read as a distinct "filled" state against the pastel accent.
   // Both remain user-overridable in Settings; only the DEFAULTS changed -
@@ -27,6 +29,41 @@ export const THEME_DEFAULTS = {
   activeOpacity: 0.8,
 };
 
+const THEME_PALETTES = {
+  neo: {
+    accent: "#ff91bb",
+    heartColor: "#ce7698",
+    colors: {
+      "panel-bg": "#111", surface: "#1a1a1a", "surface-alt": "#242424",
+      divider: "#222", border: "#333", "border-strong": "#444",
+      "muted-strong": "#555", muted: "#666", "muted-soft": "#888",
+      secondary: "#999", "secondary-soft": "#aaa", "secondary-bright": "#bbb",
+      "text-soft": "#ccc", text: "#ddd", "text-bright": "#eee",
+    },
+  },
+  modern: {
+    accent: "#ff66aa",
+    heartColor: "#d94f91",
+    colors: {
+      "panel-bg": "#2b242c", surface: "#362b35", "surface-alt": "#443541",
+      divider: "#4c3a48", border: "#5b4856", "border-strong": "#70596a",
+      "muted-strong": "#977d90", muted: "#ae96a7", "muted-soft": "#c2afbd",
+      secondary: "#d0c0cc", "secondary-soft": "#dccfd9", "secondary-bright": "#e7dce5",
+      "text-soft": "#eee5ec", text: "#f5eff4", "text-bright": "#ffffff",
+    },
+  },
+  classic: {
+    accent: "#a64d83",
+    heartColor: "#8c3f70",
+    colors: {
+      "panel-bg": "#f3f0fb", surface: "#ffffff", "surface-alt": "#ece8f7",
+      divider: "#d8d1e8", border: "#c6bddb", "border-strong": "#afa4cf",
+      "muted-strong": "#9388aa", muted: "#827795", "muted-soft": "#766b8e",
+      secondary: "#6b607f", "secondary-soft": "#5f5573", "secondary-bright": "#504762",
+      "text-soft": "#453c59", text: "#38304b", "text-bright": "#2e273f",
+    },
+  },
+};
 // Simple hex darken for the accent's hover/pressed shade - keeps the same
 // ~-25% lightness relationship for any picked color (the original pair
 // was #ff66aa → #ff3377; the v6 default darkens equivalently).
@@ -39,9 +76,15 @@ function darkenHex(hex, amount = 0.25) {
 }
 
 export function getThemeSettings() {
+  const storedStyle = GM_getValue(THEME_STYLE_KEY, THEME_DEFAULTS.style);
+  const style = Object.prototype.hasOwnProperty.call(THEME_PALETTES, storedStyle)
+    ? storedStyle
+    : THEME_DEFAULTS.style;
+  const palette = THEME_PALETTES[style];
   return {
-    accent: GM_getValue(THEME_ACCENT_KEY, THEME_DEFAULTS.accent),
-    heartColor: GM_getValue(THEME_HEART_KEY, THEME_DEFAULTS.heartColor),
+    style,
+    accent: GM_getValue(THEME_ACCENT_KEY, palette.accent),
+    heartColor: GM_getValue(THEME_HEART_KEY, palette.heartColor),
     idleOpacity: GM_getValue(THEME_IDLE_OPACITY_KEY, THEME_DEFAULTS.idleOpacity),
     idleDim: GM_getValue(THEME_IDLE_DIM_KEY, THEME_DEFAULTS.idleDim),
     hoverDim: GM_getValue(THEME_HOVER_DIM_KEY, THEME_DEFAULTS.hoverDim),
@@ -55,6 +98,10 @@ export function getThemeSettings() {
 export function applyTheme() {
   const t = getThemeSettings();
   const root = document.documentElement.style;
+  const palette = THEME_PALETTES[t.style];
+  for (const [name, value] of Object.entries(palette.colors)) {
+    root.setProperty(`--osu-fav-${name}`, value);
+  }
   root.setProperty("--osu-fav-accent", t.accent);
   root.setProperty("--osu-fav-accent-dark", darkenHex(t.accent));
   root.setProperty("--osu-fav-heart-color", t.heartColor);
