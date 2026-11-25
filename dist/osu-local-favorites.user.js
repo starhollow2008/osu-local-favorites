@@ -5162,7 +5162,7 @@ function darkenHex(hex, amount = 0.25) {
   
       // A tiny page mockup, using the same background, header, navigation,
       // surfaces, stats, and text colors that applyTheme() puts on the panel.
-      const header = makeBlock(
+      makeBlock(
         btn,
         "height:12px;flex:0 0 12px;background:linear-gradient(to bottom," +
           colors["header-bg"] + "," + colors["header-bg-low"] + ")",
@@ -5177,7 +5177,7 @@ function darkenHex(hex, amount = 0.25) {
         "display:flex;flex:1;min-height:0;flex-direction:column;gap:2px;padding:3px;" +
           "box-sizing:border-box;background:" + colors["panel-bg"],
       );
-      const stats = makeBlock(
+      makeBlock(
         page,
         "height:9px;flex:0 0 9px;background:" + colors["stats-bg"] +
           ";border-radius:1px",
