@@ -1491,6 +1491,7 @@ export function createSettingsView(deps) {
       (style) => {
         GM_setValue(THEME_STYLE_KEY, style);
         applyTheme();
+        updateFloatingHeart();
         renderSettingsView();
       },
     );
