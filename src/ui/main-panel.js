@@ -108,10 +108,10 @@ export function showFavoritesPanel() {
     s.id = "osu-fav-panel-style";
     s.textContent =
       "#osu-fav-list::-webkit-scrollbar{width:4px}" +
-      "#osu-fav-list::-webkit-scrollbar-thumb{background:#333;border-radius:2px}" +
+      "#osu-fav-list::-webkit-scrollbar-thumb{background:var(--osu-fav-border);border-radius:2px}" +
       "#osu-fav-list::-webkit-scrollbar-thumb:hover{background:var(--osu-fav-accent)}" +
       "#osu-fav-settings::-webkit-scrollbar{width:4px}" +
-      "#osu-fav-settings::-webkit-scrollbar-thumb{background:#333;border-radius:2px}" +
+      "#osu-fav-settings::-webkit-scrollbar-thumb{background:var(--osu-fav-border);border-radius:2px}" +
       "#osu-fav-settings::-webkit-scrollbar-thumb:hover{background:var(--osu-fav-accent)}" +
       "@keyframes osuFavSlideDown{from{max-height:0;opacity:0;overflow:hidden}to{max-height:50px;opacity:1}}" +
       "@keyframes osuFavSlideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}" +
@@ -137,12 +137,12 @@ export function showFavoritesPanel() {
     width: "min(360px, 100vw)",
     height: "100vh",
     maxHeight: "100dvh",
-    background: "#111",
-    color: "#ddd",
+    background: "var(--osu-fav-panel-bg)",
+    color: "var(--osu-fav-text)",
     fontFamily:
       '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSize: "13px",
-    borderLeft: "1px solid #333",
+    borderLeft: "1px solid var(--osu-fav-border)",
     display: "flex",
     flexDirection: "column",
     overflow: "hidden",
@@ -165,7 +165,7 @@ export function showFavoritesPanel() {
     // Card
     const card = document.createElement("div");
     card.style.cssText =
-      "width:100%;max-width:280px;background:#111;border:1px solid #333;" +
+      "width:100%;max-width:280px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);" +
       "border-radius:4px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.7);" +
       "animation:osuFavSlideUp 0.2s ease-out";
 
@@ -194,26 +194,26 @@ export function showFavoritesPanel() {
 
     // Body
     const body = document.createElement("div");
-    body.style.cssText = "padding:14px;font-size:12px;color:#bbb;line-height:1.5";
+    body.style.cssText = "padding:14px;font-size:12px;color:var(--osu-fav-secondary-bright);line-height:1.5";
     body.innerHTML =
-      `<b style="color:#ddd">osu! Local Favorites</b> has a new version ready.<br>` +
+      `<b style="color:var(--osu-fav-text)">osu! Local Favorites</b> has a new version ready.<br>` +
       `Install it to get the latest fixes and features.`;
 
     // Footer
     const foot = document.createElement("div");
     foot.style.cssText =
       "display:flex;justify-content:flex-end;gap:6px;padding:10px 14px;" +
-      "border-top:1px solid #222;background:#1a1a1a";
+      "border-top:1px solid var(--osu-fav-divider);background:var(--osu-fav-surface)";
 
     const laterBtn = document.createElement("button");
     laterBtn.textContent = "Later";
     laterBtn.style.cssText =
-      "font-size:10px;padding:4px 10px;border:1px solid #333;border-radius:3px;" +
-      "background:transparent;color:#888;cursor:pointer;font-weight:500";
+      "font-size:10px;padding:4px 10px;border:1px solid var(--osu-fav-border);border-radius:3px;" +
+      "background:transparent;color:var(--osu-fav-muted-soft);cursor:pointer;font-weight:500";
     hover.props(
       laterBtn,
       { borderColor: "var(--osu-fav-accent)", color: "var(--osu-fav-accent)" },
-      { borderColor: "#333", color: "#888" },
+      { borderColor: "var(--osu-fav-border)", color: "var(--osu-fav-muted-soft)" },
     );
     laterBtn.addEventListener("click", () => {
       backdrop.remove();
@@ -244,7 +244,7 @@ export function showFavoritesPanel() {
   const header = document.createElement("div");
   Object.assign(header.style, {
     padding: "10px 14px 8px",
-    background: "#1a1a1a",
+    background: "var(--osu-fav-surface)",
     borderBottom: "2px solid var(--osu-fav-accent)",
     flex: "0 0 auto",
     minHeight: "0",
@@ -276,7 +276,7 @@ export function showFavoritesPanel() {
   settingsBtn.title = "Settings";
   settingsBtn.setAttribute("aria-label", "Settings");
   settingsBtn.style.cssText =
-    "background:none;border:1px solid #333;color:#999;cursor:pointer;width:34px;height:34px;min-width:34px;min-height:34px;max-width:34px;max-height:34px;padding:0;border-radius:3px;font-size:13px;flex:0 0 34px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;line-height:1";
+    "background:none;border:1px solid var(--osu-fav-border);color:var(--osu-fav-secondary);cursor:pointer;width:34px;height:34px;min-width:34px;min-height:34px;max-width:34px;max-height:34px;padding:0;border-radius:3px;font-size:13px;flex:0 0 34px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;line-height:1";
   hover.accent(settingsBtn, () => !settingsOpen);
   settingsBtn.addEventListener("click", () => setView(!settingsOpen));
 
@@ -285,7 +285,7 @@ export function showFavoritesPanel() {
   closeBtn.title = "Close";
   closeBtn.setAttribute("aria-label", "Close");
   closeBtn.style.cssText =
-    "background:none;border:1px solid #333;color:#999;cursor:pointer;width:34px;height:34px;min-width:34px;min-height:34px;max-width:34px;max-height:34px;padding:0;border-radius:3px;font-size:13px;line-height:1;flex:0 0 34px;box-sizing:border-box;display:flex;align-items:center;justify-content:center";
+    "background:none;border:1px solid var(--osu-fav-border);color:var(--osu-fav-secondary);cursor:pointer;width:34px;height:34px;min-width:34px;min-height:34px;max-width:34px;max-height:34px;padding:0;border-radius:3px;font-size:13px;line-height:1;flex:0 0 34px;box-sizing:border-box;display:flex;align-items:center;justify-content:center";
   closeBtn.addEventListener("click", () => {
     closeFilterMenu();
     clearFavoritesPanelAudio();
@@ -300,14 +300,14 @@ export function showFavoritesPanel() {
   searchInput.type = "text";
   searchInput.placeholder = "Search title, artist, mapper...";
   searchInput.style.cssText =
-    "width:100%;height:40px;min-height:40px;max-height:40px;box-sizing:border-box;padding:6px 10px;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;font-size:12px;outline:none;display:block";
+    "width:100%;height:40px;min-height:40px;max-height:40px;box-sizing:border-box;padding:6px 10px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);font-size:12px;outline:none;display:block";
   searchInput.addEventListener(
     "focus",
     () => (searchInput.style.borderColor = "var(--osu-fav-accent)"),
   );
   searchInput.addEventListener(
     "blur",
-    () => (searchInput.style.borderColor = "#333"),
+    () => (searchInput.style.borderColor = "var(--osu-fav-border)"),
   );
   // Debounced search: renderList() re-filters, re-sorts, and rebuilds the
   // whole visible list from scratch (chunked over rAF, but still). On a
@@ -349,15 +349,15 @@ export function showFavoritesPanel() {
     starLink.rel = "noopener";
     starLink.textContent = "Enjoying Local Favorites? Star it on GitHub";
     starLink.style.cssText =
-      "flex:1;color:#ddd;text-decoration:none;font-size:11px;line-height:1.4";
-    hover.props(starLink, { color: "var(--osu-fav-accent)" }, { color: "#ddd" });
+      "flex:1;color:var(--osu-fav-text);text-decoration:none;font-size:11px;line-height:1.4";
+    hover.props(starLink, { color: "var(--osu-fav-accent)" }, { color: "var(--osu-fav-text)" });
 
     const dismissBtn = document.createElement("button");
     dismissBtn.textContent = "\u2715";
     dismissBtn.title = "Dismiss";
     dismissBtn.style.cssText =
-      "background:none;border:none;color:#888;cursor:pointer;font-size:12px;padding:2px 4px;flex-shrink:0;line-height:1";
-    hover.props(dismissBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
+      "background:none;border:none;color:var(--osu-fav-muted-soft);cursor:pointer;font-size:12px;padding:2px 4px;flex-shrink:0;line-height:1";
+    hover.props(dismissBtn, { color: "var(--osu-fav-accent)" }, { color: "var(--osu-fav-muted-soft)" });
     dismissBtn.addEventListener("click", () => githubBanner.remove());
 
     githubBanner.append(starIcon, starLink, dismissBtn);
@@ -375,8 +375,8 @@ export function showFavoritesPanel() {
   const toolbar = document.createElement("div");
   toolbar.id = "osu-fav-toolbar";
   toolbar.style.cssText =
-    "display:flex;flex-direction:column;gap:5px;padding:6px 14px;background:#1a1a1a;" +
-    "border-bottom:1px solid #333;flex-shrink:0";
+    "display:flex;flex-direction:column;gap:5px;padding:6px 14px;background:var(--osu-fav-surface);" +
+    "border-bottom:1px solid var(--osu-fav-border);flex-shrink:0";
 
   const filterRow = document.createElement("div");
   filterRow.style.cssText =
@@ -384,7 +384,7 @@ export function showFavoritesPanel() {
 
   const CHIP_BASE =
     "font-size:10px;font-weight:500;padding:4px 6px;border:1px solid transparent;border-radius:3px;" +
-    "background:transparent;cursor:pointer;user-select:none;color:#666;white-space:nowrap;" +
+    "background:transparent;cursor:pointer;user-select:none;color:var(--osu-fav-muted);white-space:nowrap;" +
     "overflow:hidden;text-overflow:ellipsis;text-align:center;box-sizing:border-box;min-width:0;width:100%";
 
   // Every category is driven by the same descriptor list, so adding one is
@@ -394,7 +394,7 @@ export function showFavoritesPanel() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.title = cat.title;
-    btn.style.cssText = CHIP_BASE + ";border-color:#333;color:#999";
+    btn.style.cssText = CHIP_BASE + ";border-color:var(--osu-fav-border);color:var(--osu-fav-secondary)";
     btn.addEventListener("click", () => {
       showFilterMenu(
         btn,
@@ -452,8 +452,8 @@ export function showFavoritesPanel() {
       btn.style.borderColor = "var(--osu-fav-accent)";
     } else {
       btn.style.background = "transparent";
-      btn.style.color = "#999";
-      btn.style.borderColor = "#333";
+      btn.style.color = "var(--osu-fav-secondary)";
+      btn.style.borderColor = "var(--osu-fav-border)";
     }
   }
   function updateFilterBtns() {
@@ -464,20 +464,20 @@ export function showFavoritesPanel() {
   function makeBtn(label, extraStyle = "") {
     const btn = document.createElement("button");
     btn.textContent = label;
-    btn.style.cssText = `font-size:10px;padding:3px 7px;border:1px solid #333;border-radius:3px;background:transparent;color:#999;cursor:pointer;${extraStyle}`;
+    btn.style.cssText = `font-size:10px;padding:3px 7px;border:1px solid var(--osu-fav-border);border-radius:3px;background:transparent;color:var(--osu-fav-secondary);cursor:pointer;${extraStyle}`;
     hover.accent(btn);
     return btn;
   }
   const collectionsBtn = document.createElement("button");
   collectionsBtn.type = "button";
   collectionsBtn.title = "Filter by collection";
-  collectionsBtn.style.cssText = CHIP_BASE + ";border-color:#333;color:#999";
+  collectionsBtn.style.cssText = CHIP_BASE + ";border-color:var(--osu-fav-border);color:var(--osu-fav-secondary)";
   function updateCollectionsBtn() {
     if (!activeCollectionId) {
       collectionsBtn.textContent = "\ud83d\udcc1 All \u25be";
       collectionsBtn.style.background = "transparent";
-      collectionsBtn.style.color = "#999";
-      collectionsBtn.style.borderColor = "#333";
+      collectionsBtn.style.color = "var(--osu-fav-secondary)";
+      collectionsBtn.style.borderColor = "var(--osu-fav-border)";
       return;
     }
     const col = getCollections()[activeCollectionId];
@@ -511,9 +511,9 @@ export function showFavoritesPanel() {
   clearAllBtn.type = "button";
   clearAllBtn.textContent = "Clear all filters";
   clearAllBtn.style.cssText =
-    "width:100%;box-sizing:border-box;font-size:10px;padding:3px 6px;border:1px solid #333;" +
-    "border-radius:3px;background:transparent;color:#888;cursor:pointer";
-  hover.props(clearAllBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
+    "width:100%;box-sizing:border-box;font-size:10px;padding:3px 6px;border:1px solid var(--osu-fav-border);" +
+    "border-radius:3px;background:transparent;color:var(--osu-fav-muted-soft);cursor:pointer";
+  hover.props(clearAllBtn, { color: "var(--osu-fav-accent)" }, { color: "var(--osu-fav-muted-soft)" });
   clearAllBtn.addEventListener("click", () => {
     closeFilterMenu();
     filterState = makeEmptyFilterState();
@@ -572,9 +572,9 @@ export function showFavoritesPanel() {
   const footer = document.createElement("div");
   footer.id = "osu-fav-footer-status";
   footer.style.cssText =
-    "width:100%;height:29px;min-height:29px;max-height:29px;box-sizing:border-box;padding:6px 14px;border-top:1px solid #333;background:#1a1a1a;font-size:10px;line-height:15px;color:#555;text-align:center;cursor:pointer;user-select:none;overflow:hidden";
+    "width:100%;height:29px;min-height:29px;max-height:29px;box-sizing:border-box;padding:6px 14px;border-top:1px solid var(--osu-fav-border);background:var(--osu-fav-surface);font-size:10px;line-height:15px;color:var(--osu-fav-muted-strong);text-align:center;cursor:pointer;user-select:none;overflow:hidden";
   footer.addEventListener("click", () => setView(true));
-  hover.props(footer, { color: "var(--osu-fav-accent)" }, { color: "#555" });
+  hover.props(footer, { color: "var(--osu-fav-accent)" }, { color: "var(--osu-fav-muted-strong)" });
 
   function updateFooterStatus() {
     const token = GM_getValue(GH_TOKEN_KEY, "");
@@ -602,8 +602,8 @@ export function showFavoritesPanel() {
   nowPlayingBar.id = "osu-fav-nowplaying";
   nowPlayingBar.style.cssText =
     "display:none;position:relative;align-items:center;gap:9px;padding:7px 14px;" +
-    "height:74px;min-height:74px;max-height:74px;box-sizing:border-box;border-top:1px solid #333;" +
-    "border-bottom:1px solid #222;background:#1a1a1a;flex:0 0 74px;overflow:hidden;" +
+    "height:74px;min-height:74px;max-height:74px;box-sizing:border-box;border-top:1px solid var(--osu-fav-border);" +
+    "border-bottom:1px solid var(--osu-fav-divider);background:var(--osu-fav-surface);flex:0 0 74px;overflow:hidden;" +
     "box-shadow:0 -3px 12px rgba(0,0,0,.35);margin-top:0;padding-bottom:7px";
 
   // Album-art backdrop - subtle and blurred, so the bar visually inherits
@@ -625,7 +625,7 @@ export function showFavoritesPanel() {
   npThumb.className = "osu-fav-np-thumb";
   npThumb.style.cssText =
     "position:relative;z-index:2;width:42px;height:42px;border-radius:3px;object-fit:cover;" +
-    "background:#111;display:block;flex-shrink:0;border:1px solid rgba(255,255,255,.08)";
+    "background:var(--osu-fav-panel-bg);display:block;flex-shrink:0;border:1px solid rgba(255,255,255,.08)";
   npThumb.addEventListener("error", () => {
     npThumb.removeAttribute("src");
     npThumb.style.visibility = "hidden";
@@ -637,16 +637,16 @@ export function showFavoritesPanel() {
   const npTitle = document.createElement("div");
   npTitle.className = "osu-fav-np-title";
   npTitle.style.cssText =
-    "font-size:12px;color:#eee;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35";
+    "font-size:12px;color:var(--osu-fav-text-bright);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35";
   const npArtist = document.createElement("div");
   npArtist.className = "osu-fav-np-artist";
   npArtist.style.cssText =
-    "font-size:10px;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;line-height:1.25";
+    "font-size:10px;color:var(--osu-fav-secondary-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;line-height:1.25";
   npInfo.append(npTitle, npArtist);
 
   const npProgressWrap = document.createElement("div");
   npProgressWrap.style.cssText =
-    "position:absolute;left:0;right:0;bottom:0;height:2px;background:#111;overflow:hidden;z-index:4";
+    "position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--osu-fav-panel-bg);overflow:hidden;z-index:4";
   const npProgressBar = document.createElement("div");
   npProgressBar.style.cssText =
     "height:100%;width:0%;background:var(--osu-fav-accent);transition:width .05s linear";
@@ -664,7 +664,7 @@ export function showFavoritesPanel() {
     b.title = title;
     b.innerHTML = svgFn();
     b.style.cssText =
-      "background:rgba(17,17,17,.46);border:1px solid #333;border-radius:3px;color:#999;cursor:pointer;" +
+      "background:rgba(17,17,17,.46);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-secondary);cursor:pointer;" +
       "padding:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0";
     hover.accent(b, () => !b._active);
     return b;
@@ -672,8 +672,8 @@ export function showFavoritesPanel() {
 
   function setNpToggleActive(btn, active) {
     btn._active = active;
-    btn.style.borderColor = active ? "var(--osu-fav-accent)" : "#333";
-    btn.style.color = active ? "var(--osu-fav-accent)" : "#999";
+    btn.style.borderColor = active ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
+    btn.style.color = active ? "var(--osu-fav-accent)" : "var(--osu-fav-secondary)";
   }
 
   const npShuffleBtn = npIconBtn(shuffleSVG, "Shuffle");
@@ -729,8 +729,8 @@ export function showFavoritesPanel() {
       audio._activeBtn.innerHTML = playSVG();
       audio._activeBtn._playing = false;
       audio._activeBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
-      audio._activeBtn.style.borderColor = "#333";
-      audio._activeBtn.style.color = "#999";
+      audio._activeBtn.style.borderColor = "var(--osu-fav-border)";
+      audio._activeBtn.style.color = "var(--osu-fav-secondary)";
     }
     if (audio._activeBar) {
       audio._activeBar.parentElement.style.display = "none";
@@ -1134,8 +1134,8 @@ export function showFavoritesPanel() {
       btn.style.opacity = playing
         ? "var(--osu-fav-active-opacity, 0.8)"
         : "var(--osu-fav-idle-opacity, 0.15)";
-      btn.style.borderColor = playing ? "var(--osu-fav-accent)" : "#333";
-      btn.style.color = playing ? "var(--osu-fav-accent)" : "#999";
+      btn.style.borderColor = playing ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
+      btn.style.color = playing ? "var(--osu-fav-accent)" : "var(--osu-fav-secondary)";
     }
     if (barWrap) barWrap.style.display = !audio.paused ? "block" : "none";
     if (bar) {
@@ -1189,8 +1189,8 @@ export function showFavoritesPanel() {
     footer.style.display = showSettings ? "block" : "none";
     nowPlayingBar.style.display = !showSettings && npAudio.src && npAudio._npCurrentId ? "flex" : "none";
     bottomBar.setAttribute("data-view", showSettings ? "settings" : "favorites");
-    settingsBtn.style.color = showSettings ? "var(--osu-fav-accent)" : "#999";
-    settingsBtn.style.borderColor = showSettings ? "var(--osu-fav-accent)" : "#333";
+    settingsBtn.style.color = showSettings ? "var(--osu-fav-accent)" : "var(--osu-fav-secondary)";
+    settingsBtn.style.borderColor = showSettings ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
     settingsBtn.title = showSettings ? "Back to favorites" : "Settings";
     if (showSettings) {
       settings.render();
@@ -1214,9 +1214,9 @@ export function showFavoritesPanel() {
         approved: "#4caf50",
         pending: "#ff9800",
         wip: "#f44336",
-        graveyard: "#666",
+        graveyard: "var(--osu-fav-muted)",
         vip: "#f6c243",
-      }[s] || "#888"
+      }[s] || "var(--osu-fav-muted-soft)"
     );
   }
   function formatDate(iso) {
@@ -1359,7 +1359,7 @@ export function showFavoritesPanel() {
           }
           if (f.bpm) {
             const bpm = document.createElement("span");
-            bpm.style.cssText = "font-size:9px;color:#555";
+            bpm.style.cssText = "font-size:9px;color:var(--osu-fav-muted-strong)";
             bpm.textContent = `${f.bpm} BPM`;
             metaDiv.appendChild(bpm);
           }
@@ -1398,7 +1398,7 @@ export function showFavoritesPanel() {
         nimg.addEventListener("error", () => {
           nimg.remove();
           coverDiv.style.fontSize = "16px";
-          coverDiv.style.color = "#444";
+          coverDiv.style.color = "var(--osu-fav-border-strong)";
           coverDiv.insertBefore(document.createTextNode("?"), coverDiv.firstChild);
         });
         coverDiv.insertBefore(nimg, coverDiv.firstChild);
@@ -1410,8 +1410,8 @@ export function showFavoritesPanel() {
       if (addToCollBtn) {
         const n = collCounts.get(id) || 0;
         addToCollBtn.textContent = n ? `\u2713 ${n}` : "+ Playlist";
-        addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "#333";
-        addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "#666";
+        addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
+        addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "var(--osu-fav-muted)";
       }
     });
   }
@@ -1541,13 +1541,13 @@ export function showFavoritesPanel() {
     };
     if (Object.keys(favs).length === 0) {
       settleEmpty(
-        '<p style="text-align:center;color:#666;padding:40px 20px;font-size:12px">No favorites yet.</p>',
+        '<p style="text-align:center;color:var(--osu-fav-muted);padding:40px 20px;font-size:12px">No favorites yet.</p>',
       );
       return;
     }
     if (entries.length === 0) {
       settleEmpty(
-        '<p style="text-align:center;color:#666;padding:40px 20px;font-size:12px">No matches.</p>',
+        '<p style="text-align:center;color:var(--osu-fav-muted);padding:40px 20px;font-size:12px">No matches.</p>',
       );
       return;
     }
@@ -1561,13 +1561,13 @@ export function showFavoritesPanel() {
       card.dataset.favId = id;
       card.style.cssText =
         "display:flex;gap:8px;padding:8px 14px;border-bottom:1px solid #1e1e1e;align-items:center";
-      hover(card, () => (card.style.background = "#1a1a1a"), () => (card.style.background = ""));
+      hover(card, () => (card.style.background = "var(--osu-fav-surface)"), () => (card.style.background = ""));
 
       // Cover
       const coverUrl = favoriteCoverUrl(f, id);
       const coverEl = document.createElement("div");
       coverEl.style.cssText =
-        "position:relative;width:56px;height:42px;border-radius:2px;overflow:hidden;flex-shrink:0;background:#1a1a1a;display:flex;align-items:center;justify-content:center;cursor:pointer";
+        "position:relative;width:56px;height:42px;border-radius:2px;overflow:hidden;flex-shrink:0;background:var(--osu-fav-surface);display:flex;align-items:center;justify-content:center;cursor:pointer";
       if (coverUrl) {
         const img = document.createElement("img");
         // Don't set src yet - the IntersectionObserver will do it when the row
@@ -1578,7 +1578,7 @@ export function showFavoritesPanel() {
         img.addEventListener("error", () => {
           img.remove();
           coverEl.style.fontSize = "16px";
-          coverEl.style.color = "#444";
+          coverEl.style.color = "var(--osu-fav-border-strong)";
           // insertBefore instead of textContent= so dimOverlay & previewBtn
           // (appended after this block) are not destroyed
           coverEl.insertBefore(document.createTextNode("?"), coverEl.firstChild);
@@ -1586,7 +1586,7 @@ export function showFavoritesPanel() {
         coverEl.appendChild(img);
         imgObserver.observe(img);
       } else {
-        coverEl.style.cssText += ";font-size:16px;color:#444";
+        coverEl.style.cssText += ";font-size:16px;color:var(--osu-fav-border-strong)";
         coverEl.textContent = "?";
       }
 
@@ -1615,7 +1615,7 @@ export function showFavoritesPanel() {
       }
       const artistDiv = document.createElement("div");
       artistDiv.style.cssText =
-        "font-size:10px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;display:flex;align-items:center;gap:4px";
+        "font-size:10px;color:var(--osu-fav-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;display:flex;align-items:center;gap:4px";
       const artistText = document.createElement("span");
       artistText.style.cssText = "overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
       artistText.textContent = f.artist || f.artist_unicode || "";
@@ -1648,7 +1648,7 @@ export function showFavoritesPanel() {
       }
       if (f.bpm) {
         const bpm = document.createElement("span");
-        bpm.style.cssText = "font-size:9px;color:#555";
+        bpm.style.cssText = "font-size:9px;color:var(--osu-fav-muted-strong)";
         bpm.textContent = `${f.bpm} BPM`;
         metaDiv.appendChild(bpm);
       }
@@ -1658,7 +1658,7 @@ export function showFavoritesPanel() {
 
       const dateDiv = document.createElement("span");
       dateDiv.style.cssText =
-        "font-size:9px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
+        "font-size:9px;color:var(--osu-fav-muted-strong);overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
       dateDiv.textContent = formatDate(f.favourited_at);
 
       // Add-to-collection dropdown - sits right next to the date-added text.
@@ -1675,15 +1675,15 @@ export function showFavoritesPanel() {
         addToCollBtn.title = n
           ? `In ${n} collection${n > 1 ? "s" : ""} - click to manage`
           : "Add to a collection";
-        addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "#333";
-        addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "#666";
+        addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
+        addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "var(--osu-fav-muted)";
       }
       addToCollBtn.style.cssText =
         "font-size:8px;font-weight:600;padding:1px 5px;border-radius:2px;flex-shrink:0;cursor:pointer;background:transparent";
       refreshAddToCollBtn();
       // Style refresh already read the count; reuse it instead of a second scan.
       const _collN = collCount();
-      addToCollBtn.style.border = `1px solid ${_collN ? "var(--osu-fav-accent)" : "#333"}`;
+      addToCollBtn.style.border = `1px solid ${_collN ? "var(--osu-fav-accent)" : "var(--osu-fav-border)"}`;
       addToCollBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         showAddToCollectionMenu(addToCollBtn, id, () => {
@@ -1694,8 +1694,8 @@ export function showFavoritesPanel() {
           addToCollBtn.title = n
             ? `In ${n} collection${n > 1 ? "s" : ""} - click to manage`
             : "Add to a collection";
-          addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "#333";
-          addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "#666";
+          addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
+          addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "var(--osu-fav-muted)";
           // Membership changed - if a collection filter is active, this
           // card may need to appear/disappear from the visible list.
           if (activeCollectionId) renderList();
@@ -1707,7 +1707,7 @@ export function showFavoritesPanel() {
       // Progress bar (shown during playback)
       const progressWrap = document.createElement("div");
       progressWrap.className = "osu-fav-progress-wrap";
-      progressWrap.style.cssText = "height:2px;background:#333;border-radius:1px;margin-top:3px;overflow:hidden;display:none";
+      progressWrap.style.cssText = "height:2px;background:var(--osu-fav-border);border-radius:1px;margin-top:3px;overflow:hidden;display:none";
       const progressBar = document.createElement("div");
       progressBar.className = "osu-fav-progress-bar";
       progressBar.style.cssText = "height:100%;width:0%;background:var(--osu-fav-accent);border-radius:1px";
@@ -1727,7 +1727,7 @@ export function showFavoritesPanel() {
       openLink.target = "_blank";
       openLink.textContent = "Open";
       openLink.style.cssText =
-        "font-size:10px;padding:4px 8px;border:1px solid #333;border-radius:2px;color:#999;text-decoration:none;text-align:center;display:block;white-space:nowrap";
+        "font-size:10px;padding:4px 8px;border:1px solid var(--osu-fav-border);border-radius:2px;color:var(--osu-fav-secondary);text-decoration:none;text-align:center;display:block;white-space:nowrap";
       hover.accent(openLink);
 
       // If a default mirror is configured (Settings → Download Mirrors)
@@ -1751,7 +1751,7 @@ export function showFavoritesPanel() {
         if (opts.length === 1) soleOption = opts[0];
       }
       const downloadStyle =
-        "font-size:10px;padding:4px 8px;border:1px solid #333;border-radius:2px;background:none;color:#999;" +
+        "font-size:10px;padding:4px 8px;border:1px solid var(--osu-fav-border);border-radius:2px;background:none;color:var(--osu-fav-secondary);" +
         "cursor:pointer;text-align:center;white-space:nowrap;width:100%;text-decoration:none;display:block;box-sizing:border-box";
 
       let downloadLink;
@@ -1781,12 +1781,12 @@ export function showFavoritesPanel() {
       const removeBtn = document.createElement("button");
       removeBtn.textContent = "Remove";
       removeBtn.style.cssText =
-        "font-size:10px;padding:4px 8px;border:1px solid #333;border-radius:2px;background:none;color:#999;cursor:pointer;white-space:nowrap";
+        "font-size:10px;padding:4px 8px;border:1px solid var(--osu-fav-border);border-radius:2px;background:none;color:var(--osu-fav-secondary);cursor:pointer;white-space:nowrap";
       // Remove is the one destructive control - red hover, not accent.
       hover.props(
         removeBtn,
         { borderColor: "#e55", color: "#e55" },
-        { borderColor: "#333", color: "#999" },
+        { borderColor: "var(--osu-fav-border)", color: "var(--osu-fav-secondary)" },
       );
       removeBtn.addEventListener("click", () => {
         const favs = getFavorites();
@@ -1820,8 +1820,8 @@ export function showFavoritesPanel() {
       previewBtn.title = "Preview audio";
       previewBtn.style.cssText =
         "position:absolute;inset:0;margin:auto;width:fit-content;height:fit-content;" +
-        "font-size:11px;padding:2px 6px;border:1px solid #333;border-radius:2px;" +
-        "background:none;color:#999;cursor:pointer;text-align:center;line-height:1;" +
+        "font-size:11px;padding:2px 6px;border:1px solid var(--osu-fav-border);border-radius:2px;" +
+        "background:none;color:var(--osu-fav-secondary);cursor:pointer;text-align:center;line-height:1;" +
         "opacity:var(--osu-fav-idle-opacity, 0.15);transition:opacity 0.15s";
 
       // Show/hide button on cover hover; restore the resting look on leave.
@@ -1838,8 +1838,8 @@ export function showFavoritesPanel() {
         () => {
           if (!previewBtn._playing) {
             previewBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
-            previewBtn.style.borderColor = "#333";
-            previewBtn.style.color = "#999";
+            previewBtn.style.borderColor = "var(--osu-fav-border)";
+            previewBtn.style.color = "var(--osu-fav-secondary)";
             dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-idle-dim, 0))";
           }
         },
@@ -1861,8 +1861,8 @@ export function showFavoritesPanel() {
             previewBtn.innerHTML = playSVG();
             previewBtn._playing = false;
             previewBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
-            previewBtn.style.borderColor = "#333";
-            previewBtn.style.color = "#999";
+            previewBtn.style.borderColor = "var(--osu-fav-border)";
+            previewBtn.style.color = "var(--osu-fav-secondary)";
             dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-idle-dim, 0))";
           } else {
             // Re-link the bar/dim to this card every time we (re)start
@@ -2030,7 +2030,7 @@ export function showFavoritesPanel() {
   bottomBar.id = "osu-fav-bottom-bar";
   bottomBar.style.cssText =
     "position:absolute;left:0;right:0;bottom:0;z-index:20;overflow:hidden;" +
-    "background:#1a1a1a;box-shadow:0 -3px 12px rgba(0,0,0,.35);" +
+    "background:var(--osu-fav-surface);box-shadow:0 -3px 12px rgba(0,0,0,.35);" +
     "padding-bottom:0;box-sizing:border-box;min-height:0;height:auto;";
   bottomBar.append(nowPlayingBar, footer);
   panel.append(header, ...(githubBanner ? [githubBanner] : []), toolbar, contentArea, bottomBar);
