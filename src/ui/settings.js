@@ -1378,6 +1378,7 @@ export function createSettingsView(deps) {
       (style) => {
         GM_setValue(THEME_STYLE_KEY, style);
         applyTheme();
+        renderSettingsView();
       },
     );
     wrap.appendChild(settingsRow("Style", styleSelector));
