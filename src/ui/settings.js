@@ -1444,6 +1444,7 @@ export function createSettingsView(deps) {
       "width:100%;box-sizing:border-box;text-align:center;padding:6px;margin-top:6px",
     );
     resetThemeBtn.addEventListener("click", () => {
+      GM_setValue(THEME_STYLE_KEY, THEME_DEFAULTS.style);
       GM_setValue(THEME_ACCENT_KEY, THEME_DEFAULTS.accent);
       GM_setValue(THEME_HEART_KEY, THEME_DEFAULTS.heartColor);
       GM_setValue(THEME_IDLE_OPACITY_KEY, THEME_DEFAULTS.idleOpacity);
