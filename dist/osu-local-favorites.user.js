@@ -607,14 +607,52 @@
   const THEME_IDLE_DIM_KEY = "osu_theme_idle_dim";
   const THEME_HOVER_DIM_KEY = "osu_theme_hover_dim";
   const THEME_ACTIVE_OPACITY_KEY = "osu_theme_active_opacity";
+  const THEME_STYLE_KEY = "osu_theme_style";
 
   const THEME_DEFAULTS = {
+    style: "neo",
     accent: "#ff91bb",
     heartColor: "#ce7698",
     idleOpacity: 0.15,
     idleDim: 0,
     hoverDim: 0.65,
     activeOpacity: 0.8,
+  };
+
+  const THEME_PALETTES = {
+    neo: {
+      accent: "#ff91bb",
+      heartColor: "#ce7698",
+      colors: {
+        "panel-bg": "#111", surface: "#1a1a1a", "surface-alt": "#242424",
+        divider: "#222", border: "#333", "border-strong": "#444",
+        "muted-strong": "#555", muted: "#666", "muted-soft": "#888",
+        secondary: "#999", "secondary-soft": "#aaa", "secondary-bright": "#bbb",
+        "text-soft": "#ccc", text: "#ddd", "text-bright": "#eee",
+      },
+    },
+    modern: {
+      accent: "#ff66aa",
+      heartColor: "#d94f91",
+      colors: {
+        "panel-bg": "#2b242c", surface: "#362b35", "surface-alt": "#443541",
+        divider: "#4c3a48", border: "#5b4856", "border-strong": "#70596a",
+        "muted-strong": "#977d90", muted: "#ae96a7", "muted-soft": "#c2afbd",
+        secondary: "#d0c0cc", "secondary-soft": "#dccfd9", "secondary-bright": "#e7dce5",
+        "text-soft": "#eee5ec", text: "#f5eff4", "text-bright": "#ffffff",
+      },
+    },
+    classic: {
+      accent: "#a64d83",
+      heartColor: "#8c3f70",
+      colors: {
+        "panel-bg": "#f3f0fb", surface: "#ffffff", "surface-alt": "#ece8f7",
+        divider: "#d8d1e8", border: "#c6bddb", "border-strong": "#afa4cf",
+        "muted-strong": "#9388aa", muted: "#827795", "muted-soft": "#766b8e",
+        secondary: "#6b607f", "secondary-soft": "#5f5573", "secondary-bright": "#504762",
+        "text-soft": "#453c59", text: "#38304b", "text-bright": "#2e273f",
+      },
+    },
   };
 
   function darkenHex(hex, amount = 0.25) {
@@ -626,19 +664,21 @@
   }
 
   function getThemeSettings() {
-    return {
-      accent: GM_getValue(THEME_ACCENT_KEY, THEME_DEFAULTS.accent),
-      heartColor: GM_getValue(THEME_HEART_KEY, THEME_DEFAULTS.heartColor),
-      idleOpacity: GM_getValue(THEME_IDLE_OPACITY_KEY, THEME_DEFAULTS.idleOpacity),
-      idleDim: GM_getValue(THEME_IDLE_DIM_KEY, THEME_DEFAULTS.idleDim),
-      hoverDim: GM_getValue(THEME_HOVER_DIM_KEY, THEME_DEFAULTS.hoverDim),
-      activeOpacity: GM_getValue(THEME_ACTIVE_OPACITY_KEY, THEME_DEFAULTS.activeOpacity),
-    };
-  }
-
-  function applyTheme() {
+    const storedStyle = GM_getValue(THEME_STYLE_KEY, THEME_DEFAULTS.style);
+    const style = Object.prototype.hasOwnProperty.call(THEME_PALETTES, storedStyle)
+      ? storedStyle
+      : THEME_DEFAULTS.style;
+    const palette = THEME_PALETTES[style];
+    const storedAccent = GM_getValue(THEME_ACCENT_KEY, null);
+    const storedHeartColor = GM_getValue(THEME_HEART_KEY, null);
+    const isPresetColor = (value, key) =>
+      value == null || Object.values(THEME_PALETTES).some((preset) => preset[  function applyTheme() {
     const t = getThemeSettings();
     const root = document.documentElement.style;
+    const palette = THEME_PALETTES[t.style];
+    for (const [name, value] of Object.entries(palette.colors)) {
+      root.setProperty(`--osu-fav-${name}`, value);
+    }
     root.setProperty("--osu-fav-accent", t.accent);
     root.setProperty("--osu-fav-accent-dark", darkenHex(t.accent));
     root.setProperty("--osu-fav-heart-color", t.heartColor);
@@ -698,7 +738,7 @@
     return hover(
       el,
       () => { if (!guard || guard()) { el.style.borderColor = "var(--osu-fav-accent)"; el.style.color = "var(--osu-fav-accent)"; } },
-      () => { if (!guard || guard()) { el.style.borderColor = "#333"; el.style.color = "#999"; } },
+      () => { if (!guard || guard()) { el.style.borderColor = "var(--osu-fav-border)"; el.style.color = "var(--osu-fav-secondary)"; } },
     );
   };
   // ━━━━━━━━━━ src/data/mirrors.js ━━━━━━━━━━
@@ -2091,8 +2131,8 @@
       audio._activeBtn.innerHTML = playSVG();
       audio._activeBtn._playing = false;
       audio._activeBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
-      audio._activeBtn.style.borderColor = "#333";
-      audio._activeBtn.style.color = "#999";
+      audio._activeBtn.style.borderColor = "var(--osu-fav-border)";
+      audio._activeBtn.style.color = "var(--osu-fav-secondary)";
     }
     if (audio._activeBar) {
       if (audio._activeBar.parentElement) audio._activeBar.parentElement.style.display = "none";
@@ -2452,7 +2492,7 @@
     menu._anchor = anchorEl;
     menu.style.cssText =
       "position:fixed;z-index:100002;" + css +
-      "background:#1a1a1a;border:1px solid #333;border-radius:4px;" +
+      "background:var(--osu-fav-surface);border:1px solid var(--osu-fav-border);border-radius:4px;" +
       "box-shadow:0 4px 16px rgba(0,0,0,.5);padding:4px;" +
       "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif";
 
@@ -2519,7 +2559,7 @@
 
     if (options.length === 0) {
       const empty = document.createElement("div");
-      empty.style.cssText = "font-size:11px;color:#666;padding:8px 10px;line-height:1.4";
+      empty.style.cssText = "font-size:11px;color:var(--osu-fav-muted);padding:8px 10px;line-height:1.4";
       empty.textContent = "No download source available - enable a mirror in Settings.";
       menu.appendChild(empty);
     } else {
@@ -2530,12 +2570,12 @@
         row.rel = "noopener";
         row.textContent = opt.label;
         row.style.cssText =
-          "display:block;padding:6px 10px;font-size:11px;color:#ddd;text-decoration:none;" +
+          "display:block;padding:6px 10px;font-size:11px;color:var(--osu-fav-text);text-decoration:none;" +
           "border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
         hover.props(
           row,
           { background: "var(--osu-fav-accent)", color: "#fff" },
-          { background: "transparent", color: "#ddd" },
+          { background: "transparent", color: "var(--osu-fav-text)" },
         );
         row.addEventListener("click", cleanup);
         menu.appendChild(row);
@@ -2603,14 +2643,14 @@
     let sections = config.collect() || [];
 
     const hint = document.createElement("div");
-    hint.style.cssText = "font-size:9px;color:#666;padding:2px 6px 6px;line-height:1.4";
+    hint.style.cssText = "font-size:9px;color:var(--osu-fav-muted);padding:2px 6px 6px;line-height:1.4";
     hint.textContent = config.hint || "Tap: include (green) \u2192 exclude (red) \u2192 off";
     menu.appendChild(hint);
 
     if (config.sortOptions && config.sortOptions.length && config.onSortSelect) {
       const sortLabel = document.createElement("div");
       sortLabel.style.cssText =
-        "font-size:9px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.03em;padding:0 6px 3px";
+        "font-size:9px;font-weight:700;color:var(--osu-fav-muted);text-transform:uppercase;letter-spacing:.03em;padding:0 6px 3px";
       sortLabel.textContent = "Sort";
       menu.appendChild(sortLabel);
 
@@ -2620,9 +2660,9 @@
       const paintSort = () => {
         sortBtnEls.forEach((b) => {
           const on = config.isSortActive && config.sortAsc === b._asc;
-          b.style.borderColor = on ? "var(--osu-fav-accent)" : "#333";
+          b.style.borderColor = on ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
           b.style.background = on ? "var(--osu-fav-accent)" : "transparent";
-          b.style.color = on ? "#fff" : "#999";
+          b.style.color = on ? "#fff" : "var(--osu-fav-secondary)";
         });
       };
       config.sortOptions.forEach((opt) => {
@@ -2632,7 +2672,7 @@
         sBtn.textContent = opt.label;
         sBtn.style.cssText =
           "flex:1;min-width:0;font-size:10px;font-weight:500;padding:4px 4px;border-radius:3px;" +
-          "cursor:pointer;box-sizing:border-box;border:1px solid #333;background:transparent;color:#999";
+          "cursor:pointer;box-sizing:border-box;border:1px solid var(--osu-fav-border);background:transparent;color:var(--osu-fav-secondary)";
         sBtn.addEventListener("click", () => {
           if (config.isSortActive && config.sortAsc === opt.asc) return;
           config.isSortActive = true;
@@ -2647,7 +2687,7 @@
       menu.appendChild(sortRow);
 
       const sortDivider = document.createElement("div");
-      sortDivider.style.cssText = "height:1px;background:#333;margin:0 2px 6px";
+      sortDivider.style.cssText = "height:1px;background:var(--osu-fav-border);margin:0 2px 6px";
       menu.appendChild(sortDivider);
     }
 
@@ -2657,7 +2697,7 @@
       searchBox.type = "text";
       searchBox.placeholder = config.placeholder || "Filter list...";
       searchBox.style.cssText =
-        "width:100%;box-sizing:border-box;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;" +
+        "width:100%;box-sizing:border-box;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);" +
         "font-size:10px;padding:4px 6px;outline:none;margin-bottom:4px";
       searchBox.addEventListener("click", (e) => e.stopPropagation());
       searchBox.addEventListener("keydown", (e) => e.stopPropagation());
@@ -2670,7 +2710,7 @@
     function styleForState(s) {
       if (s === "include") return { bg: "#215a2b", border: "#3fa54a", color: "#fff" };
       if (s === "exclude") return { bg: "#5a2121", border: "#c0392b", color: "#fff" };
-      return { bg: "transparent", border: "#333", color: "#ccc" };
+      return { bg: "transparent", border: "var(--osu-fav-border)", color: "var(--osu-fav-text-soft)" };
     }
 
     function makeRow(term) {
@@ -2724,7 +2764,7 @@
         if (section.label) {
           const label = document.createElement("div");
           label.style.cssText =
-            "font-size:9px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.03em;padding:5px 8px 2px";
+            "font-size:9px;font-weight:700;color:var(--osu-fav-muted);text-transform:uppercase;letter-spacing:.03em;padding:5px 8px 2px";
           label.textContent = section.label;
           frag.appendChild(label);
         }
@@ -2733,12 +2773,12 @@
 
       if (!shownAny) {
         const empty = document.createElement("div");
-        empty.style.cssText = "font-size:11px;color:#666;padding:8px 10px";
+        empty.style.cssText = "font-size:11px;color:var(--osu-fav-muted);padding:8px 10px";
         empty.textContent = q ? "No matches." : config.emptyText || "Nothing to filter yet.";
         frag.appendChild(empty);
       } else if (hiddenTotal > 0) {
         const note = document.createElement("div");
-        note.style.cssText = "font-size:9px;color:#555;padding:5px 8px;line-height:1.4";
+        note.style.cssText = "font-size:9px;color:var(--osu-fav-muted-strong);padding:5px 8px;line-height:1.4";
         note.textContent = `+${hiddenTotal} more - type to narrow`;
         frag.appendChild(note);
       }
@@ -2753,7 +2793,7 @@
     const hasTerms = sections.some((s) => s.terms && s.terms.length);
     if (hasTerms) {
       const divider = document.createElement("div");
-      divider.style.cssText = "height:1px;background:#333;margin:4px 2px";
+      divider.style.cssText = "height:1px;background:var(--osu-fav-border);margin:4px 2px";
       menu.appendChild(divider);
 
       const clearBtn = document.createElement("button");
@@ -2761,7 +2801,7 @@
       clearBtn.textContent = config.clearLabel || "Clear this filter";
       clearBtn.style.cssText =
         "display:block;width:100%;text-align:center;padding:5px 8px;font-size:10px;box-sizing:border-box;" +
-      hover.props(clearBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
+      hover.props(clearBtn, { color: "var(--osu-fav-accent)" }, { color: "var(--osu-fav-muted-soft)" });
       clearBtn.addEventListener("click", () => {
         Object.keys(state).forEach((k) => delete state[k]);
         onApply({});
@@ -3067,7 +3107,7 @@
       allRow.style.cssText =
         `display:block;width:100%;text-align:left;padding:6px 10px;margin-bottom:2px;font-size:11px;border:none;` +
         `border-radius:3px;cursor:pointer;box-sizing:border-box;` +
-      hover(allRow, () => { if (activeId) allRow.style.background = "#242424"; }, () => { if (activeId) allRow.style.background = "transparent"; });
+      hover(allRow, () => { if (activeId) allRow.style.background = "var(--osu-fav-surface-alt)"; }, () => { if (activeId) allRow.style.background = "transparent"; });
       allRow.addEventListener("click", () => { onSelect(""); cleanup(); });
       menu.appendChild(allRow);
 
@@ -3076,7 +3116,7 @@
 
       if (entries.length === 0) {
         const empty = document.createElement("div");
-        empty.style.cssText = "font-size:11px;color:#666;padding:8px 10px;line-height:1.4";
+        empty.style.cssText = "font-size:11px;color:var(--osu-fav-muted);padding:8px 10px;line-height:1.4";
         empty.textContent = "No collections yet - create one below.";
         menu.appendChild(empty);
       }
@@ -3091,8 +3131,8 @@
         selectBtn.style.cssText =
           `flex:1;min-width:0;text-align:left;padding:6px 10px;font-size:11px;border:none;border-radius:3px;` +
           `cursor:pointer;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;` +
-          `background:${activeId === id ? "var(--osu-fav-accent)" : "transparent"};color:${activeId === id ? "#fff" : "#ddd"}`;
-        hover(selectBtn, () => { if (activeId !== id) selectBtn.style.background = "#242424"; }, () => { if (activeId !== id) selectBtn.style.background = "transparent"; });
+          `background:${activeId === id ? "var(--osu-fav-accent)" : "transparent"};color:${activeId === id ? "#fff" : "var(--osu-fav-text)"}`;
+        hover(selectBtn, () => { if (activeId !== id) selectBtn.style.background = "var(--osu-fav-surface-alt)"; }, () => { if (activeId !== id) selectBtn.style.background = "transparent"; });
         selectBtn.addEventListener("click", () => { onSelect(activeId === id ? "" : id); cleanup(); });
 
         const delBtn = document.createElement("button");
@@ -3100,7 +3140,7 @@
         delBtn.textContent = "\u2715";
         delBtn.title = "Delete collection";
         delBtn.style.cssText =
-          "flex-shrink:0;font-size:9px;padding:3px 5px;border:1px solid #333;border-radius:3px;background:transparent;color:#666;cursor:pointer";
+          "flex-shrink:0;font-size:9px;padding:3px 5px;border:1px solid var(--osu-fav-border);border-radius:3px;background:transparent;color:var(--osu-fav-muted);cursor:pointer";
         let confirming = false;
         delBtn.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -3113,8 +3153,8 @@
               if (confirming) {
                 confirming = false;
                 delBtn.textContent = "\u2715";
-                delBtn.style.borderColor = "#333";
-                delBtn.style.color = "#666";
+                delBtn.style.borderColor = "var(--osu-fav-border)";
+                delBtn.style.color = "var(--osu-fav-muted)";
               }
             }, 3000);
           } else {
@@ -3129,7 +3169,7 @@
       });
 
       const divider = document.createElement("div");
-      divider.style.cssText = "height:1px;background:#333;margin:4px 2px";
+      divider.style.cssText = "height:1px;background:var(--osu-fav-border);margin:4px 2px";
       menu.appendChild(divider);
 
       const newRow = document.createElement("div");
@@ -3138,7 +3178,7 @@
       input.type = "text";
       input.placeholder = "New collection...";
       input.style.cssText =
-        "flex:1;min-width:0;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;" +
+        "flex:1;min-width:0;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);" +
         "font-size:10px;padding:4px 6px;outline:none;box-sizing:border-box";
       input.addEventListener("click", (e) => e.stopPropagation());
       input.addEventListener("keydown", (e) => {
@@ -3177,7 +3217,7 @@
 
       if (entries.length === 0) {
         const empty = document.createElement("div");
-        empty.style.cssText = "font-size:11px;color:#666;padding:8px 10px;line-height:1.4";
+        empty.style.cssText = "font-size:11px;color:var(--osu-fav-muted);padding:8px 10px;line-height:1.4";
         empty.textContent = "No collections yet - create one below.";
         menu.appendChild(empty);
       } else {
@@ -3187,9 +3227,9 @@
           row.type = "button";
           row.style.cssText =
             "display:flex;align-items:center;gap:6px;width:100%;text-align:left;padding:6px 10px;" +
-            "font-size:11px;color:#ddd;background:transparent;border:none;border-radius:3px;cursor:pointer;" +
+            "font-size:11px;color:var(--osu-fav-text);background:transparent;border:none;border-radius:3px;cursor:pointer;" +
             "white-space:nowrap;box-sizing:border-box";
-          hover(row, () => (row.style.background = "#242424"), () => (row.style.background = "transparent"));
+          hover(row, () => (row.style.background = "var(--osu-fav-surface-alt)"), () => (row.style.background = "transparent"));
 
           const check = document.createElement("span");
           check.textContent = inCol ? "\u2713" : "";
@@ -3210,7 +3250,7 @@
       }
 
       const divider = document.createElement("div");
-      divider.style.cssText = "height:1px;background:#333;margin:4px 2px";
+      divider.style.cssText = "height:1px;background:var(--osu-fav-border);margin:4px 2px";
       menu.appendChild(divider);
 
       const newRow = document.createElement("div");
@@ -3219,7 +3259,7 @@
       input.type = "text";
       input.placeholder = "New collection...";
       input.style.cssText =
-        "flex:1;min-width:0;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;" +
+        "flex:1;min-width:0;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);" +
         "font-size:10px;padding:4px 6px;outline:none;box-sizing:border-box";
       input.addEventListener("click", (e) => e.stopPropagation());
       input.addEventListener("keydown", (e) => {
@@ -4742,7 +4782,7 @@
     ind._lastDragging = dragging;
     ind.innerHTML = heartSVG(fav);
     ind.style.background = "rgba(17,17,17,0.95)";
-    ind.style.border = fav ? "1px solid var(--osu-fav-accent)" : "1px solid #333";
+    ind.style.border = fav ? "1px solid var(--osu-fav-accent)" : "1px solid var(--osu-fav-border)";
     ind.style.boxShadow = "none";
     ind.style.opacity = dragging ? "0.85" : "";
   }
@@ -4994,7 +5034,7 @@
 
   function divider() {
     const d = document.createElement("div");
-    d.style.cssText = "height:1px;background:#222;margin:4px 0";
+    d.style.cssText = "height:1px;background:var(--osu-fav-divider);margin:4px 0";
     return d;
   }
 
@@ -5005,12 +5045,12 @@
     const left = document.createElement("div");
     left.style.cssText = "flex:1;min-width:0";
     const lbl = document.createElement("div");
-    lbl.style.cssText = "font-size:11px;color:#ddd;font-weight:500";
+    lbl.style.cssText = "font-size:11px;color:var(--osu-fav-text);font-weight:500";
     lbl.textContent = labelText;
     left.appendChild(lbl);
     if (subtitleText) {
       const sub = document.createElement("div");
-      sub.style.cssText = "font-size:10px;color:#666;margin-top:2px;line-height:1.4";
+      sub.style.cssText = "font-size:10px;color:var(--osu-fav-muted);margin-top:2px;line-height:1.4";
       if (typeof subtitleText === "string") sub.textContent = subtitleText;
       else sub.appendChild(subtitleText);
       left.appendChild(sub);
@@ -5023,14 +5063,14 @@
     const wrap = document.createElement("button");
     wrap.type = "button";
     let on = initialOn;
-    wrap.style.cssText = `position:relative;width:34px;height:18px;border-radius:9px;flex-shrink:0;padding:0;cursor:pointer;border:1px solid ${on ? "var(--osu-fav-accent)" : "#333"};background:${on ? "var(--osu-fav-accent)" : "#222"};transition:background .15s,border-color .15s`;
+    wrap.style.cssText = `position:relative;width:34px;height:18px;border-radius:9px;flex-shrink:0;padding:0;cursor:pointer;border:1px solid ${on ? "var(--osu-fav-accent)" : "var(--osu-fav-border)"};background:${on ? "var(--osu-fav-accent)" : "var(--osu-fav-divider)"};transition:background .15s,border-color .15s`;
     const knob = document.createElement("span");
     knob.style.cssText = `position:absolute;top:1px;left:${on ? "17px" : "1px"};width:14px;height:14px;border-radius:50%;background:#fff;transition:left .15s`;
     wrap.appendChild(knob);
     wrap.addEventListener("click", () => {
       on = !on;
-      wrap.style.background = on ? "var(--osu-fav-accent)" : "#222";
-      wrap.style.borderColor = on ? "var(--osu-fav-accent)" : "#333";
+      wrap.style.background = on ? "var(--osu-fav-accent)" : "var(--osu-fav-divider)";
+      wrap.style.borderColor = on ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
       knob.style.left = on ? "17px" : "1px";
       onChange(on);
     });
@@ -5040,19 +5080,19 @@
   function makeSegmented(options, initial, onChange) {
     const wrap = document.createElement("div");
     wrap.style.cssText =
-      "display:flex;gap:2px;background:#111;border:1px solid #333;border-radius:3px;padding:2px;flex-shrink:0";
+      "display:flex;gap:2px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;padding:2px;flex-shrink:0";
     let current = initial;
     const btns = {};
     options.forEach(({ value, label }) => {
       const btn = document.createElement("button");
       btn.textContent = label;
-      btn.style.cssText = `font-size:10px;font-weight:500;padding:3px 10px;border:none;border-radius:2px;cursor:pointer;background:${value === current ? "var(--osu-fav-accent)" : "transparent"};color:${value === current ? "#fff" : "#666"}`;
+      btn.style.cssText = `font-size:10px;font-weight:500;padding:3px 10px;border:none;border-radius:2px;cursor:pointer;background:${value === current ? "var(--osu-fav-accent)" : "transparent"};color:${value === current ? "#fff" : "var(--osu-fav-muted)"}`;
       btn.addEventListener("click", () => {
         if (current === value) return;
         current = value;
         options.forEach((o) => {
           btns[o.value].style.background = o.value === current ? "var(--osu-fav-accent)" : "transparent";
-          btns[o.value].style.color = o.value === current ? "#fff" : "#666";
+          btns[o.value].style.color = o.value === current ? "#fff" : "var(--osu-fav-muted)";
         });
         onChange(current);
       });
@@ -5065,7 +5105,7 @@
   function makeDropdown(options, initial, onChange) {
     const select = document.createElement("select");
     select.style.cssText =
-      "background:#111;border:1px solid #333;border-radius:3px;color:#ddd;" +
+      "background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);" +
       "font-size:10px;font-family:inherit;padding:4px 6px;cursor:pointer;flex-shrink:0;max-width:150px";
     options.forEach(({ value, label }) => {
       const o = document.createElement("option");
@@ -5093,7 +5133,7 @@
     valSpan.title = "Tap to enter a percentage";
     valSpan.setAttribute("aria-label", "Edit percentage");
     valSpan.style.cssText =
-      "font-size:10px;color:#888;width:46px;min-height:28px;text-align:right;flex-shrink:0;" +
+      "font-size:10px;color:var(--osu-fav-muted-soft);width:46px;min-height:28px;text-align:right;flex-shrink:0;" +
       "padding:3px 4px;border:1px solid transparent;border-radius:3px;background:transparent;" +
       "font-family:inherit;cursor:text";
     valSpan.textContent = initialPct + "%";
@@ -5114,7 +5154,7 @@
       editor.setAttribute("aria-label", "Percentage from 0 to 100");
       editor.style.cssText =
         "box-sizing:border-box;width:46px;height:28px;padding:3px 4px;text-align:right;" +
-        "border:1px solid var(--osu-fav-accent);border-radius:3px;background:#111;color:#ddd;" +
+        "border:1px solid var(--osu-fav-accent);border-radius:3px;background:var(--osu-fav-panel-bg);color:var(--osu-fav-text);" +
         "font-size:11px;font-family:inherit;flex-shrink:0";
       let cancelled = false;
       const closeEditor = (commit) => {
@@ -5215,7 +5255,7 @@
     function makeColorInput(root, initialHex, onChange) {
     const swatch = document.createElement("div");
     swatch.style.cssText =
-      `width:40px;height:24px;border:1px solid #333;border-radius:3px;cursor:pointer;` +
+      `width:40px;height:24px;border:1px solid var(--osu-fav-border);border-radius:3px;cursor:pointer;` +
       `background:${initialHex};flex-shrink:0`;
 
     const rgb0 = hexToRgb(initialHex);
@@ -5233,7 +5273,7 @@
       panel = document.createElement("div");
       panel.style.cssText =
         "position:fixed;z-index:100002;width:200px;box-sizing:border-box;" +
-        "background:#1a1a1a;border:1px solid #333;border-radius:4px;" +
+        "background:var(--osu-fav-surface);border:1px solid var(--osu-fav-border);border-radius:4px;" +
         "box-shadow:0 4px 16px rgba(0,0,0,.5);padding:10px;" +
         "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;" +
         "display:flex;flex-direction:column;gap:8px";
@@ -5263,13 +5303,13 @@
       hexRow.style.cssText = "display:flex;gap:6px;align-items:center";
       const preview = document.createElement("div");
       preview.style.cssText =
-        "width:24px;height:24px;border:1px solid #333;border-radius:3px;flex-shrink:0";
+        "width:24px;height:24px;border:1px solid var(--osu-fav-border);border-radius:3px;flex-shrink:0";
       const hexInput = document.createElement("input");
       hexInput.type = "text";
       hexInput.maxLength = 7;
       hexInput.style.cssText =
-        "flex:1;min-width:0;box-sizing:border-box;background:#111;border:1px solid #333;" +
-        "border-radius:3px;color:#ddd;font-size:11px;font-family:inherit;padding:5px 6px";
+        "flex:1;min-width:0;box-sizing:border-box;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);" +
+        "border-radius:3px;color:var(--osu-fav-text);font-size:11px;font-family:inherit;padding:5px 6px";
       hexRow.append(preview, hexInput);
 
       panel.append(plane, hueBar, hexRow);
@@ -5540,7 +5580,7 @@
 
       wrap.appendChild(sectionLabel("About"));
       const aboutHint = document.createElement("div");
-      aboutHint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:8px";
+      aboutHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:8px";
       aboutHint.innerHTML =
         "osu! Local Favorites v" + getCurrentVersion() + " - " +
         '<a href="https://github.com/starhollow2008/osu-local-favorites" target="_blank" rel="noopener" style="color:var(--osu-fav-accent);text-decoration:none">GitHub repository</a>' +
@@ -5595,11 +5635,11 @@
       const apiConnected = osuApiIsConnected();
       if (!apiConnected) {
         const apiHint = document.createElement("div");
-        apiHint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:8px";
+        apiHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:8px";
         apiHint.innerHTML =
           "Connect the official osu! API v2 for reliable metadata enrichment. Create an " +
           '<a href="https://osu.ppy.sh/home/account/edit#new-oauth-application" target="_blank" style="color:var(--osu-fav-accent);text-decoration:none">new OAuth application →</a>' +
-          " with callback URL <code style='color:#aaa'>https://osu.ppy.sh/home</code>, then paste its Client ID and Secret below.";
+          " with callback URL <code style='color:var(--osu-fav-secondary-soft)'>https://osu.ppy.sh/home</code>, then paste its Client ID and Secret below.";
         wrap.appendChild(apiHint);
       } else {
         const apiUsername = GM_getValue(OSU_API_USERNAME_KEY, "");
@@ -5608,7 +5648,7 @@
         const apiStatusDot = document.createElement("span");
         apiStatusDot.style.cssText = "width:6px;height:6px;border-radius:50%;background:#4caf50;flex-shrink:0";
         const apiStatusText = document.createElement("span");
-        apiStatusText.style.cssText = "font-size:11px;color:#ddd;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
+        apiStatusText.style.cssText = "font-size:11px;color:var(--osu-fav-text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
         apiStatusText.textContent =
           "Connected" + (apiUsername ? " as " + apiUsername : "") + " - enrichment uses the API";
         const apiRowDisconnectBtn = makeBtn("Disconnect");
@@ -5633,9 +5673,9 @@
         apiSecretInput.placeholder = "Client Secret";
         apiSecretInput.value = GM_getValue(OSU_API_CLIENT_SECRET_KEY, "");
         for (const inp of [apiIdInput, apiSecretInput]) {
-          inp.style.cssText = "width:100%;box-sizing:border-box;padding:6px 10px;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;font-size:12px;outline:none;margin-bottom:6px";
+          inp.style.cssText = "width:100%;box-sizing:border-box;padding:6px 10px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);font-size:12px;outline:none;margin-bottom:6px";
           inp.addEventListener("focus", () => (inp.style.borderColor = "var(--osu-fav-accent)"));
-          inp.addEventListener("blur", () => (inp.style.borderColor = "#333"));
+          inp.addEventListener("blur", () => (inp.style.borderColor = "var(--osu-fav-border)"));
           wrap.appendChild(inp);
         }
 
@@ -5665,7 +5705,7 @@
 
       if (!token) {
         const hint = document.createElement("div");
-        hint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:8px";
+        hint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:8px";
         hint.innerHTML =
           "Connect a GitHub account to back up your favorites to a Gist. " +
           '<a href="https://github.com/settings/tokens/new?scopes=gist&description=osu%20Local%20Favorites" target="_blank" style="color:var(--osu-fav-accent);text-decoration:none">Create a token →</a>';
@@ -5675,9 +5715,9 @@
         tokenInput.type = "password";
         tokenInput.placeholder = "Paste a token with 'gist' scope";
         tokenInput.style.cssText =
-          "width:100%;box-sizing:border-box;padding:6px 10px;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;font-size:12px;outline:none;margin-bottom:6px";
+          "width:100%;box-sizing:border-box;padding:6px 10px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);font-size:12px;outline:none;margin-bottom:6px";
         tokenInput.addEventListener("focus", () => (tokenInput.style.borderColor = "var(--osu-fav-accent)"));
-        tokenInput.addEventListener("blur", () => (tokenInput.style.borderColor = "#333"));
+        tokenInput.addEventListener("blur", () => (tokenInput.style.borderColor = "var(--osu-fav-border)"));
         wrap.appendChild(tokenInput);
 
         const connectBtn = makeBtn("Connect GitHub", "width:100%;box-sizing:border-box;text-align:center;padding:6px");
@@ -5717,16 +5757,16 @@
         fetchInput.type = "text";
         fetchInput.placeholder = "Gist ID or URL";
         fetchInput.style.cssText =
-          "flex:1;min-width:0;box-sizing:border-box;padding:6px 10px;background:#111;" +
-          "border:1px solid #333;border-radius:3px;color:#ddd;font-size:11px;outline:none";
+          "flex:1;min-width:0;box-sizing:border-box;padding:6px 10px;background:var(--osu-fav-panel-bg);" +
+          "border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);font-size:11px;outline:none";
         fetchInput.addEventListener("focus", () => (fetchInput.style.borderColor = "var(--osu-fav-accent)"));
-        fetchInput.addEventListener("blur", () => (fetchInput.style.borderColor = "#333"));
+        fetchInput.addEventListener("blur", () => (fetchInput.style.borderColor = "var(--osu-fav-border)"));
         const fetchBtn = makeBtn("Fetch", "flex-shrink:0;padding:6px 12px");
         fetchRow.append(fetchInput, fetchBtn);
         wrap.appendChild(fetchRow);
 
         const fetchHint = document.createElement("div");
-        fetchHint.style.cssText = "font-size:10px;color:#666;margin-top:4px;line-height:1.4";
+        fetchHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);margin-top:4px;line-height:1.4";
         fetchHint.textContent =
           "Pull from any gist - your own or someone else's shared list - without " +
           "changing what Backup now targets. Handy on a new device before your first backup.";
@@ -5770,7 +5810,7 @@
         const dot = document.createElement("span");
         dot.style.cssText = "width:6px;height:6px;border-radius:50%;background:#4caf50;flex-shrink:0";
         const statusText = document.createElement("span");
-        statusText.style.cssText = "font-size:11px;color:#ddd;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
+        statusText.style.cssText = "font-size:11px;color:var(--osu-fav-text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
         statusText.textContent = "Connected as " + (username || "GitHub user");
         const disconnectBtn = makeBtn("Disconnect");
         statusRow.append(dot, statusText, disconnectBtn);
@@ -5906,16 +5946,16 @@
         fetchInput.type = "text";
         fetchInput.placeholder = "Gist ID or URL";
         fetchInput.style.cssText =
-          "flex:1;min-width:0;box-sizing:border-box;padding:6px 10px;background:#111;" +
-          "border:1px solid #333;border-radius:3px;color:#ddd;font-size:11px;outline:none";
+          "flex:1;min-width:0;box-sizing:border-box;padding:6px 10px;background:var(--osu-fav-panel-bg);" +
+          "border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);font-size:11px;outline:none";
         fetchInput.addEventListener("focus", () => (fetchInput.style.borderColor = "var(--osu-fav-accent)"));
-        fetchInput.addEventListener("blur", () => (fetchInput.style.borderColor = "#333"));
+        fetchInput.addEventListener("blur", () => (fetchInput.style.borderColor = "var(--osu-fav-border)"));
         const fetchBtn = makeBtn("Fetch", "flex-shrink:0;padding:6px 12px");
         fetchRow.append(fetchInput, fetchBtn);
         wrap.appendChild(fetchRow);
 
         const fetchHint = document.createElement("div");
-        fetchHint.style.cssText = "font-size:10px;color:#666;margin-top:4px;line-height:1.4";
+        fetchHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);margin-top:4px;line-height:1.4";
         fetchHint.textContent =
           "Pull from any gist - your own or someone else's shared list - without " +
           "changing what Backup now targets. Handy on a new device before your first backup.";
@@ -5959,7 +5999,7 @@
         const lastSync = GM_getValue(GH_LAST_SYNC_KEY, 0);
         const syncInfo = document.createElement("div");
         syncInfo.style.cssText =
-          "font-size:10px;color:#666;margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px";
+          "font-size:10px;color:var(--osu-fav-muted);margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px";
         const syncText = document.createElement("span");
         syncText.textContent = lastSync
           ? "Last synced " + formatDate(new Date(lastSync).toISOString())
@@ -5981,7 +6021,7 @@
 
       wrap.appendChild(sectionLabel("Download Mirrors"));
       const mirrorHint = document.createElement("div");
-      mirrorHint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:4px";
+      mirrorHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:4px";
       mirrorHint.textContent =
         "osu!'s own download requires being signed in, and some maps have downloads " +
         "disabled entirely. Enable mirrors below to download anyway - they're offered " +
@@ -6035,7 +6075,7 @@
 
       wrap.appendChild(sectionLabel("Music Playback"));
       const fullSongHint = document.createElement("div");
-      fullSongHint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:4px";
+      fullSongHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:4px";
       fullSongHint.textContent =
         "The ▶ preview button in this panel plays osu!'s own ~10s clip by default. " +
         "Hinamizawa's music mirror streams the full track instead whenever it has one " +
@@ -6088,7 +6128,7 @@
 
       wrap.appendChild(sectionLabel("Media Cache"));
       const cacheHint = document.createElement("div");
-      cacheHint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:4px";
+      cacheHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:4px";
       cacheHint.textContent =
         "Background covers and preview clips are stored locally so reloading the page or " +
         "reopening the panel doesn't re-request them. Songs are written as they stream, so " +
@@ -6132,7 +6172,7 @@
         customInput.step = "1";
         customInput.value = String(cacheCustomMinutes());
         customInput.style.cssText =
-          "width:70px;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;" +
+          "width:70px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);" +
           "font-size:10px;font-family:inherit;padding:4px 6px;flex-shrink:0";
         customInput.addEventListener("change", () => {
           const n = Math.max(1, Math.round(Number(customInput.value) || 60));
@@ -6175,7 +6215,7 @@
         customSizeInput.step = "10";
         customSizeInput.value = String(cacheSizeCustomMb());
         customSizeInput.style.cssText =
-          "width:70px;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;" +
+          "width:70px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);" +
           "font-size:10px;font-family:inherit;padding:4px 6px;flex-shrink:0";
         customSizeInput.addEventListener("change", () => {
           const n = Math.max(10, Math.round(Number(customSizeInput.value) || 512));
@@ -6187,7 +6227,7 @@
       }
 
       const cacheStatsText = document.createElement("div");
-      cacheStatsText.style.cssText = "font-size:10px;color:#666;margin:4px 0 8px";
+      cacheStatsText.style.cssText = "font-size:10px;color:var(--osu-fav-muted);margin:4px 0 8px";
       cacheStatsText.textContent = "Checking cache size…";
       wrap.appendChild(cacheStatsText);
       function refreshCacheStats() {
@@ -6217,7 +6257,22 @@
       wrap.appendChild(sectionLabel("Appearance"));
       const theme = getThemeSettings();
 
-      const colorSwatch = makeColorInput(settingsView, theme.accent, (hex) => {
+      const styleSelector = makeSegmented(
+        [
+          { value: "neo", label: "Neo" },
+          { value: "modern", label: "Modern" },
+          { value: "classic", label: "Classic" },
+        ],
+        theme.style,
+        (style) => {
+          GM_setValue(THEME_STYLE_KEY, style);
+          applyTheme();
+          renderSettingsView();
+        },
+      );
+      wrap.appendChild(settingsRow("Style", styleSelector));
+
+            const colorSwatch = makeColorInput(settingsView, theme.accent, (hex) => {
         GM_setValue(THEME_ACCENT_KEY, hex);
         applyTheme();
       });
@@ -6278,6 +6333,7 @@
         "width:100%;box-sizing:border-box;text-align:center;padding:6px;margin-top:6px",
       );
       resetThemeBtn.addEventListener("click", () => {
+        GM_setValue(THEME_STYLE_KEY, THEME_DEFAULTS.style);
         GM_setValue(THEME_ACCENT_KEY, THEME_DEFAULTS.accent);
         GM_setValue(THEME_HEART_KEY, THEME_DEFAULTS.heartColor);
         GM_setValue(THEME_IDLE_OPACITY_KEY, THEME_DEFAULTS.idleOpacity);
@@ -6293,7 +6349,7 @@
 
       wrap.appendChild(sectionLabel("Library Maintenance"));
       const maintHint = document.createElement("div");
-      maintHint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:8px";
+      maintHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:8px";
       maintHint.textContent =
         "Re-fetches full metadata - tags, source, genre, language, BPM, status, cover - " +
         "for every favorited map. Useful if fields look stale or were saved in an older, " +
@@ -6316,7 +6372,7 @@
       const reenrichBtn = document.createElement("button");
       reenrichBtn.id = "osu-fav-reenrich-btn";
       reenrichBtn.style.cssText =
-        "font-size:10px;padding:6px 10px;border:1px solid #333;border-radius:3px;background:transparent;color:#999;cursor:pointer;width:100%;box-sizing:border-box";
+        "font-size:10px;padding:6px 10px;border:1px solid var(--osu-fav-border);border-radius:3px;background:transparent;color:var(--osu-fav-secondary);cursor:pointer;width:100%;box-sizing:border-box";
       hover.accent(reenrichBtn, () => !isReenrichRunning());
       reenrichBtn.addEventListener("click", () => {
         if (isReenrichRunning()) cancelGlobalReenrichment();
@@ -6328,14 +6384,14 @@
       reenrichProgress.id = "osu-fav-reenrich-progress";
       reenrichProgress.style.cssText = "display:none;margin-top:8px";
       const reenrichBarTrack = document.createElement("div");
-      reenrichBarTrack.style.cssText = "height:4px;background:#333;border-radius:2px;overflow:hidden";
+      reenrichBarTrack.style.cssText = "height:4px;background:var(--osu-fav-border);border-radius:2px;overflow:hidden";
       const reenrichBar = document.createElement("div");
       reenrichBar.id = "osu-fav-reenrich-bar";
       reenrichBar.style.cssText = "height:100%;width:0%;background:var(--osu-fav-accent);border-radius:2px;transition:width .2s";
       reenrichBarTrack.appendChild(reenrichBar);
       const reenrichText = document.createElement("div");
       reenrichText.id = "osu-fav-reenrich-text";
-      reenrichText.style.cssText = "font-size:10px;color:#666;margin-top:4px;text-align:center";
+      reenrichText.style.cssText = "font-size:10px;color:var(--osu-fav-muted);margin-top:4px;text-align:center";
       reenrichProgress.append(reenrichBarTrack, reenrichText);
       wrap.appendChild(reenrichProgress);
 
@@ -6347,7 +6403,7 @@
       const removeAllBtn = document.createElement("button");
       removeAllBtn.textContent = "Remove all favorites";
       removeAllBtn.style.cssText =
-        "font-size:10px;padding:6px 10px;border:1px solid #555;border-radius:3px;background:none;color:#888;cursor:pointer;width:100%";
+        "font-size:10px;padding:6px 10px;border:1px solid var(--osu-fav-muted-strong);border-radius:3px;background:none;color:var(--osu-fav-muted-soft);cursor:pointer;width:100%";
       wrap.appendChild(removeAllBtn);
 
       let confirmingRemoveAll = false;
@@ -6362,7 +6418,7 @@
               confirmingRemoveAll = false;
               removeAllBtn.textContent = "Remove all favorites";
               removeAllBtn.style.cssText =
-                "font-size:10px;padding:6px 10px;border:1px solid #555;border-radius:3px;background:none;color:#888;cursor:pointer;width:100%";
+                "font-size:10px;padding:6px 10px;border:1px solid var(--osu-fav-muted-strong);border-radius:3px;background:none;color:var(--osu-fav-muted-soft);cursor:pointer;width:100%";
             }
           }, 3000);
         } else {
@@ -6454,10 +6510,10 @@
       s.id = "osu-fav-panel-style";
       s.textContent =
         "#osu-fav-list::-webkit-scrollbar{width:4px}" +
-        "#osu-fav-list::-webkit-scrollbar-thumb{background:#333;border-radius:2px}" +
+        "#osu-fav-list::-webkit-scrollbar-thumb{background:var(--osu-fav-border);border-radius:2px}" +
         "#osu-fav-list::-webkit-scrollbar-thumb:hover{background:var(--osu-fav-accent)}" +
         "#osu-fav-settings::-webkit-scrollbar{width:4px}" +
-        "#osu-fav-settings::-webkit-scrollbar-thumb{background:#333;border-radius:2px}" +
+        "#osu-fav-settings::-webkit-scrollbar-thumb{background:var(--osu-fav-border);border-radius:2px}" +
         "#osu-fav-settings::-webkit-scrollbar-thumb:hover{background:var(--osu-fav-accent)}" +
         "@keyframes osuFavSlideDown{from{max-height:0;opacity:0;overflow:hidden}to{max-height:50px;opacity:1}}" +
         "@keyframes osuFavSlideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}" +
@@ -6483,12 +6539,12 @@
       width: "min(360px, 100vw)",
       height: "100vh",
       maxHeight: "100dvh",
-      background: "#111",
-      color: "#ddd",
+      background: "var(--osu-fav-panel-bg)",
+      color: "var(--osu-fav-text)",
       fontFamily:
         '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       fontSize: "13px",
-      borderLeft: "1px solid #333",
+      borderLeft: "1px solid var(--osu-fav-border)",
       display: "flex",
       flexDirection: "column",
       overflow: "hidden",
@@ -6508,7 +6564,7 @@
 
       const card = document.createElement("div");
       card.style.cssText =
-        "width:100%;max-width:280px;background:#111;border:1px solid #333;" +
+        "width:100%;max-width:280px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);" +
         "border-radius:4px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.7);" +
         "animation:osuFavSlideUp 0.2s ease-out";
 
@@ -6535,25 +6591,25 @@
       accent.append(accentTitle, accentClose);
 
       const body = document.createElement("div");
-      body.style.cssText = "padding:14px;font-size:12px;color:#bbb;line-height:1.5";
+      body.style.cssText = "padding:14px;font-size:12px;color:var(--osu-fav-secondary-bright);line-height:1.5";
       body.innerHTML =
-        `<b style="color:#ddd">osu! Local Favorites</b> has a new version ready.<br>` +
+        `<b style="color:var(--osu-fav-text)">osu! Local Favorites</b> has a new version ready.<br>` +
         `Install it to get the latest fixes and features.`;
 
       const foot = document.createElement("div");
       foot.style.cssText =
         "display:flex;justify-content:flex-end;gap:6px;padding:10px 14px;" +
-        "border-top:1px solid #222;background:#1a1a1a";
+        "border-top:1px solid var(--osu-fav-divider);background:var(--osu-fav-surface)";
 
       const laterBtn = document.createElement("button");
       laterBtn.textContent = "Later";
       laterBtn.style.cssText =
-        "font-size:10px;padding:4px 10px;border:1px solid #333;border-radius:3px;" +
-        "background:transparent;color:#888;cursor:pointer;font-weight:500";
+        "font-size:10px;padding:4px 10px;border:1px solid var(--osu-fav-border);border-radius:3px;" +
+        "background:transparent;color:var(--osu-fav-muted-soft);cursor:pointer;font-weight:500";
       hover.props(
         laterBtn,
         { borderColor: "var(--osu-fav-accent)", color: "var(--osu-fav-accent)" },
-        { borderColor: "#333", color: "#888" },
+        { borderColor: "var(--osu-fav-border)", color: "var(--osu-fav-muted-soft)" },
       );
       laterBtn.addEventListener("click", () => {
         backdrop.remove();
@@ -6583,7 +6639,7 @@
     const header = document.createElement("div");
     Object.assign(header.style, {
       padding: "10px 14px 8px",
-      background: "#1a1a1a",
+      background: "var(--osu-fav-surface)",
       borderBottom: "2px solid var(--osu-fav-accent)",
       flex: "0 0 auto",
       minHeight: "0",
@@ -6615,7 +6671,7 @@
     settingsBtn.title = "Settings";
     settingsBtn.setAttribute("aria-label", "Settings");
     settingsBtn.style.cssText =
-      "background:none;border:1px solid #333;color:#999;cursor:pointer;width:34px;height:34px;min-width:34px;min-height:34px;max-width:34px;max-height:34px;padding:0;border-radius:3px;font-size:13px;flex:0 0 34px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;line-height:1";
+      "background:none;border:1px solid var(--osu-fav-border);color:var(--osu-fav-secondary);cursor:pointer;width:34px;height:34px;min-width:34px;min-height:34px;max-width:34px;max-height:34px;padding:0;border-radius:3px;font-size:13px;flex:0 0 34px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;line-height:1";
     hover.accent(settingsBtn, () => !settingsOpen);
     settingsBtn.addEventListener("click", () => setView(!settingsOpen));
 
@@ -6624,7 +6680,7 @@
     closeBtn.title = "Close";
     closeBtn.setAttribute("aria-label", "Close");
     closeBtn.style.cssText =
-      "background:none;border:1px solid #333;color:#999;cursor:pointer;width:34px;height:34px;min-width:34px;min-height:34px;max-width:34px;max-height:34px;padding:0;border-radius:3px;font-size:13px;line-height:1;flex:0 0 34px;box-sizing:border-box;display:flex;align-items:center;justify-content:center";
+      "background:none;border:1px solid var(--osu-fav-border);color:var(--osu-fav-secondary);cursor:pointer;width:34px;height:34px;min-width:34px;min-height:34px;max-width:34px;max-height:34px;padding:0;border-radius:3px;font-size:13px;line-height:1;flex:0 0 34px;box-sizing:border-box;display:flex;align-items:center;justify-content:center";
     closeBtn.addEventListener("click", () => {
       closeFilterMenu();
       clearFavoritesPanelAudio();
@@ -6638,14 +6694,14 @@
     searchInput.type = "text";
     searchInput.placeholder = "Search title, artist, mapper...";
     searchInput.style.cssText =
-      "width:100%;height:40px;min-height:40px;max-height:40px;box-sizing:border-box;padding:6px 10px;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;font-size:12px;outline:none;display:block";
+      "width:100%;height:40px;min-height:40px;max-height:40px;box-sizing:border-box;padding:6px 10px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);font-size:12px;outline:none;display:block";
     searchInput.addEventListener(
       "focus",
       () => (searchInput.style.borderColor = "var(--osu-fav-accent)"),
     );
     searchInput.addEventListener(
       "blur",
-      () => (searchInput.style.borderColor = "#333"),
+      () => (searchInput.style.borderColor = "var(--osu-fav-border)"),
     );
     let searchRenderTimer = null;
     searchInput.addEventListener("input", () => {
@@ -6680,15 +6736,15 @@
       starLink.rel = "noopener";
       starLink.textContent = "Enjoying Local Favorites? Star it on GitHub";
       starLink.style.cssText =
-        "flex:1;color:#ddd;text-decoration:none;font-size:11px;line-height:1.4";
-      hover.props(starLink, { color: "var(--osu-fav-accent)" }, { color: "#ddd" });
+        "flex:1;color:var(--osu-fav-text);text-decoration:none;font-size:11px;line-height:1.4";
+      hover.props(starLink, { color: "var(--osu-fav-accent)" }, { color: "var(--osu-fav-text)" });
 
       const dismissBtn = document.createElement("button");
       dismissBtn.textContent = "\u2715";
       dismissBtn.title = "Dismiss";
       dismissBtn.style.cssText =
-        "background:none;border:none;color:#888;cursor:pointer;font-size:12px;padding:2px 4px;flex-shrink:0;line-height:1";
-      hover.props(dismissBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
+        "background:none;border:none;color:var(--osu-fav-muted-soft);cursor:pointer;font-size:12px;padding:2px 4px;flex-shrink:0;line-height:1";
+      hover.props(dismissBtn, { color: "var(--osu-fav-accent)" }, { color: "var(--osu-fav-muted-soft)" });
       dismissBtn.addEventListener("click", () => githubBanner.remove());
 
       githubBanner.append(starIcon, starLink, dismissBtn);
@@ -6697,8 +6753,8 @@
     const toolbar = document.createElement("div");
     toolbar.id = "osu-fav-toolbar";
     toolbar.style.cssText =
-      "display:flex;flex-direction:column;gap:5px;padding:6px 14px;background:#1a1a1a;" +
-      "border-bottom:1px solid #333;flex-shrink:0";
+      "display:flex;flex-direction:column;gap:5px;padding:6px 14px;background:var(--osu-fav-surface);" +
+      "border-bottom:1px solid var(--osu-fav-border);flex-shrink:0";
 
     const filterRow = document.createElement("div");
     filterRow.style.cssText =
@@ -6706,7 +6762,7 @@
 
     const CHIP_BASE =
       "font-size:10px;font-weight:500;padding:4px 6px;border:1px solid transparent;border-radius:3px;" +
-      "background:transparent;cursor:pointer;user-select:none;color:#666;white-space:nowrap;" +
+      "background:transparent;cursor:pointer;user-select:none;color:var(--osu-fav-muted);white-space:nowrap;" +
       "overflow:hidden;text-overflow:ellipsis;text-align:center;box-sizing:border-box;min-width:0;width:100%";
 
     const filterBtns = {};
@@ -6714,7 +6770,7 @@
       const btn = document.createElement("button");
       btn.type = "button";
       btn.title = cat.title;
-      btn.style.cssText = CHIP_BASE + ";border-color:#333;color:#999";
+      btn.style.cssText = CHIP_BASE + ";border-color:var(--osu-fav-border);color:var(--osu-fav-secondary)";
       btn.addEventListener("click", () => {
         showFilterMenu(
           btn,
@@ -6768,8 +6824,8 @@
         btn.style.borderColor = "var(--osu-fav-accent)";
       } else {
         btn.style.background = "transparent";
-        btn.style.color = "#999";
-        btn.style.borderColor = "#333";
+        btn.style.color = "var(--osu-fav-secondary)";
+        btn.style.borderColor = "var(--osu-fav-border)";
       }
     }
     function updateFilterBtns() {
@@ -6780,20 +6836,20 @@
     function makeBtn(label, extraStyle = "") {
       const btn = document.createElement("button");
       btn.textContent = label;
-      btn.style.cssText = `font-size:10px;padding:3px 7px;border:1px solid #333;border-radius:3px;background:transparent;color:#999;cursor:pointer;${extraStyle}`;
+      btn.style.cssText = `font-size:10px;padding:3px 7px;border:1px solid var(--osu-fav-border);border-radius:3px;background:transparent;color:var(--osu-fav-secondary);cursor:pointer;${extraStyle}`;
       hover.accent(btn);
       return btn;
     }
     const collectionsBtn = document.createElement("button");
     collectionsBtn.type = "button";
     collectionsBtn.title = "Filter by collection";
-    collectionsBtn.style.cssText = CHIP_BASE + ";border-color:#333;color:#999";
+    collectionsBtn.style.cssText = CHIP_BASE + ";border-color:var(--osu-fav-border);color:var(--osu-fav-secondary)";
     function updateCollectionsBtn() {
       if (!activeCollectionId) {
         collectionsBtn.textContent = "\ud83d\udcc1 All \u25be";
         collectionsBtn.style.background = "transparent";
-        collectionsBtn.style.color = "#999";
-        collectionsBtn.style.borderColor = "#333";
+        collectionsBtn.style.color = "var(--osu-fav-secondary)";
+        collectionsBtn.style.borderColor = "var(--osu-fav-border)";
         return;
       }
       const col = getCollections()[activeCollectionId];
@@ -6825,9 +6881,9 @@
     clearAllBtn.type = "button";
     clearAllBtn.textContent = "Clear all filters";
     clearAllBtn.style.cssText =
-      "width:100%;box-sizing:border-box;font-size:10px;padding:3px 6px;border:1px solid #333;" +
-      "border-radius:3px;background:transparent;color:#888;cursor:pointer";
-    hover.props(clearAllBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
+      "width:100%;box-sizing:border-box;font-size:10px;padding:3px 6px;border:1px solid var(--osu-fav-border);" +
+      "border-radius:3px;background:transparent;color:var(--osu-fav-muted-soft);cursor:pointer";
+    hover.props(clearAllBtn, { color: "var(--osu-fav-accent)" }, { color: "var(--osu-fav-muted-soft)" });
     clearAllBtn.addEventListener("click", () => {
       closeFilterMenu();
       filterState = makeEmptyFilterState();
@@ -6877,9 +6933,9 @@
     const footer = document.createElement("div");
     footer.id = "osu-fav-footer-status";
     footer.style.cssText =
-      "width:100%;height:29px;min-height:29px;max-height:29px;box-sizing:border-box;padding:6px 14px;border-top:1px solid #333;background:#1a1a1a;font-size:10px;line-height:15px;color:#555;text-align:center;cursor:pointer;user-select:none;overflow:hidden";
+      "width:100%;height:29px;min-height:29px;max-height:29px;box-sizing:border-box;padding:6px 14px;border-top:1px solid var(--osu-fav-border);background:var(--osu-fav-surface);font-size:10px;line-height:15px;color:var(--osu-fav-muted-strong);text-align:center;cursor:pointer;user-select:none;overflow:hidden";
     footer.addEventListener("click", () => setView(true));
-    hover.props(footer, { color: "var(--osu-fav-accent)" }, { color: "#555" });
+    hover.props(footer, { color: "var(--osu-fav-accent)" }, { color: "var(--osu-fav-muted-strong)" });
 
     function updateFooterStatus() {
       const token = GM_getValue(GH_TOKEN_KEY, "");
@@ -6903,8 +6959,8 @@
     nowPlayingBar.id = "osu-fav-nowplaying";
     nowPlayingBar.style.cssText =
       "display:none;position:relative;align-items:center;gap:9px;padding:7px 14px;" +
-      "height:74px;min-height:74px;max-height:74px;box-sizing:border-box;border-top:1px solid #333;" +
-      "border-bottom:1px solid #222;background:#1a1a1a;flex:0 0 74px;overflow:hidden;" +
+      "height:74px;min-height:74px;max-height:74px;box-sizing:border-box;border-top:1px solid var(--osu-fav-border);" +
+      "border-bottom:1px solid var(--osu-fav-divider);background:var(--osu-fav-surface);flex:0 0 74px;overflow:hidden;" +
       "box-shadow:0 -3px 12px rgba(0,0,0,.35);margin-top:0;padding-bottom:7px";
 
     const npBg = document.createElement("div");
@@ -6922,7 +6978,7 @@
     npThumb.className = "osu-fav-np-thumb";
     npThumb.style.cssText =
       "position:relative;z-index:2;width:42px;height:42px;border-radius:3px;object-fit:cover;" +
-      "background:#111;display:block;flex-shrink:0;border:1px solid rgba(255,255,255,.08)";
+      "background:var(--osu-fav-panel-bg);display:block;flex-shrink:0;border:1px solid rgba(255,255,255,.08)";
     npThumb.addEventListener("error", () => {
       npThumb.removeAttribute("src");
       npThumb.style.visibility = "hidden";
@@ -6934,16 +6990,16 @@
     const npTitle = document.createElement("div");
     npTitle.className = "osu-fav-np-title";
     npTitle.style.cssText =
-      "font-size:12px;color:#eee;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35";
+      "font-size:12px;color:var(--osu-fav-text-bright);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35";
     const npArtist = document.createElement("div");
     npArtist.className = "osu-fav-np-artist";
     npArtist.style.cssText =
-      "font-size:10px;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;line-height:1.25";
+      "font-size:10px;color:var(--osu-fav-secondary-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;line-height:1.25";
     npInfo.append(npTitle, npArtist);
 
     const npProgressWrap = document.createElement("div");
     npProgressWrap.style.cssText =
-      "position:absolute;left:0;right:0;bottom:0;height:2px;background:#111;overflow:hidden;z-index:4";
+      "position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--osu-fav-panel-bg);overflow:hidden;z-index:4";
     const npProgressBar = document.createElement("div");
     npProgressBar.style.cssText =
       "height:100%;width:0%;background:var(--osu-fav-accent);transition:width .05s linear";
@@ -6961,7 +7017,7 @@
       b.title = title;
       b.innerHTML = svgFn();
       b.style.cssText =
-        "background:rgba(17,17,17,.46);border:1px solid #333;border-radius:3px;color:#999;cursor:pointer;" +
+        "background:rgba(17,17,17,.46);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-secondary);cursor:pointer;" +
         "padding:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0";
       hover.accent(b, () => !b._active);
       return b;
@@ -6969,8 +7025,8 @@
 
     function setNpToggleActive(btn, active) {
       btn._active = active;
-      btn.style.borderColor = active ? "var(--osu-fav-accent)" : "#333";
-      btn.style.color = active ? "var(--osu-fav-accent)" : "#999";
+      btn.style.borderColor = active ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
+      btn.style.color = active ? "var(--osu-fav-accent)" : "var(--osu-fav-secondary)";
     }
 
     const npShuffleBtn = npIconBtn(shuffleSVG, "Shuffle");
@@ -7017,8 +7073,8 @@
         audio._activeBtn.innerHTML = playSVG();
         audio._activeBtn._playing = false;
         audio._activeBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
-        audio._activeBtn.style.borderColor = "#333";
-        audio._activeBtn.style.color = "#999";
+        audio._activeBtn.style.borderColor = "var(--osu-fav-border)";
+        audio._activeBtn.style.color = "var(--osu-fav-secondary)";
       }
       if (audio._activeBar) {
         audio._activeBar.parentElement.style.display = "none";
@@ -7281,8 +7337,8 @@
         btn.style.opacity = playing
           ? "var(--osu-fav-active-opacity, 0.8)"
           : "var(--osu-fav-idle-opacity, 0.15)";
-        btn.style.borderColor = playing ? "var(--osu-fav-accent)" : "#333";
-        btn.style.color = playing ? "var(--osu-fav-accent)" : "#999";
+        btn.style.borderColor = playing ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
+        btn.style.color = playing ? "var(--osu-fav-accent)" : "var(--osu-fav-secondary)";
       }
       if (barWrap) barWrap.style.display = !audio.paused ? "block" : "none";
       if (bar) {
@@ -7332,8 +7388,8 @@
       footer.style.display = showSettings ? "block" : "none";
       nowPlayingBar.style.display = !showSettings && npAudio.src && npAudio._npCurrentId ? "flex" : "none";
       bottomBar.setAttribute("data-view", showSettings ? "settings" : "favorites");
-      settingsBtn.style.color = showSettings ? "var(--osu-fav-accent)" : "#999";
-      settingsBtn.style.borderColor = showSettings ? "var(--osu-fav-accent)" : "#333";
+      settingsBtn.style.color = showSettings ? "var(--osu-fav-accent)" : "var(--osu-fav-secondary)";
+      settingsBtn.style.borderColor = showSettings ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
       settingsBtn.title = showSettings ? "Back to favorites" : "Settings";
       if (showSettings) {
         settings.render();
@@ -7353,9 +7409,9 @@
           approved: "#4caf50",
           pending: "#ff9800",
           wip: "#f44336",
-          graveyard: "#666",
+          graveyard: "var(--osu-fav-muted)",
           vip: "#f6c243",
-        }[s] || "#888"
+        }[s] || "var(--osu-fav-muted-soft)"
       );
     }
     function formatDate(iso) {
@@ -7475,7 +7531,7 @@
             }
             if (f.bpm) {
               const bpm = document.createElement("span");
-              bpm.style.cssText = "font-size:9px;color:#555";
+              bpm.style.cssText = "font-size:9px;color:var(--osu-fav-muted-strong)";
               bpm.textContent = `${f.bpm} BPM`;
               metaDiv.appendChild(bpm);
             }
@@ -7505,7 +7561,7 @@
           nimg.addEventListener("error", () => {
             nimg.remove();
             coverDiv.style.fontSize = "16px";
-            coverDiv.style.color = "#444";
+            coverDiv.style.color = "var(--osu-fav-border-strong)";
             coverDiv.insertBefore(document.createTextNode("?"), coverDiv.firstChild);
           });
           coverDiv.insertBefore(nimg, coverDiv.firstChild);
@@ -7516,8 +7572,8 @@
         if (addToCollBtn) {
           const n = collCounts.get(id) || 0;
           addToCollBtn.textContent = n ? `\u2713 ${n}` : "+ Playlist";
-          addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "#333";
-          addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "#666";
+          addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
+          addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "var(--osu-fav-muted)";
         }
       });
     }
@@ -7602,13 +7658,13 @@
       };
       if (Object.keys(favs).length === 0) {
         settleEmpty(
-          '<p style="text-align:center;color:#666;padding:40px 20px;font-size:12px">No favorites yet.</p>',
+          '<p style="text-align:center;color:var(--osu-fav-muted);padding:40px 20px;font-size:12px">No favorites yet.</p>',
         );
         return;
       }
       if (entries.length === 0) {
         settleEmpty(
-          '<p style="text-align:center;color:#666;padding:40px 20px;font-size:12px">No matches.</p>',
+          '<p style="text-align:center;color:var(--osu-fav-muted);padding:40px 20px;font-size:12px">No matches.</p>',
         );
         return;
       }
@@ -7618,12 +7674,12 @@
         card.dataset.favId = id;
         card.style.cssText =
           "display:flex;gap:8px;padding:8px 14px;border-bottom:1px solid #1e1e1e;align-items:center";
-        hover(card, () => (card.style.background = "#1a1a1a"), () => (card.style.background = ""));
+        hover(card, () => (card.style.background = "var(--osu-fav-surface)"), () => (card.style.background = ""));
 
         const coverUrl = favoriteCoverUrl(f, id);
         const coverEl = document.createElement("div");
         coverEl.style.cssText =
-          "position:relative;width:56px;height:42px;border-radius:2px;overflow:hidden;flex-shrink:0;background:#1a1a1a;display:flex;align-items:center;justify-content:center;cursor:pointer";
+          "position:relative;width:56px;height:42px;border-radius:2px;overflow:hidden;flex-shrink:0;background:var(--osu-fav-surface);display:flex;align-items:center;justify-content:center;cursor:pointer";
         if (coverUrl) {
           const img = document.createElement("img");
           img.dataset.src = coverUrl;
@@ -7632,13 +7688,13 @@
           img.addEventListener("error", () => {
             img.remove();
             coverEl.style.fontSize = "16px";
-            coverEl.style.color = "#444";
+            coverEl.style.color = "var(--osu-fav-border-strong)";
             coverEl.insertBefore(document.createTextNode("?"), coverEl.firstChild);
           });
           coverEl.appendChild(img);
           imgObserver.observe(img);
         } else {
-          coverEl.style.cssText += ";font-size:16px;color:#444";
+          coverEl.style.cssText += ";font-size:16px;color:var(--osu-fav-border-strong)";
           coverEl.textContent = "?";
         }
 
@@ -7664,7 +7720,7 @@
         }
         const artistDiv = document.createElement("div");
         artistDiv.style.cssText =
-          "font-size:10px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;display:flex;align-items:center;gap:4px";
+          "font-size:10px;color:var(--osu-fav-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;display:flex;align-items:center;gap:4px";
         const artistText = document.createElement("span");
         artistText.style.cssText = "overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
         artistText.textContent = f.artist || f.artist_unicode || "";
@@ -7697,7 +7753,7 @@
         }
         if (f.bpm) {
           const bpm = document.createElement("span");
-          bpm.style.cssText = "font-size:9px;color:#555";
+          bpm.style.cssText = "font-size:9px;color:var(--osu-fav-muted-strong)";
           bpm.textContent = `${f.bpm} BPM`;
           metaDiv.appendChild(bpm);
         }
@@ -7707,7 +7763,7 @@
 
         const dateDiv = document.createElement("span");
         dateDiv.style.cssText =
-          "font-size:9px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
+          "font-size:9px;color:var(--osu-fav-muted-strong);overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
         dateDiv.textContent = formatDate(f.favourited_at);
 
         const collCount = () => _collCounts.get(id) || 0;
@@ -7719,14 +7775,14 @@
           addToCollBtn.title = n
             ? `In ${n} collection${n > 1 ? "s" : ""} - click to manage`
             : "Add to a collection";
-          addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "#333";
-          addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "#666";
+          addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
+          addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "var(--osu-fav-muted)";
         }
         addToCollBtn.style.cssText =
           "font-size:8px;font-weight:600;padding:1px 5px;border-radius:2px;flex-shrink:0;cursor:pointer;background:transparent";
         refreshAddToCollBtn();
         const _collN = collCount();
-        addToCollBtn.style.border = `1px solid ${_collN ? "var(--osu-fav-accent)" : "#333"}`;
+        addToCollBtn.style.border = `1px solid ${_collN ? "var(--osu-fav-accent)" : "var(--osu-fav-border)"}`;
         addToCollBtn.addEventListener("click", (e) => {
           e.stopPropagation();
           showAddToCollectionMenu(addToCollBtn, id, () => {
@@ -7735,8 +7791,8 @@
             addToCollBtn.title = n
               ? `In ${n} collection${n > 1 ? "s" : ""} - click to manage`
               : "Add to a collection";
-            addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "#333";
-            addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "#666";
+            addToCollBtn.style.borderColor = n ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
+            addToCollBtn.style.color = n ? "var(--osu-fav-accent)" : "var(--osu-fav-muted)";
             if (activeCollectionId) renderList();
           });
         });
@@ -7745,7 +7801,7 @@
 
         const progressWrap = document.createElement("div");
         progressWrap.className = "osu-fav-progress-wrap";
-        progressWrap.style.cssText = "height:2px;background:#333;border-radius:1px;margin-top:3px;overflow:hidden;display:none";
+        progressWrap.style.cssText = "height:2px;background:var(--osu-fav-border);border-radius:1px;margin-top:3px;overflow:hidden;display:none";
         const progressBar = document.createElement("div");
         progressBar.className = "osu-fav-progress-bar";
         progressBar.style.cssText = "height:100%;width:0%;background:var(--osu-fav-accent);border-radius:1px";
@@ -7762,7 +7818,7 @@
         openLink.target = "_blank";
         openLink.textContent = "Open";
         openLink.style.cssText =
-          "font-size:10px;padding:4px 8px;border:1px solid #333;border-radius:2px;color:#999;text-decoration:none;text-align:center;display:block;white-space:nowrap";
+          "font-size:10px;padding:4px 8px;border:1px solid var(--osu-fav-border);border-radius:2px;color:var(--osu-fav-secondary);text-decoration:none;text-align:center;display:block;white-space:nowrap";
         hover.accent(openLink);
 
         const defaultMirror = resolveDefaultMirror(id);
@@ -7772,7 +7828,7 @@
           if (opts.length === 1) soleOption = opts[0];
         }
         const downloadStyle =
-          "font-size:10px;padding:4px 8px;border:1px solid #333;border-radius:2px;background:none;color:#999;" +
+          "font-size:10px;padding:4px 8px;border:1px solid var(--osu-fav-border);border-radius:2px;background:none;color:var(--osu-fav-secondary);" +
           "cursor:pointer;text-align:center;white-space:nowrap;width:100%;text-decoration:none;display:block;box-sizing:border-box";
 
         let downloadLink;
@@ -7802,11 +7858,11 @@
         const removeBtn = document.createElement("button");
         removeBtn.textContent = "Remove";
         removeBtn.style.cssText =
-          "font-size:10px;padding:4px 8px;border:1px solid #333;border-radius:2px;background:none;color:#999;cursor:pointer;white-space:nowrap";
+          "font-size:10px;padding:4px 8px;border:1px solid var(--osu-fav-border);border-radius:2px;background:none;color:var(--osu-fav-secondary);cursor:pointer;white-space:nowrap";
         hover.props(
           removeBtn,
           { borderColor: "#e55", color: "#e55" },
-          { borderColor: "#333", color: "#999" },
+          { borderColor: "var(--osu-fav-border)", color: "var(--osu-fav-secondary)" },
         );
         removeBtn.addEventListener("click", () => {
           const favs = getFavorites();
@@ -7832,8 +7888,8 @@
         previewBtn.title = "Preview audio";
         previewBtn.style.cssText =
           "position:absolute;inset:0;margin:auto;width:fit-content;height:fit-content;" +
-          "font-size:11px;padding:2px 6px;border:1px solid #333;border-radius:2px;" +
-          "background:none;color:#999;cursor:pointer;text-align:center;line-height:1;" +
+          "font-size:11px;padding:2px 6px;border:1px solid var(--osu-fav-border);border-radius:2px;" +
+          "background:none;color:var(--osu-fav-secondary);cursor:pointer;text-align:center;line-height:1;" +
           "opacity:var(--osu-fav-idle-opacity, 0.15);transition:opacity 0.15s";
 
         hover(
@@ -7846,8 +7902,8 @@
           () => {
             if (!previewBtn._playing) {
               previewBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
-              previewBtn.style.borderColor = "#333";
-              previewBtn.style.color = "#999";
+              previewBtn.style.borderColor = "var(--osu-fav-border)";
+              previewBtn.style.color = "var(--osu-fav-secondary)";
               dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-idle-dim, 0))";
             }
           },
@@ -7864,8 +7920,8 @@
               previewBtn.innerHTML = playSVG();
               previewBtn._playing = false;
               previewBtn.style.opacity = "var(--osu-fav-idle-opacity, 0.15)";
-              previewBtn.style.borderColor = "#333";
-              previewBtn.style.color = "#999";
+              previewBtn.style.borderColor = "var(--osu-fav-border)";
+              previewBtn.style.color = "var(--osu-fav-secondary)";
               dimOverlay.style.background = "rgba(51,51,51,var(--osu-fav-idle-dim, 0))";
             } else {
               audio._activeBtn = previewBtn;
@@ -7990,7 +8046,7 @@
     bottomBar.id = "osu-fav-bottom-bar";
     bottomBar.style.cssText =
       "position:absolute;left:0;right:0;bottom:0;z-index:20;overflow:hidden;" +
-      "background:#1a1a1a;box-shadow:0 -3px 12px rgba(0,0,0,.35);" +
+      "background:var(--osu-fav-surface);box-shadow:0 -3px 12px rgba(0,0,0,.35);" +
       "padding-bottom:0;box-sizing:border-box;min-height:0;height:auto;";
     bottomBar.append(nowPlayingBar, footer);
     panel.append(header, ...(githubBanner ? [githubBanner] : []), toolbar, contentArea, bottomBar);
@@ -8332,12 +8388,12 @@
       bottom: "20px",
       right: rightOffset,
       zIndex: "100001",
-      background: "#222",
-      border: "1px solid #444",
+      background: "var(--osu-fav-divider)",
+      border: "1px solid var(--osu-fav-border-strong)",
       borderRadius: "4px",
       padding: "7px 14px",
       fontSize: "12px",
-      color: "#ddd",
+      color: "var(--osu-fav-text)",
       boxShadow: "0 2px 8px rgba(0,0,0,.5)",
       pointerEvents: "none",
       transition: "opacity 0.2s ease",
@@ -8440,7 +8496,7 @@
       s.id = "osu-fav-panel-style";
       s.textContent =
         "#osu-fav-list::-webkit-scrollbar{width:4px}" +
-        "#osu-fav-list::-webkit-scrollbar-thumb{background:#333;border-radius:2px}" +
+        "#osu-fav-list::-webkit-scrollbar-thumb{background:var(--osu-fav-border);border-radius:2px}" +
         "#osu-fav-list::-webkit-scrollbar-thumb:hover{background:var(--osu-fav-accent)}" +
         "@keyframes osuFavSlideDown{from{max-height:0;opacity:0;overflow:hidden}to{max-height:50px;opacity:1}}" +
         "@keyframes osuFavSlideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}";
@@ -8455,10 +8511,10 @@
       right: "20px",
       zIndex: "100002",
       width: "300px",
-      background: "#111",
-      border: "1px solid #333",
+      background: "var(--osu-fav-panel-bg)",
+      border: "1px solid var(--osu-fav-border)",
       borderRadius: "4px",
-      color: "#ddd",
+      color: "var(--osu-fav-text)",
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       fontSize: "13px",
       boxShadow: "0 4px 24px rgba(0,0,0,0.6)",
@@ -8490,25 +8546,25 @@
     accentBar.append(accentLabel, accentClose);
 
     const body = document.createElement("div");
-    body.style.cssText = "padding:12px 14px;line-height:1.5;font-size:12px;color:#bbb";
+    body.style.cssText = "padding:12px 14px;line-height:1.5;font-size:12px;color:var(--osu-fav-secondary-bright)";
     body.innerHTML =
-      `<b style="color:#ddd">osu! Local Favorites</b> has an update ready.<br>` +
+      `<b style="color:var(--osu-fav-text)">osu! Local Favorites</b> has an update ready.<br>` +
       `Install it now to get the latest fixes and features.`;
 
     const footer = document.createElement("div");
     footer.style.cssText =
       "display:flex;justify-content:flex-end;gap:6px;padding:8px 14px;" +
-      "border-top:1px solid #222;background:#1a1a1a";
+      "border-top:1px solid var(--osu-fav-divider);background:var(--osu-fav-surface)";
 
     const laterBtn = document.createElement("button");
     laterBtn.textContent = "Later";
     laterBtn.style.cssText =
-      "font-size:10px;padding:4px 10px;border:1px solid #333;border-radius:3px;" +
-      "background:transparent;color:#888;cursor:pointer;font-weight:500";
+      "font-size:10px;padding:4px 10px;border:1px solid var(--osu-fav-border);border-radius:3px;" +
+      "background:transparent;color:var(--osu-fav-muted-soft);cursor:pointer;font-weight:500";
     hover.props(
       laterBtn,
       { borderColor: "var(--osu-fav-accent)", color: "var(--osu-fav-accent)" },
-      { borderColor: "#333", color: "#888" },
+      { borderColor: "var(--osu-fav-border)", color: "var(--osu-fav-muted-soft)" },
     );
     laterBtn.addEventListener("click", () => {
       modal.remove();
