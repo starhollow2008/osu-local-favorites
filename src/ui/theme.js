@@ -13,8 +13,10 @@ export const THEME_IDLE_OPACITY_KEY = "osu_theme_idle_opacity";
 export const THEME_IDLE_DIM_KEY = "osu_theme_idle_dim";
 export const THEME_HOVER_DIM_KEY = "osu_theme_hover_dim";
 export const THEME_ACTIVE_OPACITY_KEY = "osu_theme_active_opacity";
+export const THEME_STYLE_KEY = "osu_theme_style";
 
 export const THEME_DEFAULTS = {
+  style: "neo",
   // v6 palette: softer sakura accent and a deeper heart fill so favorited
   // hearts read as a distinct "filled" state against the pastel accent.
   // Both remain user-overridable in Settings; only the DEFAULTS changed -
@@ -27,6 +29,50 @@ export const THEME_DEFAULTS = {
   activeOpacity: 0.8,
 };
 
+export const THEME_PALETTES = {
+  neo: {
+    colors: {
+      "panel-bg": "#111", surface: "#1a1a1a", "surface-alt": "#242424", "floating-button-bg": "rgba(17,17,17,0.95)",
+      divider: "#222", border: "#333", "border-strong": "#444",
+      "muted-strong": "#555", muted: "#666", "muted-soft": "#888",
+      secondary: "#999", "secondary-soft": "#aaa", "secondary-bright": "#bbb",
+      "text-soft": "#ccc", text: "#ddd", "text-bright": "#eee",
+      "header-bg": "#1a1a1a", "header-bg-low": "#1a1a1a", "nav-bg": "#242424", "stats-bg": "#333",
+      "surface-soft": "#242424", "bio-box": "#1a1a1a", "mode-active": "#ff91bb",
+      "section-bar": "#444", heading: "#ff91bb", label: "#ddd",
+      "username-link": "#ff91bb", "login-link": "#ff91bb", "nav-text": "#ddd",
+      "chart-line": "#ff91bb", "rank-ss": "#ce7698",
+    },
+  },
+  modern: {
+    colors: {
+      "panel-bg": "#2a2226", surface: "#382e32", "surface-alt": "#46393f", "floating-button-bg": "#2a2226",
+      divider: "#2a2226", border: "#514047", "border-strong": "#6b505c",
+      "muted-strong": "#c8b8bf", muted: "#b8a8af", "muted-soft": "#a9959e",
+      secondary: "#d9a6bd", "secondary-soft": "#c8b8bf", "secondary-bright": "#ffffff",
+      "text-soft": "#ffffff", text: "#ffffff", "text-bright": "#ffffff",
+      "header-bg": "#2e1f25", "header-bg-low": "#2e1f25", "nav-bg": "#382e32", "stats-bg": "#46393f",
+      "surface-soft": "#46393f", "bio-box": "#382e32", "mode-active": "#514047",
+      "section-bar": "#514047", heading: "#ff66ab", label: "#ffffff",
+      "username-link": "#ff66ab", "login-link": "#ff66ab", "nav-text": "#e0d5da",
+      "chart-line": "#ff66ab", "rank-ss": "#ce1c9d",
+    },
+  },
+  classic: {
+    colors: {
+      "panel-bg": "#e9e7e9", surface: "#dedbdf", "surface-alt": "#e5e2e6", "floating-button-bg": "#5f5f5f",
+      divider: "#d5d1d6", border: "#c5c0c8", "border-strong": "#aaa2ad",
+      "muted-strong": "#77717a", muted: "#77717a", "muted-soft": "#918a94",
+      secondary: "#625966", "secondary-soft": "#756b79", "secondary-bright": "#514956",
+      "text-soft": "#5e5762", text: "#49434d", "text-bright": "#38333c",
+      "header-bg": "#817985", "header-bg-low": "#a29aa5", "nav-bg": "#e3dfe4", "stats-bg": "#d3ced5",
+      "surface-soft": "#e7e3e8", "bio-box": "#e2dee4", "mode-active": "#d4cdd7",
+      "section-bar": "#c9c2cc", heading: "#75647a", label: "#655b6b",
+      "username-link": "#625c78", "login-link": "#625c78", "nav-text": "#514a56",
+      "chart-line": "#a97863", "rank-ss": "#aa718c",
+    },
+  }
+};
 // Simple hex darken for the accent's hover/pressed shade - keeps the same
 // ~-25% lightness relationship for any picked color (the original pair
 // was #ff66aa → #ff3377; the v6 default darkens equivalently).
@@ -39,7 +85,14 @@ function darkenHex(hex, amount = 0.25) {
 }
 
 export function getThemeSettings() {
+  const storedStyle = GM_getValue(THEME_STYLE_KEY, THEME_DEFAULTS.style);
+  const style = Object.prototype.hasOwnProperty.call(THEME_PALETTES, storedStyle)
+    ? storedStyle
+    : THEME_DEFAULTS.style;
   return {
+    style,
+    // Accent and heart fill are independent user settings, not part of a
+    // style preset. Switching palettes must never rewrite or substitute them.
     accent: GM_getValue(THEME_ACCENT_KEY, THEME_DEFAULTS.accent),
     heartColor: GM_getValue(THEME_HEART_KEY, THEME_DEFAULTS.heartColor),
     idleOpacity: GM_getValue(THEME_IDLE_OPACITY_KEY, THEME_DEFAULTS.idleOpacity),
@@ -55,6 +108,11 @@ export function getThemeSettings() {
 export function applyTheme() {
   const t = getThemeSettings();
   const root = document.documentElement.style;
+  const palette = THEME_PALETTES[t.style];
+  for (const [name, value] of Object.entries(palette.colors)) {
+    root.setProperty(`--osu-fav-${name}`, value);
+  }
+  root.setProperty("--osu-fav-floating-button-bg", palette.colors["floating-button-bg"]);
   root.setProperty("--osu-fav-accent", t.accent);
   root.setProperty("--osu-fav-accent-dark", darkenHex(t.accent));
   root.setProperty("--osu-fav-heart-color", t.heartColor);

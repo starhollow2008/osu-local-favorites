@@ -17,7 +17,7 @@ export function createPopupMenu(anchorEl, id, css) {
   menu._anchor = anchorEl;
   menu.style.cssText =
     "position:fixed;z-index:100002;" + css +
-    "background:#1a1a1a;border:1px solid #333;border-radius:4px;" +
+    "background:var(--osu-fav-surface);border:1px solid var(--osu-fav-border);border-radius:4px;" +
     "box-shadow:0 4px 16px rgba(0,0,0,.5);padding:4px;" +
     "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif";
 

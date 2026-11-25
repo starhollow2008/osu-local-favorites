@@ -44,7 +44,7 @@ export function showDownloadMenu(anchorEl, beatmapId) {
 
   if (options.length === 0) {
     const empty = document.createElement("div");
-    empty.style.cssText = "font-size:11px;color:#666;padding:8px 10px;line-height:1.4";
+    empty.style.cssText = "font-size:11px;color:var(--osu-fav-muted);padding:8px 10px;line-height:1.4";
     empty.textContent = "No download source available - enable a mirror in Settings.";
     menu.appendChild(empty);
   } else {
@@ -55,12 +55,12 @@ export function showDownloadMenu(anchorEl, beatmapId) {
       row.rel = "noopener";
       row.textContent = opt.label;
       row.style.cssText =
-        "display:block;padding:6px 10px;font-size:11px;color:#ddd;text-decoration:none;" +
+        "display:block;padding:6px 10px;font-size:11px;color:var(--osu-fav-text);text-decoration:none;" +
         "border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis";
       hover.props(
         row,
         { background: "var(--osu-fav-accent)", color: "#fff" },
-        { background: "transparent", color: "#ddd" },
+        { background: "transparent", color: "var(--osu-fav-text)" },
       );
       row.addEventListener("click", cleanup);
       menu.appendChild(row);

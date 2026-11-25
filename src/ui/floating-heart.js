@@ -20,19 +20,21 @@ function indApplyVisual(ind, fav, dragging) {
   // the DOM (parse + node replacement + style invalidation) several times
   // per second even when the heart's state hadn't changed. Skip when the
   // visual state is identical - the very first call still renders.
+  ind.style.background = "var(--osu-fav-floating-button-bg)";
   if (ind._lastFav === fav && ind._lastDragging === dragging) return;
   ind._lastFav = fav;
   ind._lastDragging = dragging;
   ind.innerHTML = heartSVG(fav);
-  ind.style.background = "rgba(17,17,17,0.95)";
-  ind.style.border = fav ? "1px solid var(--osu-fav-accent)" : "1px solid #333";
+  ind.style.border = fav ? "1px solid var(--osu-fav-accent)" : "1px solid var(--osu-fav-border)";
   // No glow in either state. The accent-coloured border is already the
   // favorited signal; the pink drop shadow on top of it was the one piece
   // of the old "glowing circle" look left over, and it read as a halo
   // around the button on beatmap pages. Explicitly set to "none" rather
   // than removed, so a favorited -> unfavorited transition still clears
   // any shadow left on the element.
-  ind.style.boxShadow = "none";
+  ind.style.setProperty("box-shadow", "none", "important");
+  ind.style.setProperty("filter", "none", "important");
+  ind.style.setProperty("text-shadow", "none", "important");
   ind.style.opacity = dragging ? "0.85" : "";
 }
 

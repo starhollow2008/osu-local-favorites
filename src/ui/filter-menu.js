@@ -51,7 +51,7 @@ export function showFilterMenu(anchorEl, config, currentState, onApply) {
   let sections = config.collect() || [];
 
   const hint = document.createElement("div");
-  hint.style.cssText = "font-size:9px;color:#666;padding:2px 6px 6px;line-height:1.4";
+  hint.style.cssText = "font-size:9px;color:var(--osu-fav-muted);padding:2px 6px 6px;line-height:1.4";
   hint.textContent = config.hint || "Tap: include (green) \u2192 exclude (red) \u2192 off";
   menu.appendChild(hint);
 
@@ -63,7 +63,7 @@ export function showFilterMenu(anchorEl, config, currentState, onApply) {
   if (config.sortOptions && config.sortOptions.length && config.onSortSelect) {
     const sortLabel = document.createElement("div");
     sortLabel.style.cssText =
-      "font-size:9px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.03em;padding:0 6px 3px";
+      "font-size:9px;font-weight:700;color:var(--osu-fav-muted);text-transform:uppercase;letter-spacing:.03em;padding:0 6px 3px";
     sortLabel.textContent = "Sort";
     menu.appendChild(sortLabel);
 
@@ -73,9 +73,9 @@ export function showFilterMenu(anchorEl, config, currentState, onApply) {
     const paintSort = () => {
       sortBtnEls.forEach((b) => {
         const on = config.isSortActive && config.sortAsc === b._asc;
-        b.style.borderColor = on ? "var(--osu-fav-accent)" : "#333";
+        b.style.borderColor = on ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
         b.style.background = on ? "var(--osu-fav-accent)" : "transparent";
-        b.style.color = on ? "#fff" : "#999";
+        b.style.color = on ? "#fff" : "var(--osu-fav-secondary)";
       });
     };
     config.sortOptions.forEach((opt) => {
@@ -85,7 +85,7 @@ export function showFilterMenu(anchorEl, config, currentState, onApply) {
       sBtn.textContent = opt.label;
       sBtn.style.cssText =
         "flex:1;min-width:0;font-size:10px;font-weight:500;padding:4px 4px;border-radius:3px;" +
-        "cursor:pointer;box-sizing:border-box;border:1px solid #333;background:transparent;color:#999";
+        "cursor:pointer;box-sizing:border-box;border:1px solid var(--osu-fav-border);background:transparent;color:var(--osu-fav-secondary)";
       sBtn.addEventListener("click", () => {
         if (config.isSortActive && config.sortAsc === opt.asc) return; // already active
         config.isSortActive = true;
@@ -100,7 +100,7 @@ export function showFilterMenu(anchorEl, config, currentState, onApply) {
     menu.appendChild(sortRow);
 
     const sortDivider = document.createElement("div");
-    sortDivider.style.cssText = "height:1px;background:#333;margin:0 2px 6px";
+    sortDivider.style.cssText = "height:1px;background:var(--osu-fav-border);margin:0 2px 6px";
     menu.appendChild(sortDivider);
   }
 
@@ -110,7 +110,7 @@ export function showFilterMenu(anchorEl, config, currentState, onApply) {
     searchBox.type = "text";
     searchBox.placeholder = config.placeholder || "Filter list...";
     searchBox.style.cssText =
-      "width:100%;box-sizing:border-box;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;" +
+      "width:100%;box-sizing:border-box;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);" +
       "font-size:10px;padding:4px 6px;outline:none;margin-bottom:4px";
     searchBox.addEventListener("click", (e) => e.stopPropagation());
     searchBox.addEventListener("keydown", (e) => e.stopPropagation());
@@ -123,7 +123,7 @@ export function showFilterMenu(anchorEl, config, currentState, onApply) {
   function styleForState(s) {
     if (s === "include") return { bg: "#215a2b", border: "#3fa54a", color: "#fff" };
     if (s === "exclude") return { bg: "#5a2121", border: "#c0392b", color: "#fff" };
-    return { bg: "transparent", border: "#333", color: "#ccc" };
+    return { bg: "transparent", border: "var(--osu-fav-border)", color: "var(--osu-fav-text-soft)" };
   }
 
   function makeRow(term) {
@@ -178,7 +178,7 @@ export function showFilterMenu(anchorEl, config, currentState, onApply) {
       if (section.label) {
         const label = document.createElement("div");
         label.style.cssText =
-          "font-size:9px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.03em;padding:5px 8px 2px";
+          "font-size:9px;font-weight:700;color:var(--osu-fav-muted);text-transform:uppercase;letter-spacing:.03em;padding:5px 8px 2px";
         label.textContent = section.label;
         frag.appendChild(label);
       }
@@ -187,12 +187,12 @@ export function showFilterMenu(anchorEl, config, currentState, onApply) {
 
     if (!shownAny) {
       const empty = document.createElement("div");
-      empty.style.cssText = "font-size:11px;color:#666;padding:8px 10px";
+      empty.style.cssText = "font-size:11px;color:var(--osu-fav-muted);padding:8px 10px";
       empty.textContent = q ? "No matches." : config.emptyText || "Nothing to filter yet.";
       frag.appendChild(empty);
     } else if (hiddenTotal > 0) {
       const note = document.createElement("div");
-      note.style.cssText = "font-size:9px;color:#555;padding:5px 8px;line-height:1.4";
+      note.style.cssText = "font-size:9px;color:var(--osu-fav-muted-strong);padding:5px 8px;line-height:1.4";
       note.textContent = `+${hiddenTotal} more - type to narrow`;
       frag.appendChild(note);
     }
@@ -207,7 +207,7 @@ export function showFilterMenu(anchorEl, config, currentState, onApply) {
   const hasTerms = sections.some((s) => s.terms && s.terms.length);
   if (hasTerms) {
     const divider = document.createElement("div");
-    divider.style.cssText = "height:1px;background:#333;margin:4px 2px";
+    divider.style.cssText = "height:1px;background:var(--osu-fav-border);margin:4px 2px";
     menu.appendChild(divider);
 
     const clearBtn = document.createElement("button");
@@ -215,7 +215,7 @@ export function showFilterMenu(anchorEl, config, currentState, onApply) {
     clearBtn.textContent = config.clearLabel || "Clear this filter";
     clearBtn.style.cssText =
       "display:block;width:100%;text-align:center;padding:5px 8px;font-size:10px;box-sizing:border-box;" +
-    hover.props(clearBtn, { color: "var(--osu-fav-accent)" }, { color: "#888" });
+    hover.props(clearBtn, { color: "var(--osu-fav-accent)" }, { color: "var(--osu-fav-muted-soft)" });
     clearBtn.addEventListener("click", () => {
       Object.keys(state).forEach((k) => delete state[k]);
       onApply({});

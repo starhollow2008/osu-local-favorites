@@ -16,7 +16,7 @@ export function showCollectionsMenu(anchorEl, activeId, onSelect) {
     allRow.style.cssText =
       `display:block;width:100%;text-align:left;padding:6px 10px;margin-bottom:2px;font-size:11px;border:none;` +
       `border-radius:3px;cursor:pointer;box-sizing:border-box;` +
-    hover(allRow, () => { if (activeId) allRow.style.background = "#242424"; }, () => { if (activeId) allRow.style.background = "transparent"; });
+    hover(allRow, () => { if (activeId) allRow.style.background = "var(--osu-fav-surface-alt)"; }, () => { if (activeId) allRow.style.background = "transparent"; });
     allRow.addEventListener("click", () => { onSelect(""); cleanup(); });
     menu.appendChild(allRow);
 
@@ -25,7 +25,7 @@ export function showCollectionsMenu(anchorEl, activeId, onSelect) {
 
     if (entries.length === 0) {
       const empty = document.createElement("div");
-      empty.style.cssText = "font-size:11px;color:#666;padding:8px 10px;line-height:1.4";
+      empty.style.cssText = "font-size:11px;color:var(--osu-fav-muted);padding:8px 10px;line-height:1.4";
       empty.textContent = "No collections yet - create one below.";
       menu.appendChild(empty);
     }
@@ -40,8 +40,8 @@ export function showCollectionsMenu(anchorEl, activeId, onSelect) {
       selectBtn.style.cssText =
         `flex:1;min-width:0;text-align:left;padding:6px 10px;font-size:11px;border:none;border-radius:3px;` +
         `cursor:pointer;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;` +
-        `background:${activeId === id ? "var(--osu-fav-accent)" : "transparent"};color:${activeId === id ? "#fff" : "#ddd"}`;
-      hover(selectBtn, () => { if (activeId !== id) selectBtn.style.background = "#242424"; }, () => { if (activeId !== id) selectBtn.style.background = "transparent"; });
+        `background:${activeId === id ? "var(--osu-fav-accent)" : "transparent"};color:${activeId === id ? "#fff" : "var(--osu-fav-text)"}`;
+      hover(selectBtn, () => { if (activeId !== id) selectBtn.style.background = "var(--osu-fav-surface-alt)"; }, () => { if (activeId !== id) selectBtn.style.background = "transparent"; });
       selectBtn.addEventListener("click", () => { onSelect(activeId === id ? "" : id); cleanup(); });
 
       const delBtn = document.createElement("button");
@@ -49,7 +49,7 @@ export function showCollectionsMenu(anchorEl, activeId, onSelect) {
       delBtn.textContent = "\u2715";
       delBtn.title = "Delete collection";
       delBtn.style.cssText =
-        "flex-shrink:0;font-size:9px;padding:3px 5px;border:1px solid #333;border-radius:3px;background:transparent;color:#666;cursor:pointer";
+        "flex-shrink:0;font-size:9px;padding:3px 5px;border:1px solid var(--osu-fav-border);border-radius:3px;background:transparent;color:var(--osu-fav-muted);cursor:pointer";
       let confirming = false;
       delBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -62,8 +62,8 @@ export function showCollectionsMenu(anchorEl, activeId, onSelect) {
             if (confirming) {
               confirming = false;
               delBtn.textContent = "\u2715";
-              delBtn.style.borderColor = "#333";
-              delBtn.style.color = "#666";
+              delBtn.style.borderColor = "var(--osu-fav-border)";
+              delBtn.style.color = "var(--osu-fav-muted)";
             }
           }, 3000);
         } else {
@@ -78,7 +78,7 @@ export function showCollectionsMenu(anchorEl, activeId, onSelect) {
     });
 
     const divider = document.createElement("div");
-    divider.style.cssText = "height:1px;background:#333;margin:4px 2px";
+    divider.style.cssText = "height:1px;background:var(--osu-fav-border);margin:4px 2px";
     menu.appendChild(divider);
 
     const newRow = document.createElement("div");
@@ -87,7 +87,7 @@ export function showCollectionsMenu(anchorEl, activeId, onSelect) {
     input.type = "text";
     input.placeholder = "New collection...";
     input.style.cssText =
-      "flex:1;min-width:0;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;" +
+      "flex:1;min-width:0;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);" +
       "font-size:10px;padding:4px 6px;outline:none;box-sizing:border-box";
     input.addEventListener("click", (e) => e.stopPropagation());
     input.addEventListener("keydown", (e) => {
@@ -129,7 +129,7 @@ export function showAddToCollectionMenu(anchorEl, mapId, onChange) {
 
     if (entries.length === 0) {
       const empty = document.createElement("div");
-      empty.style.cssText = "font-size:11px;color:#666;padding:8px 10px;line-height:1.4";
+      empty.style.cssText = "font-size:11px;color:var(--osu-fav-muted);padding:8px 10px;line-height:1.4";
       empty.textContent = "No collections yet - create one below.";
       menu.appendChild(empty);
     } else {
@@ -139,9 +139,9 @@ export function showAddToCollectionMenu(anchorEl, mapId, onChange) {
         row.type = "button";
         row.style.cssText =
           "display:flex;align-items:center;gap:6px;width:100%;text-align:left;padding:6px 10px;" +
-          "font-size:11px;color:#ddd;background:transparent;border:none;border-radius:3px;cursor:pointer;" +
+          "font-size:11px;color:var(--osu-fav-text);background:transparent;border:none;border-radius:3px;cursor:pointer;" +
           "white-space:nowrap;box-sizing:border-box";
-        hover(row, () => (row.style.background = "#242424"), () => (row.style.background = "transparent"));
+        hover(row, () => (row.style.background = "var(--osu-fav-surface-alt)"), () => (row.style.background = "transparent"));
 
         const check = document.createElement("span");
         check.textContent = inCol ? "\u2713" : "";
@@ -162,7 +162,7 @@ export function showAddToCollectionMenu(anchorEl, mapId, onChange) {
     }
 
     const divider = document.createElement("div");
-    divider.style.cssText = "height:1px;background:#333;margin:4px 2px";
+    divider.style.cssText = "height:1px;background:var(--osu-fav-border);margin:4px 2px";
     menu.appendChild(divider);
 
     const newRow = document.createElement("div");
@@ -171,7 +171,7 @@ export function showAddToCollectionMenu(anchorEl, mapId, onChange) {
     input.type = "text";
     input.placeholder = "New collection...";
     input.style.cssText =
-      "flex:1;min-width:0;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;" +
+      "flex:1;min-width:0;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);" +
       "font-size:10px;padding:4px 6px;outline:none;box-sizing:border-box";
     input.addEventListener("click", (e) => e.stopPropagation());
     input.addEventListener("keydown", (e) => {
