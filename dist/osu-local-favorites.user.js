@@ -622,7 +622,7 @@
 const THEME_PALETTES = {
     neo: {
       colors: {
-        "panel-bg": "#111", surface: "#1a1a1a", "surface-alt": "#242424",
+        "panel-bg": "#111", surface: "#1a1a1a", "surface-alt": "#242424", "floating-button-bg": "rgba(17,17,17,0.95)",
         divider: "#222", border: "#333", "border-strong": "#444",
         "muted-strong": "#555", muted: "#666", "muted-soft": "#888",
         secondary: "#999", "secondary-soft": "#aaa", "secondary-bright": "#bbb",
@@ -636,7 +636,7 @@ const THEME_PALETTES = {
     },
     modern: {
       colors: {
-        "panel-bg": "#2a2226", surface: "#1c1719", "surface-alt": "#382e32",
+        "panel-bg": "#2a2226", surface: "#1c1719", "surface-alt": "#382e32", "floating-button-bg": "#2a2226",
         divider: "#3d2932", border: "#46393f", "border-strong": "#ff66ab",
         "muted-strong": "#d9a6bd", muted: "#d9a6bd", "muted-soft": "#d9a6bd",
         secondary: "#d9a6bd", "secondary-soft": "#d9a6bd", "secondary-bright": "#ffffff",
@@ -650,13 +650,13 @@ const THEME_PALETTES = {
     },
     classic: {
       colors: {
-        "panel-bg": "#ffffff", surface: "#a9a9ff", "surface-alt": "#5f5f5f",
+        "panel-bg": "#ffffff", surface: "#a9a9ff", "surface-alt": "#f0ecfa", "floating-button-bg": "#5f5f5f",
         divider: "#bea8f4", border: "#5a539a", "border-strong": "#5f5f5f",
         "muted-strong": "#5f5f5f", muted: "#5a539a", "muted-soft": "#3843a6",
         secondary: "#4e2151", "secondary-soft": "#3843a6", "secondary-bright": "#3366ff",
         "text-soft": "#4e2151", text: "#4e2151", "text-bright": "#3843a6",
         "header-bg": "#666cbc", "header-bg-low": "#888adf", "nav-bg": "#ffd6f3", "stats-bg": "#8588dd",
-        "surface-soft": "#f5f2fe", "bio-box": "#5f5f5f", "mode-active": "#bea8f4",
+        "surface-soft": "#f5f2fe", "bio-box": "#e7e4fc", "mode-active": "#bea8f4",
         "section-bar": "#5f5f5f", heading: "#5a539a", label: "#3843a6",
         "username-link": "#3366ff", "login-link": "#0f72ff", "nav-text": "#4e2151",
         "chart-line": "#ff7f0e", "rank-ss": "#ff5bac",
@@ -4799,7 +4799,7 @@ function darkenHex(hex, amount = 0.25) {
     ind._lastFav = fav;
     ind._lastDragging = dragging;
     ind.innerHTML = heartSVG(fav);
-    ind.style.background = "rgba(17,17,17,0.95)";
+    ind.style.background = "var(--osu-fav-floating-button-bg, rgba(17,17,17,0.95))";
     ind.style.border = fav ? "1px solid var(--osu-fav-accent)" : "1px solid var(--osu-fav-border)";
     ind.style.setProperty("box-shadow", "none", "important");
     ind.style.setProperty("filter", "none", "important");
