@@ -32,7 +32,9 @@ function indApplyVisual(ind, fav, dragging) {
   // around the button on beatmap pages. Explicitly set to "none" rather
   // than removed, so a favorited -> unfavorited transition still clears
   // any shadow left on the element.
-  ind.style.boxShadow = "none";
+  ind.style.setProperty("box-shadow", "none", "important");
+  ind.style.setProperty("filter", "none", "important");
+  ind.style.setProperty("text-shadow", "none", "important");
   ind.style.opacity = dragging ? "0.85" : "";
 }
 
