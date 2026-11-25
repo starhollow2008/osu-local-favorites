@@ -126,37 +126,95 @@ function makeStylePreviews(options, initial, onChange) {
   let current = initial;
   const buttons = {};
 
+  function makeBlock(parent, cssText, text) {
+    const el = document.createElement("div");
+    el.style.cssText = cssText;
+    if (text) el.textContent = text;
+    parent.appendChild(el);
+    return el;
+  }
+
   function paintButton(option) {
     const btn = buttons[option.value];
+    const colors = option.palette.colors;
     const selected = option.value === current;
-    const colors = option.palette.preview;
-    const stops = colors.map((color, index) => {
-      const from = (index / colors.length) * 100;
-      const to = ((index + 1) / colors.length) * 100;
-      return `${color} ${from}% ${to}%`;
-    }).join(", ");
-    btn.style.border = `${selected ? 2 : 1}px solid ${selected ? option.palette.accent : option.palette.colors.border}`;
-    btn.style.background = `linear-gradient(to bottom, ${stops})`;
+    btn.style.border = `2px solid ${selected ? colors.heading : colors.border}`;
+    btn.style.background = colors["panel-bg"];
     btn.setAttribute("aria-pressed", selected ? "true" : "false");
   }
 
   options.forEach((option) => {
+    const colors = option.palette.colors;
     const btn = document.createElement("button");
     btn.type = "button";
     btn.title = `${option.label} appearance`;
     btn.setAttribute("aria-label", `${option.label} appearance preview`);
     btn.style.cssText =
-      "position:relative;display:flex;align-items:center;justify-content:center;" +
-      "box-sizing:border-box;width:48px;height:96px;min-width:48px;flex:0 0 48px;" +
-      "padding:0;border-radius:5px;overflow:hidden;cursor:pointer;box-shadow:none;" +
-      "transition:border-color .15s ease,transform .15s ease";
-    const label = document.createElement("span");
-    label.textContent = option.label;
-    label.style.cssText =
-      "display:block;width:100%;padding:5px 0;background:rgba(0,0,0,.58);" +
-      "color:#fff;font-size:9px;font-weight:700;letter-spacing:.1px;" +
-      "text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.65);pointer-events:none";
-    btn.appendChild(label);
+      "display:flex;flex-direction:column;box-sizing:border-box;width:48px;height:96px;" +
+      "min-width:48px;flex:0 0 48px;padding:0;border-radius:5px;overflow:hidden;" +
+      "cursor:pointer;box-shadow:none;transition:border-color .15s ease,transform .15s ease";
+
+    // A tiny page mockup, using the same background, header, navigation,
+    // surfaces, stats, and text colors that applyTheme() puts on the panel.
+    const header = makeBlock(
+      btn,
+      "height:12px;flex:0 0 12px;background:linear-gradient(to bottom," +
+        colors["header-bg"] + "," + colors["header-bg-low"] + ")",
+    );
+    makeBlock(
+      btn,
+      "height:7px;flex:0 0 7px;background:" + colors["nav-bg"],
+    );
+
+    const page = makeBlock(
+      btn,
+      "display:flex;flex:1;min-height:0;flex-direction:column;gap:2px;padding:3px;" +
+        "box-sizing:border-box;background:" + colors["panel-bg"],
+    );
+    const stats = makeBlock(
+      page,
+      "height:9px;flex:0 0 9px;background:" + colors["stats-bg"] +
+        ";border-radius:1px",
+    );
+    const columns = makeBlock(
+      page,
+      "display:flex;flex:1;min-height:0;gap:2px",
+    );
+    const content = makeBlock(
+      columns,
+      "display:flex;flex:1;flex-direction:column;gap:2px;padding:3px;" +
+        "box-sizing:border-box;background:" + colors.surface,
+    );
+    makeBlock(
+      content,
+      "height:3px;width:70%;background:" + colors.heading + ";border-radius:1px",
+    );
+    makeBlock(
+      content,
+      "height:2px;width:48%;background:" + colors.label + ";border-radius:1px",
+    );
+    makeBlock(
+      content,
+      "height:8px;background:" + colors["surface-soft"] + ";border-radius:1px",
+    );
+    const sidebar = makeBlock(
+      columns,
+      "width:12px;flex:0 0 12px;background:" + colors["surface-alt"] +
+        ";border-radius:1px",
+    );
+    makeBlock(
+      sidebar,
+      "height:8px;margin:2px;background:" + colors["bio-box"] + ";border-radius:1px",
+    );
+    makeBlock(
+      btn,
+      "height:13px;flex:0 0 13px;display:flex;align-items:center;justify-content:center;" +
+        "background:" + colors["surface-soft"] + ";border-top:1px solid " +
+        colors["section-bar"] + ";color:" + colors.heading +
+        ";font-size:8px;font-weight:700;line-height:1",
+      option.label,
+    );
+
     btn.addEventListener("click", () => {
       if (current === option.value) return;
       current = option.value;
