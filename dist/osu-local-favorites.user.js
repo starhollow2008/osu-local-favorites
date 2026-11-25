@@ -630,7 +630,7 @@ const THEME_PALETTES = {
         "muted-strong": "#555", muted: "#666", "muted-soft": "#888",
         secondary: "#999", "secondary-soft": "#aaa", "secondary-bright": "#bbb",
         "text-soft": "#ccc", text: "#ddd", "text-bright": "#eee",
-        "header-bg": "#1a1a1a", "nav-bg": "#242424", "stats-bg": "#333",
+        "header-bg": "#1a1a1a", "header-bg-low": "#1a1a1a", "nav-bg": "#242424", "stats-bg": "#333",
         "surface-soft": "#242424", "bio-box": "#1a1a1a", "mode-active": "#ff91bb",
         "section-bar": "#444", heading: "#ff91bb", label: "#ddd",
         "username-link": "#ff91bb", "login-link": "#ff91bb", "nav-text": "#ddd",
@@ -647,7 +647,7 @@ const THEME_PALETTES = {
         "muted-strong": "#d9a6bd", muted: "#d9a6bd", "muted-soft": "#d9a6bd",
         secondary: "#d9a6bd", "secondary-soft": "#d9a6bd", "secondary-bright": "#ffffff",
         "text-soft": "#ffffff", text: "#ffffff", "text-bright": "#ffffff",
-        "header-bg": "#2e1f25", "nav-bg": "#3d2932", "stats-bg": "#382e32",
+        "header-bg": "#2e1f25", "header-bg-low": "#2e1f25", "nav-bg": "#3d2932", "stats-bg": "#382e32",
         "surface-soft": "#382e32", "bio-box": "#2a2226", "mode-active": "#46393f",
         "section-bar": "#46393f", heading: "#ff66ab", label: "#ffffff",
         "username-link": "#ff66ab", "login-link": "#ff66ab", "nav-text": "#d9a6bd",
@@ -656,15 +656,15 @@ const THEME_PALETTES = {
     },
     classic: {
       accent: "#ff5bac",
-      heartColor: "#a64d83",
-      preview: ["#a9a9ff", "#ffffff", "#f0ecfa", "#f5f2fe", "#e7e4fc", "#ffd6f3", "#5a539a"],
+      heartColor: "#ff5bac",
+      preview: ["#666cbc", "#888adf", "#a9a9ff", "#ffffff", "#f0ecfa", "#e7e4fc", "#ffd6f3", "#5a539a"],
       colors: {
         "panel-bg": "#a9a9ff", surface: "#ffffff", "surface-alt": "#f0ecfa",
         divider: "#bea8f4", border: "#5a539a", "border-strong": "#5f5f5f",
         "muted-strong": "#5f5f5f", muted: "#5a539a", "muted-soft": "#3843a6",
         secondary: "#4e2151", "secondary-soft": "#3843a6", "secondary-bright": "#3366ff",
         "text-soft": "#4e2151", text: "#4e2151", "text-bright": "#3843a6",
-        "header-bg": "#666cbc", "nav-bg": "#ffd6f3", "stats-bg": "#8588dd",
+        "header-bg": "#666cbc", "header-bg-low": "#888adf", "nav-bg": "#ffd6f3", "stats-bg": "#8588dd",
         "surface-soft": "#f5f2fe", "bio-box": "#e7e4fc", "mode-active": "#bea8f4",
         "section-bar": "#5f5f5f", heading: "#5a539a", label: "#3843a6",
         "username-link": "#3366ff", "login-link": "#0f72ff", "nav-text": "#4e2151",
@@ -673,9 +673,7 @@ const THEME_PALETTES = {
     },
   };
 
-
-
-  function darkenHex(hex, amount = 0.25) {
+function darkenHex(hex, amount = 0.25) {
     const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     if (!m) return hex;
     const clamp = (n) => Math.max(0, Math.min(255, Math.round(n)));
