@@ -2114,10 +2114,12 @@
     stopPlayback(audio);
   }
 
-  function swapAudioSourceToCached(audio, sourceUrl) {
+    function swapAudioSourceToCached(audio, sourceUrl) {
     const cachedBlob = getKnownCachedBlob(sourceUrl);
     if (!cachedBlob) return Promise.resolve(false);
-
+  
+    // Bind the handoff to this exact playback request. A late cache completion
+    // must never replace a track selected after the writer started.
     const trackId = audio._npCurrentId;
     const requestSeq = audio._playRequestSeq;
     const ownsTrack = () =>
@@ -2125,41 +2127,58 @@
       audio._playRequestSeq === requestSeq &&
       audio._activeCacheKey === sourceUrl;
     if (!ownsTrack() || audio.ended) return Promise.resolve(false);
-
+  
     let localUrl = _blobUrlCache.get(sourceUrl);
     if (!localUrl) {
       localUrl = URL.createObjectURL(cachedBlob);
       _blobUrlCache.set(sourceUrl, localUrl);
     }
-
+  
     const applyState = () => {
       audio._usingBlobCache = true;
       audio._activePreviewUrl = localUrl;
     };
-
+  
+    // Paused (or ended mid-swap): no sound to bridge. The paused position
+    // survives via the seek below; a paused element reloads silently.
     if (audio.paused) {
       const resumeAt = audio.currentTime;
       try { audio.preload = "auto"; } catch {}
       applyState();
-      audio.addEventListener("loadedmetadata", () => {
+      // Attach before load so the metadata event cannot race the listener.
+      const onMetadata = () => {
         if (!ownsTrack() || audio._activePreviewUrl !== localUrl) return;
+        if (audio.currentSrc && audio.currentSrc !== localUrl) return;
+        if (audio.readyState < 1) return;
+        audio.removeEventListener("loadedmetadata", onMetadata);
         try {
           if (Number.isFinite(resumeAt) && resumeAt > 0 && resumeAt < (audio.duration || Infinity)) {
             audio.currentTime = resumeAt;
           }
-        } catch (e) {}
-      }, { once: true });
+        } catch (e) { /* unseekable blob - restart from the top */ }
+      };
+      audio.addEventListener("loadedmetadata", onMetadata);
       audio.src = localUrl;
       try { audio.load(); } catch {}
       return Promise.resolve(true);
     }
-
+  
+    // Playing: bridge with a shadow element so the re-src gap is inaudible.
+    // Every failure BEFORE the main element is re-srced aborts with NO-OP
+    // (network source keeps playing untouched) instead of killing playback.
+    // After the main element is re-srced, failures leave it paused at the
+    // correct position with the blob source, so one tap resumes.
     return new Promise((resolve) => {
       let settled = false;
       let handoffStarted = false;
       let shadow = null;
       let shadowWatchdog = null;
       let mainMetaWatchdog = null;
+      // The track may change while the swap is in flight. Before the handoff
+      // the main element must still be on the source we started from; after
+      // it, still on the blob we staged. Anything else means a newer track
+      // owns the element and this swap must not touch it (a stale onMeta
+      // would otherwise seek the new song to the old song's position).
       const startedActive = audio._activePreviewUrl;
       const superseded = () =>
         !ownsTrack() ||
@@ -2208,108 +2227,205 @@
           stopPlayback(audio);
         }
       };
-
-      shadowWatchdog = setTimeout(finishNoop, 1500);
-
+  
+      shadowWatchdog = setTimeout(finishNoop, 5000);
+  
       try {
         shadow = new Audio(localUrl);
         shadow.preload = "auto";
+        // Watch the bridge explicitly: load() can cancel the network source's
+        // natural ended event while the main element is being replaced.
         shadow.addEventListener("ended", handleShadowEnded);
+        // A shadow error only aborts BEFORE the handoff; afterwards the main
+        // element owns playback and the shadow is just a bridge.
         shadow.addEventListener("error", () => { if (!handoffStarted) finishNoop(); }, { once: true });
         shadow.addEventListener("canplay", () => {
           if (settled || handoffStarted) return;
           if (superseded()) { finishNoop(); return; }
           const sh = shadow;
-          try { sh.currentTime = audio.currentTime; } catch {}
-          const sp = sh.play();
-          const proceed = () => {
-            if (settled || handoffStarted) return;
-            clearTimeout(shadowWatchdog);
-            if (superseded()) { finishNoop(); return; }
-            beginMainHandoff();
+          const shadowTarget = audio.currentTime;
+          if (!Number.isFinite(shadowTarget) || shadowTarget < 0) { finishNoop(); return; }
+  
+          const startShadow = () => {
+            if (settled || handoffStarted || superseded()) {
+              if (!settled) finishNoop();
+              return;
+            }
+            // The requested seek is not complete until "seeked". Starting
+            // early can make the bridge play from 0 and roll the main track
+            // backwards by the time elapsed since playback began.
+            if (!Number.isFinite(sh.currentTime) || Math.abs(sh.currentTime - shadowTarget) > 0.75) {
+              finishNoop();
+              return;
+            }
+            const sp = sh.play();
+            const proceed = () => {
+              if (settled || handoffStarted) return;
+              clearTimeout(shadowWatchdog);
+              if (superseded()) { finishNoop(); return; }
+              beginMainHandoff();
+            };
+            if (sp && typeof sp.then === "function") sp.then(proceed).catch(finishNoop);
+            else proceed();
           };
-          if (sp && typeof sp.then === "function") {
-            sp.then(proceed).catch(finishNoop);
+  
+          if (Math.abs(sh.currentTime - shadowTarget) <= 0.15 && !sh.seeking) {
+            startShadow();
           } else {
-            proceed();
+            const onShadowSeeked = () => startShadow();
+            sh.addEventListener("seeked", onShadowSeeked, { once: true });
+            try { sh.currentTime = shadowTarget; }
+            catch (_) {
+              sh.removeEventListener("seeked", onShadowSeeked);
+              finishNoop();
+              return;
+            }
+            if (!sh.seeking && Math.abs(sh.currentTime - shadowTarget) <= 0.15) {
+              sh.removeEventListener("seeked", onShadowSeeked);
+              startShadow();
+            }
           }
         }, { once: true });
       } catch {
         finishNoop();
         return;
       }
-
+  
       const beginMainHandoff = () => {
         if (settled || handoffStarted) return;
         handoffStarted = true;
+        // Shadow is now audible and covering at the live position.
+        // Remember where we are: after load() the main element reports 0,
+        // so if the shadow is gone by then, this is the fallback position
+        // (reading audio.currentTime there restarted the song).
         let resumeFrom = 0;
         try {
           resumeFrom = shadow ? shadow.currentTime : audio.currentTime;
         } catch {}
         try { audio.preload = "auto"; } catch {}
         applyState();
-
+  
         let metaDone = false;
         const onMeta = () => {
-          if (metaDone) return;
+          if (metaDone || settled || superseded()) return;
+          // Ignore metadata from the old network resource, and never treat the
+          // watchdog as proof that the new Blob has metadata ready.
+          if (audio.currentSrc && audio.currentSrc !== localUrl) return;
+          if (audio.readyState < 1 || !Number.isFinite(audio.duration)) return;
           metaDone = true;
+          audio.removeEventListener("loadedmetadata", onMeta);
           clearTimeout(mainMetaWatchdog);
-          if (settled || superseded()) { finishNoop(); return; }
           if (shadow && shadow.ended) { handleShadowEnded(); return; }
-          try {
-            const t = shadow ? shadow.currentTime : resumeFrom;
-            const dur = audio.duration;
-            if (Number.isFinite(t) && t > 0 && (!Number.isFinite(dur) || t < dur)) {
-              audio.currentTime = t;
-            }
-          } catch {}
-          let bridgeDone = false;
-          let bridgeFallback = null;
-          const finishBridge = () => {
-            if (bridgeDone) return;
-            bridgeDone = true;
-            clearTimeout(bridgeFallback);
-            audio.removeEventListener("playing", finishBridge);
-            if (settled || superseded()) { finishNoop(); return; }
+  
+          const startMainPlayback = () => {
+            if (settled || superseded()) return;
             if (shadow && shadow.ended) { handleShadowEnded(); return; }
-            try {
-              const t2 = shadow ? shadow.currentTime : audio.currentTime;
-              if (Number.isFinite(t2) && Math.abs(audio.currentTime - t2) > 0.15) audio.currentTime = t2;
-            } catch {}
-            finishOk();
-          };
-          audio.addEventListener("playing", finishBridge);
-          const p = audio.play();
-          if (p && typeof p.then === "function") {
-            p.then(() => {
-              finishBridge();
-            }).catch(() => {
+  
+            let bridgeDone = false;
+            let bridgeFallback = null;
+            const finishBridge = () => {
+              if (bridgeDone || settled || superseded()) return;
+              if (shadow && shadow.ended) { handleShadowEnded(); return; }
+              if (audio.paused || audio.readyState < 2) return;
               bridgeDone = true;
               clearTimeout(bridgeFallback);
               audio.removeEventListener("playing", finishBridge);
-              try { if (shadow) shadow.pause(); } catch {}
+              // Do not sync to shadow.currentTime here: it can already be
+              // behind the main player's clock and cause a second rollback.
               finishOk();
-            });
-            bridgeFallback = setTimeout(finishBridge, 400);
-          } else {
-            bridgeFallback = setTimeout(finishBridge, 100);
-          }
+            };
+  
+            audio.addEventListener("playing", finishBridge);
+            const p = audio.play();
+            if (p && typeof p.then === "function") {
+              p.then(() => {
+                if (!audio.paused && audio.readyState >= 2) finishBridge();
+              }).catch(() => {
+                // Keep the bridge alive if the replacement play() is denied;
+                // its ended handler still performs the normal loop/auto-next.
+                audio.removeEventListener("playing", finishBridge);
+              });
+              bridgeFallback = setTimeout(() => {
+                if (!audio.paused && audio.readyState >= 2) finishBridge();
+              }, 1500);
+            } else {
+              bridgeFallback = setTimeout(() => {
+                if (!audio.paused && audio.readyState >= 2) finishBridge();
+              }, 400);
+            }
+          };
+  
+          const alignMainToShadow = (attempt = 0) => {
+            if (settled || superseded()) return;
+            if (shadow && shadow.ended) { handleShadowEnded(); return; }
+            const shadowPosition = shadow ? shadow.currentTime : resumeFrom;
+            if (!Number.isFinite(shadowPosition)) { startMainPlayback(); return; }
+  
+            const duration = Number.isFinite(audio.duration) ? audio.duration : Infinity;
+            const target = Math.max(0, Math.min(shadowPosition, duration));
+            // Never seek backwards to follow a lagging shadow clock.
+            if (target <= audio.currentTime + 0.15) {
+              startMainPlayback();
+              return;
+            }
+  
+            let seekDone = false;
+            let seekWatchdog = null;
+            const onSeeked = () => {
+              if (seekDone) return;
+              seekDone = true;
+              clearTimeout(seekWatchdog);
+              audio.removeEventListener("seeked", onSeeked);
+              if (settled || superseded()) return;
+              if (!Number.isFinite(audio.currentTime) || Math.abs(audio.currentTime - target) > 0.75) return;
+  
+              const drift = shadow ? shadow.currentTime - audio.currentTime : 0;
+              if (drift > 1.25 && attempt < 2) {
+                alignMainToShadow(attempt + 1);
+                return;
+              }
+              startMainPlayback();
+            };
+  
+            audio.addEventListener("seeked", onSeeked, { once: true });
+            try { audio.currentTime = target; }
+            catch (_) {
+              audio.removeEventListener("seeked", onSeeked);
+              return;
+            }
+            if (!audio.seeking && Math.abs(audio.currentTime - target) <= 0.15) {
+              onSeeked();
+              return;
+            }
+            seekWatchdog = setTimeout(() => {
+              if (seekDone) return;
+              if (!audio.seeking && Math.abs(audio.currentTime - target) <= 0.75) onSeeked();
+              else {
+                seekDone = true;
+                audio.removeEventListener("seeked", onSeeked);
+                // Leave the shadow running if the main decoder fails to confirm
+                // its seek, rather than cutting off the track.
+              }
+            }, 2000);
+          };
+  
+          alignMainToShadow();
         };
-
-        audio.addEventListener("loadedmetadata", onMeta, { once: true });
+  
+        audio.addEventListener("loadedmetadata", onMeta);
         mainMetaWatchdog = setTimeout(() => {
-          if (!metaDone) {
-            audio.removeEventListener("loadedmetadata", onMeta);
-            onMeta();
-          }
-        }, 1200);
+          if (
+            !metaDone &&
+            audio.readyState >= 1 &&
+            Number.isFinite(audio.duration) &&
+            (!audio.currentSrc || audio.currentSrc === localUrl)
+          ) onMeta();
+        }, 2000);
         audio.src = localUrl;
         try { audio.load(); } catch {}
       };
     });
-  }
-
-  // ━━━━━━━━━━ src/ui/popup-menu.js ━━━━━━━━━━
+  }  // ━━━━━━━━━━ src/ui/popup-menu.js ━━━━━━━━━━
 
   function createPopupMenu(anchorEl, id, css) {
     const existing = document.getElementById(id);
@@ -4948,27 +5064,77 @@
     return select;
   }
 
-  function makeSlider(initialPct, onChange) {
+    function makeSlider(initialPct, onChange) {
     const wrap = document.createElement("div");
-    wrap.style.cssText = "display:flex;align-items:center;gap:8px;flex-shrink:0;width:130px";
+    wrap.style.cssText = "display:flex;align-items:center;gap:8px;flex-shrink:0;width:150px";
     const slider = document.createElement("input");
     slider.type = "range";
     slider.min = "0";
     slider.max = "100";
     slider.value = String(initialPct);
     slider.style.cssText = "flex:1;min-width:0;accent-color:var(--osu-fav-accent);cursor:pointer";
-    const valSpan = document.createElement("span");
-    valSpan.style.cssText = "font-size:10px;color:#666;width:32px;text-align:right;flex-shrink:0";
+  
+    const valSpan = document.createElement("button");
+    valSpan.type = "button";
+    valSpan.title = "Tap to enter a percentage";
+    valSpan.setAttribute("aria-label", "Edit percentage");
+    valSpan.style.cssText =
+      "font-size:10px;color:#888;width:46px;min-height:28px;text-align:right;flex-shrink:0;" +
+      "padding:3px 4px;border:1px solid transparent;border-radius:3px;background:transparent;" +
+      "font-family:inherit;cursor:text";
     valSpan.textContent = initialPct + "%";
+  
     slider.addEventListener("input", () => {
       valSpan.textContent = slider.value + "%";
       onChange(Number(slider.value) / 100);
     });
+  
+    valSpan.addEventListener("click", () => {
+      if (valSpan.parentNode !== wrap) return;
+      const editor = document.createElement("input");
+      editor.type = "text";
+      editor.inputMode = "numeric";
+      editor.pattern = "[0-9]*";
+      editor.maxLength = 3;
+      editor.value = slider.value;
+      editor.setAttribute("aria-label", "Percentage from 0 to 100");
+      editor.style.cssText =
+        "box-sizing:border-box;width:46px;height:28px;padding:3px 4px;text-align:right;" +
+        "border:1px solid var(--osu-fav-accent);border-radius:3px;background:#111;color:#ddd;" +
+        "font-size:11px;font-family:inherit;flex-shrink:0";
+      let cancelled = false;
+      const closeEditor = (commit) => {
+        if (editor.parentNode !== wrap) return;
+        if (commit) {
+          const raw = editor.value.trim();
+          if (/^\d{1,3}$/.test(raw)) {
+            const pct = Math.max(0, Math.min(100, Number(raw)));
+            slider.value = String(pct);
+            valSpan.textContent = pct + "%";
+            onChange(pct / 100);
+          }
+        }
+        editor.replaceWith(valSpan);
+      };
+      editor.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          editor.blur();
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          cancelled = true;
+          editor.blur();
+        }
+      });
+      editor.addEventListener("blur", () => closeEditor(!cancelled), { once: true });
+      valSpan.replaceWith(editor);
+      editor.focus();
+      editor.select();
+    });
+  
     wrap.append(slider, valSpan);
     return wrap;
-  }
-
-  function hexToRgb(hex) {
+  }  function hexToRgb(hex) {
     hex = String(hex).replace("#", "");
     if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
     const num = parseInt(hex, 16);
@@ -5883,7 +6049,7 @@
         GM_setValue(MUSIC_AUTONEXT_KEY, on);
       });
       wrap.appendChild(
-        settingsRow("Auto next", autoNextToggle, "Plays the next favorite automatically when a track ends - ignored while Loop track is on"),
+        settingsRow("Autoplay", autoNextToggle, "Plays the next favorite automatically when a track ends - ignored while Loop track is on"),
       );
 
       const shuffleToggle = makeToggleSwitch(musicShuffleEnabled(), (on) => {

@@ -139,25 +139,75 @@ function makeDropdown(options, initial, onChange) {
 // 0–100 percentage slider with a live-updating label - used by Appearance
 function makeSlider(initialPct, onChange) {
   const wrap = document.createElement("div");
-  wrap.style.cssText = "display:flex;align-items:center;gap:8px;flex-shrink:0;width:130px";
+  wrap.style.cssText = "display:flex;align-items:center;gap:8px;flex-shrink:0;width:150px";
   const slider = document.createElement("input");
   slider.type = "range";
   slider.min = "0";
   slider.max = "100";
   slider.value = String(initialPct);
   slider.style.cssText = "flex:1;min-width:0;accent-color:var(--osu-fav-accent);cursor:pointer";
-  const valSpan = document.createElement("span");
-  valSpan.style.cssText = "font-size:10px;color:#666;width:32px;text-align:right;flex-shrink:0";
+
+  const valSpan = document.createElement("button");
+  valSpan.type = "button";
+  valSpan.title = "Tap to enter a percentage";
+  valSpan.setAttribute("aria-label", "Edit percentage");
+  valSpan.style.cssText =
+    "font-size:10px;color:#888;width:46px;min-height:28px;text-align:right;flex-shrink:0;" +
+    "padding:3px 4px;border:1px solid transparent;border-radius:3px;background:transparent;" +
+    "font-family:inherit;cursor:text";
   valSpan.textContent = initialPct + "%";
+
   slider.addEventListener("input", () => {
     valSpan.textContent = slider.value + "%";
     onChange(Number(slider.value) / 100);
   });
+
+  valSpan.addEventListener("click", () => {
+    if (valSpan.parentNode !== wrap) return;
+    const editor = document.createElement("input");
+    editor.type = "text";
+    editor.inputMode = "numeric";
+    editor.pattern = "[0-9]*";
+    editor.maxLength = 3;
+    editor.value = slider.value;
+    editor.setAttribute("aria-label", "Percentage from 0 to 100");
+    editor.style.cssText =
+      "box-sizing:border-box;width:46px;height:28px;padding:3px 4px;text-align:right;" +
+      "border:1px solid var(--osu-fav-accent);border-radius:3px;background:#111;color:#ddd;" +
+      "font-size:11px;font-family:inherit;flex-shrink:0";
+    let cancelled = false;
+    const closeEditor = (commit) => {
+      if (editor.parentNode !== wrap) return;
+      if (commit) {
+        const raw = editor.value.trim();
+        if (/^\d{1,3}$/.test(raw)) {
+          const pct = Math.max(0, Math.min(100, Number(raw)));
+          slider.value = String(pct);
+          valSpan.textContent = pct + "%";
+          onChange(pct / 100);
+        }
+      }
+      editor.replaceWith(valSpan);
+    };
+    editor.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        editor.blur();
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        cancelled = true;
+        editor.blur();
+      }
+    });
+    editor.addEventListener("blur", () => closeEditor(!cancelled), { once: true });
+    valSpan.replaceWith(editor);
+    editor.focus();
+    editor.select();
+  });
+
   wrap.append(slider, valSpan);
   return wrap;
-}
-
-// ── Custom color picker ──
+}// ── Custom color picker ──
 // We used to hand off to a real <input type="color">, but the
 // saturation/value "plane" it opens is drawn by the browser's own
 // chrome (not page content), so a userscript has zero access to it -
@@ -1159,7 +1209,7 @@ export function createSettingsView(deps) {
       GM_setValue(MUSIC_AUTONEXT_KEY, on);
     });
     wrap.appendChild(
-      settingsRow("Auto next", autoNextToggle, "Plays the next favorite automatically when a track ends - ignored while Loop track is on"),
+      settingsRow("Autoplay", autoNextToggle, "Plays the next favorite automatically when a track ends - ignored while Loop track is on"),
     );
 
     const shuffleToggle = makeToggleSwitch(musicShuffleEnabled(), (on) => {
