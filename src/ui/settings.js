@@ -44,7 +44,7 @@ function sectionLabel(text) {
 
 function divider() {
   const d = document.createElement("div");
-  d.style.cssText = "height:1px;background:#222;margin:4px 0";
+  d.style.cssText = "height:1px;background:var(--osu-fav-divider);margin:4px 0";
   return d;
 }
 
@@ -55,12 +55,12 @@ function settingsRow(labelText, controlEl, subtitleText) {
   const left = document.createElement("div");
   left.style.cssText = "flex:1;min-width:0";
   const lbl = document.createElement("div");
-  lbl.style.cssText = "font-size:11px;color:#ddd;font-weight:500";
+  lbl.style.cssText = "font-size:11px;color:var(--osu-fav-text);font-weight:500";
   lbl.textContent = labelText;
   left.appendChild(lbl);
   if (subtitleText) {
     const sub = document.createElement("div");
-    sub.style.cssText = "font-size:10px;color:#666;margin-top:2px;line-height:1.4";
+    sub.style.cssText = "font-size:10px;color:var(--osu-fav-muted);margin-top:2px;line-height:1.4";
     // Usually plain text, but a row can also pass a Node/DocumentFragment
     // (e.g. to embed a real hyperlink inside the subtitle)
     if (typeof subtitleText === "string") sub.textContent = subtitleText;
@@ -76,14 +76,14 @@ function makeToggleSwitch(initialOn, onChange) {
   const wrap = document.createElement("button");
   wrap.type = "button";
   let on = initialOn;
-  wrap.style.cssText = `position:relative;width:34px;height:18px;border-radius:9px;flex-shrink:0;padding:0;cursor:pointer;border:1px solid ${on ? "var(--osu-fav-accent)" : "#333"};background:${on ? "var(--osu-fav-accent)" : "#222"};transition:background .15s,border-color .15s`;
+  wrap.style.cssText = `position:relative;width:34px;height:18px;border-radius:9px;flex-shrink:0;padding:0;cursor:pointer;border:1px solid ${on ? "var(--osu-fav-accent)" : "var(--osu-fav-border)"};background:${on ? "var(--osu-fav-accent)" : "var(--osu-fav-divider)"};transition:background .15s,border-color .15s`;
   const knob = document.createElement("span");
   knob.style.cssText = `position:absolute;top:1px;left:${on ? "17px" : "1px"};width:14px;height:14px;border-radius:50%;background:#fff;transition:left .15s`;
   wrap.appendChild(knob);
   wrap.addEventListener("click", () => {
     on = !on;
-    wrap.style.background = on ? "var(--osu-fav-accent)" : "#222";
-    wrap.style.borderColor = on ? "var(--osu-fav-accent)" : "#333";
+    wrap.style.background = on ? "var(--osu-fav-accent)" : "var(--osu-fav-divider)";
+    wrap.style.borderColor = on ? "var(--osu-fav-accent)" : "var(--osu-fav-border)";
     knob.style.left = on ? "17px" : "1px";
     onChange(on);
   });
@@ -94,19 +94,19 @@ function makeToggleSwitch(initialOn, onChange) {
 function makeSegmented(options, initial, onChange) {
   const wrap = document.createElement("div");
   wrap.style.cssText =
-    "display:flex;gap:2px;background:#111;border:1px solid #333;border-radius:3px;padding:2px;flex-shrink:0";
+    "display:flex;gap:2px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;padding:2px;flex-shrink:0";
   let current = initial;
   const btns = {};
   options.forEach(({ value, label }) => {
     const btn = document.createElement("button");
     btn.textContent = label;
-    btn.style.cssText = `font-size:10px;font-weight:500;padding:3px 10px;border:none;border-radius:2px;cursor:pointer;background:${value === current ? "var(--osu-fav-accent)" : "transparent"};color:${value === current ? "#fff" : "#666"}`;
+    btn.style.cssText = `font-size:10px;font-weight:500;padding:3px 10px;border:none;border-radius:2px;cursor:pointer;background:${value === current ? "var(--osu-fav-accent)" : "transparent"};color:${value === current ? "#fff" : "var(--osu-fav-muted)"}`;
     btn.addEventListener("click", () => {
       if (current === value) return;
       current = value;
       options.forEach((o) => {
         btns[o.value].style.background = o.value === current ? "var(--osu-fav-accent)" : "transparent";
-        btns[o.value].style.color = o.value === current ? "#fff" : "#666";
+        btns[o.value].style.color = o.value === current ? "#fff" : "var(--osu-fav-muted)";
       });
       onChange(current);
     });
@@ -123,7 +123,7 @@ function makeSegmented(options, initial, onChange) {
 function makeDropdown(options, initial, onChange) {
   const select = document.createElement("select");
   select.style.cssText =
-    "background:#111;border:1px solid #333;border-radius:3px;color:#ddd;" +
+    "background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);" +
     "font-size:10px;font-family:inherit;padding:4px 6px;cursor:pointer;flex-shrink:0;max-width:150px";
   options.forEach(({ value, label }) => {
     const o = document.createElement("option");
@@ -152,7 +152,7 @@ function makeSlider(initialPct, onChange) {
   valSpan.title = "Tap to enter a percentage";
   valSpan.setAttribute("aria-label", "Edit percentage");
   valSpan.style.cssText =
-    "font-size:10px;color:#888;width:46px;min-height:28px;text-align:right;flex-shrink:0;" +
+    "font-size:10px;color:var(--osu-fav-muted-soft);width:46px;min-height:28px;text-align:right;flex-shrink:0;" +
     "padding:3px 4px;border:1px solid transparent;border-radius:3px;background:transparent;" +
     "font-family:inherit;cursor:text";
   valSpan.textContent = initialPct + "%";
@@ -173,7 +173,7 @@ function makeSlider(initialPct, onChange) {
     editor.setAttribute("aria-label", "Percentage from 0 to 100");
     editor.style.cssText =
       "box-sizing:border-box;width:46px;height:28px;padding:3px 4px;text-align:right;" +
-      "border:1px solid var(--osu-fav-accent);border-radius:3px;background:#111;color:#ddd;" +
+      "border:1px solid var(--osu-fav-accent);border-radius:3px;background:var(--osu-fav-panel-bg);color:var(--osu-fav-text);" +
       "font-size:11px;font-family:inherit;flex-shrink:0";
     let cancelled = false;
     const closeEditor = (commit) => {
@@ -292,7 +292,7 @@ let _openColorPanelCleanup = null;  // `root` is the settings scroll container t
   function makeColorInput(root, initialHex, onChange) {
   const swatch = document.createElement("div");
   swatch.style.cssText =
-    `width:40px;height:24px;border:1px solid #333;border-radius:3px;cursor:pointer;` +
+    `width:40px;height:24px;border:1px solid var(--osu-fav-border);border-radius:3px;cursor:pointer;` +
     `background:${initialHex};flex-shrink:0`;
 
   const rgb0 = hexToRgb(initialHex);
@@ -310,7 +310,7 @@ let _openColorPanelCleanup = null;  // `root` is the settings scroll container t
     panel = document.createElement("div");
     panel.style.cssText =
       "position:fixed;z-index:100002;width:200px;box-sizing:border-box;" +
-      "background:#1a1a1a;border:1px solid #333;border-radius:4px;" +
+      "background:var(--osu-fav-surface);border:1px solid var(--osu-fav-border);border-radius:4px;" +
       "box-shadow:0 4px 16px rgba(0,0,0,.5);padding:10px;" +
       "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;" +
       "display:flex;flex-direction:column;gap:8px";
@@ -340,13 +340,13 @@ let _openColorPanelCleanup = null;  // `root` is the settings scroll container t
     hexRow.style.cssText = "display:flex;gap:6px;align-items:center";
     const preview = document.createElement("div");
     preview.style.cssText =
-      "width:24px;height:24px;border:1px solid #333;border-radius:3px;flex-shrink:0";
+      "width:24px;height:24px;border:1px solid var(--osu-fav-border);border-radius:3px;flex-shrink:0";
     const hexInput = document.createElement("input");
     hexInput.type = "text";
     hexInput.maxLength = 7;
     hexInput.style.cssText =
-      "flex:1;min-width:0;box-sizing:border-box;background:#111;border:1px solid #333;" +
-      "border-radius:3px;color:#ddd;font-size:11px;font-family:inherit;padding:5px 6px";
+      "flex:1;min-width:0;box-sizing:border-box;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);" +
+      "border-radius:3px;color:var(--osu-fav-text);font-size:11px;font-family:inherit;padding:5px 6px";
     hexRow.append(preview, hexInput);
 
     panel.append(plane, hueBar, hexRow);
@@ -657,7 +657,7 @@ export function createSettingsView(deps) {
     // already the first thing this hint says.
     wrap.appendChild(sectionLabel("About"));
     const aboutHint = document.createElement("div");
-    aboutHint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:8px";
+    aboutHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:8px";
     aboutHint.innerHTML =
       "osu! Local Favorites v" + getCurrentVersion() + " - " +
       '<a href="https://github.com/starhollow2008/osu-local-favorites" target="_blank" rel="noopener" style="color:var(--osu-fav-accent);text-decoration:none">GitHub repository</a>' +
@@ -714,11 +714,11 @@ export function createSettingsView(deps) {
     const apiConnected = osuApiIsConnected();
     if (!apiConnected) {
       const apiHint = document.createElement("div");
-      apiHint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:8px";
+      apiHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:8px";
       apiHint.innerHTML =
         "Connect the official osu! API v2 for reliable metadata enrichment. Create an " +
         '<a href="https://osu.ppy.sh/home/account/edit#new-oauth-application" target="_blank" style="color:var(--osu-fav-accent);text-decoration:none">new OAuth application →</a>' +
-        " with callback URL <code style='color:#aaa'>https://osu.ppy.sh/home</code>, then paste its Client ID and Secret below.";
+        " with callback URL <code style='color:var(--osu-fav-secondary-soft)'>https://osu.ppy.sh/home</code>, then paste its Client ID and Secret below.";
       wrap.appendChild(apiHint);
     } else {
       // Same status row as the Gist section below: coloured dot, ellipsised
@@ -732,7 +732,7 @@ export function createSettingsView(deps) {
       const apiStatusDot = document.createElement("span");
       apiStatusDot.style.cssText = "width:6px;height:6px;border-radius:50%;background:#4caf50;flex-shrink:0";
       const apiStatusText = document.createElement("span");
-      apiStatusText.style.cssText = "font-size:11px;color:#ddd;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
+      apiStatusText.style.cssText = "font-size:11px;color:var(--osu-fav-text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
       apiStatusText.textContent =
         "Connected" + (apiUsername ? " as " + apiUsername : "") + " - enrichment uses the API";
       const apiRowDisconnectBtn = makeBtn("Disconnect");
@@ -757,9 +757,9 @@ export function createSettingsView(deps) {
       apiSecretInput.placeholder = "Client Secret";
       apiSecretInput.value = GM_getValue(OSU_API_CLIENT_SECRET_KEY, "");
       for (const inp of [apiIdInput, apiSecretInput]) {
-        inp.style.cssText = "width:100%;box-sizing:border-box;padding:6px 10px;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;font-size:12px;outline:none;margin-bottom:6px";
+        inp.style.cssText = "width:100%;box-sizing:border-box;padding:6px 10px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);font-size:12px;outline:none;margin-bottom:6px";
         inp.addEventListener("focus", () => (inp.style.borderColor = "var(--osu-fav-accent)"));
-        inp.addEventListener("blur", () => (inp.style.borderColor = "#333"));
+        inp.addEventListener("blur", () => (inp.style.borderColor = "var(--osu-fav-border)"));
         wrap.appendChild(inp);
       }
 
@@ -791,7 +791,7 @@ export function createSettingsView(deps) {
 
     if (!token) {
       const hint = document.createElement("div");
-      hint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:8px";
+      hint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:8px";
       hint.innerHTML =
         "Connect a GitHub account to back up your favorites to a Gist. " +
         '<a href="https://github.com/settings/tokens/new?scopes=gist&description=osu%20Local%20Favorites" target="_blank" style="color:var(--osu-fav-accent);text-decoration:none">Create a token →</a>';
@@ -801,9 +801,9 @@ export function createSettingsView(deps) {
       tokenInput.type = "password";
       tokenInput.placeholder = "Paste a token with 'gist' scope";
       tokenInput.style.cssText =
-        "width:100%;box-sizing:border-box;padding:6px 10px;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;font-size:12px;outline:none;margin-bottom:6px";
+        "width:100%;box-sizing:border-box;padding:6px 10px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);font-size:12px;outline:none;margin-bottom:6px";
       tokenInput.addEventListener("focus", () => (tokenInput.style.borderColor = "var(--osu-fav-accent)"));
-      tokenInput.addEventListener("blur", () => (tokenInput.style.borderColor = "#333"));
+      tokenInput.addEventListener("blur", () => (tokenInput.style.borderColor = "var(--osu-fav-border)"));
       wrap.appendChild(tokenInput);
 
       const connectBtn = makeBtn("Connect GitHub", "width:100%;box-sizing:border-box;text-align:center;padding:6px");
@@ -846,16 +846,16 @@ export function createSettingsView(deps) {
       fetchInput.type = "text";
       fetchInput.placeholder = "Gist ID or URL";
       fetchInput.style.cssText =
-        "flex:1;min-width:0;box-sizing:border-box;padding:6px 10px;background:#111;" +
-        "border:1px solid #333;border-radius:3px;color:#ddd;font-size:11px;outline:none";
+        "flex:1;min-width:0;box-sizing:border-box;padding:6px 10px;background:var(--osu-fav-panel-bg);" +
+        "border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);font-size:11px;outline:none";
       fetchInput.addEventListener("focus", () => (fetchInput.style.borderColor = "var(--osu-fav-accent)"));
-      fetchInput.addEventListener("blur", () => (fetchInput.style.borderColor = "#333"));
+      fetchInput.addEventListener("blur", () => (fetchInput.style.borderColor = "var(--osu-fav-border)"));
       const fetchBtn = makeBtn("Fetch", "flex-shrink:0;padding:6px 12px");
       fetchRow.append(fetchInput, fetchBtn);
       wrap.appendChild(fetchRow);
 
       const fetchHint = document.createElement("div");
-      fetchHint.style.cssText = "font-size:10px;color:#666;margin-top:4px;line-height:1.4";
+      fetchHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);margin-top:4px;line-height:1.4";
       fetchHint.textContent =
         "Pull from any gist - your own or someone else's shared list - without " +
         "changing what Backup now targets. Handy on a new device before your first backup.";
@@ -899,7 +899,7 @@ export function createSettingsView(deps) {
       const dot = document.createElement("span");
       dot.style.cssText = "width:6px;height:6px;border-radius:50%;background:#4caf50;flex-shrink:0";
       const statusText = document.createElement("span");
-      statusText.style.cssText = "font-size:11px;color:#ddd;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
+      statusText.style.cssText = "font-size:11px;color:var(--osu-fav-text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
       statusText.textContent = "Connected as " + (username || "GitHub user");
       const disconnectBtn = makeBtn("Disconnect");
       statusRow.append(dot, statusText, disconnectBtn);
@@ -1050,16 +1050,16 @@ export function createSettingsView(deps) {
       fetchInput.type = "text";
       fetchInput.placeholder = "Gist ID or URL";
       fetchInput.style.cssText =
-        "flex:1;min-width:0;box-sizing:border-box;padding:6px 10px;background:#111;" +
-        "border:1px solid #333;border-radius:3px;color:#ddd;font-size:11px;outline:none";
+        "flex:1;min-width:0;box-sizing:border-box;padding:6px 10px;background:var(--osu-fav-panel-bg);" +
+        "border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);font-size:11px;outline:none";
       fetchInput.addEventListener("focus", () => (fetchInput.style.borderColor = "var(--osu-fav-accent)"));
-      fetchInput.addEventListener("blur", () => (fetchInput.style.borderColor = "#333"));
+      fetchInput.addEventListener("blur", () => (fetchInput.style.borderColor = "var(--osu-fav-border)"));
       const fetchBtn = makeBtn("Fetch", "flex-shrink:0;padding:6px 12px");
       fetchRow.append(fetchInput, fetchBtn);
       wrap.appendChild(fetchRow);
 
       const fetchHint = document.createElement("div");
-      fetchHint.style.cssText = "font-size:10px;color:#666;margin-top:4px;line-height:1.4";
+      fetchHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);margin-top:4px;line-height:1.4";
       fetchHint.textContent =
         "Pull from any gist - your own or someone else's shared list - without " +
         "changing what Backup now targets. Handy on a new device before your first backup.";
@@ -1103,7 +1103,7 @@ export function createSettingsView(deps) {
       const lastSync = GM_getValue(GH_LAST_SYNC_KEY, 0);
       const syncInfo = document.createElement("div");
       syncInfo.style.cssText =
-        "font-size:10px;color:#666;margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px";
+        "font-size:10px;color:var(--osu-fav-muted);margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px";
       const syncText = document.createElement("span");
       syncText.textContent = lastSync
         ? "Last synced " + formatDate(new Date(lastSync).toISOString())
@@ -1126,7 +1126,7 @@ export function createSettingsView(deps) {
     // ── Download Mirrors ──
     wrap.appendChild(sectionLabel("Download Mirrors"));
     const mirrorHint = document.createElement("div");
-    mirrorHint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:4px";
+    mirrorHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:4px";
     mirrorHint.textContent =
       "osu!'s own download requires being signed in, and some maps have downloads " +
       "disabled entirely. Enable mirrors below to download anyway - they're offered " +
@@ -1181,7 +1181,7 @@ export function createSettingsView(deps) {
     // ── Music Playback ──
     wrap.appendChild(sectionLabel("Music Playback"));
     const fullSongHint = document.createElement("div");
-    fullSongHint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:4px";
+    fullSongHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:4px";
     fullSongHint.textContent =
       "The ▶ preview button in this panel plays osu!'s own ~10s clip by default. " +
       "Hinamizawa's music mirror streams the full track instead whenever it has one " +
@@ -1238,7 +1238,7 @@ export function createSettingsView(deps) {
     // ── Media Cache ──
     wrap.appendChild(sectionLabel("Media Cache"));
     const cacheHint = document.createElement("div");
-    cacheHint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:4px";
+    cacheHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:4px";
     cacheHint.textContent =
       "Background covers and preview clips are stored locally so reloading the page or " +
       "reopening the panel doesn't re-request them. Songs are written as they stream, so " +
@@ -1282,7 +1282,7 @@ export function createSettingsView(deps) {
       customInput.step = "1";
       customInput.value = String(cacheCustomMinutes());
       customInput.style.cssText =
-        "width:70px;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;" +
+        "width:70px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);" +
         "font-size:10px;font-family:inherit;padding:4px 6px;flex-shrink:0";
       customInput.addEventListener("change", () => {
         const n = Math.max(1, Math.round(Number(customInput.value) || 60));
@@ -1325,7 +1325,7 @@ export function createSettingsView(deps) {
       customSizeInput.step = "10";
       customSizeInput.value = String(cacheSizeCustomMb());
       customSizeInput.style.cssText =
-        "width:70px;background:#111;border:1px solid #333;border-radius:3px;color:#ddd;" +
+        "width:70px;background:var(--osu-fav-panel-bg);border:1px solid var(--osu-fav-border);border-radius:3px;color:var(--osu-fav-text);" +
         "font-size:10px;font-family:inherit;padding:4px 6px;flex-shrink:0";
       customSizeInput.addEventListener("change", () => {
         const n = Math.max(10, Math.round(Number(customSizeInput.value) || 512));
@@ -1337,7 +1337,7 @@ export function createSettingsView(deps) {
     }
 
     const cacheStatsText = document.createElement("div");
-    cacheStatsText.style.cssText = "font-size:10px;color:#666;margin:4px 0 8px";
+    cacheStatsText.style.cssText = "font-size:10px;color:var(--osu-fav-muted);margin:4px 0 8px";
     cacheStatsText.textContent = "Checking cache size…";
     wrap.appendChild(cacheStatsText);
     function refreshCacheStats() {
@@ -1459,7 +1459,7 @@ export function createSettingsView(deps) {
     // ── Library Maintenance ──
     wrap.appendChild(sectionLabel("Library Maintenance"));
     const maintHint = document.createElement("div");
-    maintHint.style.cssText = "font-size:10px;color:#666;line-height:1.5;margin-bottom:8px";
+    maintHint.style.cssText = "font-size:10px;color:var(--osu-fav-muted);line-height:1.5;margin-bottom:8px";
     maintHint.textContent =
       "Re-fetches full metadata - tags, source, genre, language, BPM, status, cover - " +
       "for every favorited map. Useful if fields look stale or were saved in an older, " +
@@ -1482,7 +1482,7 @@ export function createSettingsView(deps) {
     const reenrichBtn = document.createElement("button");
     reenrichBtn.id = "osu-fav-reenrich-btn";
     reenrichBtn.style.cssText =
-      "font-size:10px;padding:6px 10px;border:1px solid #333;border-radius:3px;background:transparent;color:#999;cursor:pointer;width:100%;box-sizing:border-box";
+      "font-size:10px;padding:6px 10px;border:1px solid var(--osu-fav-border);border-radius:3px;background:transparent;color:var(--osu-fav-secondary);cursor:pointer;width:100%;box-sizing:border-box";
     hover.accent(reenrichBtn, () => !isReenrichRunning());
     reenrichBtn.addEventListener("click", () => {
       if (isReenrichRunning()) cancelGlobalReenrichment();
@@ -1494,14 +1494,14 @@ export function createSettingsView(deps) {
     reenrichProgress.id = "osu-fav-reenrich-progress";
     reenrichProgress.style.cssText = "display:none;margin-top:8px";
     const reenrichBarTrack = document.createElement("div");
-    reenrichBarTrack.style.cssText = "height:4px;background:#333;border-radius:2px;overflow:hidden";
+    reenrichBarTrack.style.cssText = "height:4px;background:var(--osu-fav-border);border-radius:2px;overflow:hidden";
     const reenrichBar = document.createElement("div");
     reenrichBar.id = "osu-fav-reenrich-bar";
     reenrichBar.style.cssText = "height:100%;width:0%;background:var(--osu-fav-accent);border-radius:2px;transition:width .2s";
     reenrichBarTrack.appendChild(reenrichBar);
     const reenrichText = document.createElement("div");
     reenrichText.id = "osu-fav-reenrich-text";
-    reenrichText.style.cssText = "font-size:10px;color:#666;margin-top:4px;text-align:center";
+    reenrichText.style.cssText = "font-size:10px;color:var(--osu-fav-muted);margin-top:4px;text-align:center";
     reenrichProgress.append(reenrichBarTrack, reenrichText);
     wrap.appendChild(reenrichProgress);
 
@@ -1516,7 +1516,7 @@ export function createSettingsView(deps) {
     const removeAllBtn = document.createElement("button");
     removeAllBtn.textContent = "Remove all favorites";
     removeAllBtn.style.cssText =
-      "font-size:10px;padding:6px 10px;border:1px solid #555;border-radius:3px;background:none;color:#888;cursor:pointer;width:100%";
+      "font-size:10px;padding:6px 10px;border:1px solid var(--osu-fav-muted-strong);border-radius:3px;background:none;color:var(--osu-fav-muted-soft);cursor:pointer;width:100%";
     wrap.appendChild(removeAllBtn);
 
     let confirmingRemoveAll = false;
@@ -1531,7 +1531,7 @@ export function createSettingsView(deps) {
             confirmingRemoveAll = false;
             removeAllBtn.textContent = "Remove all favorites";
             removeAllBtn.style.cssText =
-              "font-size:10px;padding:6px 10px;border:1px solid #555;border-radius:3px;background:none;color:#888;cursor:pointer;width:100%";
+              "font-size:10px;padding:6px 10px;border:1px solid var(--osu-fav-muted-strong);border-radius:3px;background:none;color:var(--osu-fav-muted-soft);cursor:pointer;width:100%";
           }
         }, 3000);
       } else {
