@@ -13,7 +13,7 @@ import { cancelGlobalReenrichment, isReenrichRunning, runGlobalReenrichment, upd
 import { getFavorites, parseImportedFavorites, serializeFavorites, setFavorites } from "../data/storage.js";
 import { AUTO_UPDATE_CHECK_KEY, autoUpdateChecksEnabled, checkVersionUpdate, getCurrentVersion } from "../data/version-check.js";
 import { updateFloatingHeart } from "./floating-heart.js";
-import { THEME_ACCENT_KEY, THEME_ACTIVE_OPACITY_KEY, THEME_DEFAULTS, THEME_HEART_KEY, THEME_STYLE_KEY, THEME_HOVER_DIM_KEY, THEME_IDLE_DIM_KEY, THEME_IDLE_OPACITY_KEY, applyTheme, getThemeSettings } from "./theme.js";
+import { THEME_PALETTES, THEME_ACCENT_KEY, THEME_ACTIVE_OPACITY_KEY, THEME_DEFAULTS, THEME_HEART_KEY, THEME_STYLE_KEY, THEME_HOVER_DIM_KEY, THEME_IDLE_DIM_KEY, THEME_IDLE_OPACITY_KEY, applyTheme, getThemeSettings } from "./theme.js";
 import { hover } from "./hover.js";
 
 // Gist ids whose real visibility was already checked against GitHub this page
@@ -113,6 +113,61 @@ function makeSegmented(options, initial, onChange) {
     btns[value] = btn;
     wrap.appendChild(btn);
   });
+  return wrap;
+}
+
+// Tall palette swatches for the Appearance style picker. Each preview
+// shows the actual colors from its preset rather than another generic pill.
+function makeStylePreviews(options, initial, onChange) {
+  const wrap = document.createElement("div");
+  wrap.style.cssText =
+    "display:flex;justify-content:center;align-items:center;gap:14px;width:100%;" +
+    "padding:12px 0 8px;box-sizing:border-box";
+  let current = initial;
+  const buttons = {};
+
+  function paintButton(option) {
+    const btn = buttons[option.value];
+    const selected = option.value === current;
+    const colors = option.palette.preview;
+    const stops = colors.map((color, index) => {
+      const from = (index / colors.length) * 100;
+      const to = ((index + 1) / colors.length) * 100;
+      return `${color} ${from}% ${to}%`;
+    }).join(", ");
+    btn.style.border = `${selected ? 2 : 1}px solid ${selected ? option.palette.accent : option.palette.colors.border}`;
+    btn.style.background = `linear-gradient(to bottom, ${stops})`;
+    btn.setAttribute("aria-pressed", selected ? "true" : "false");
+  }
+
+  options.forEach((option) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.title = `${option.label} appearance`;
+    btn.setAttribute("aria-label", `${option.label} appearance preview`);
+    btn.style.cssText =
+      "position:relative;display:flex;align-items:center;justify-content:center;" +
+      "box-sizing:border-box;width:48px;height:96px;min-width:48px;flex:0 0 48px;" +
+      "padding:0;border-radius:5px;overflow:hidden;cursor:pointer;box-shadow:none;" +
+      "transition:border-color .15s ease,transform .15s ease";
+    const label = document.createElement("span");
+    label.textContent = option.label;
+    label.style.cssText =
+      "display:block;width:100%;padding:5px 0;background:rgba(0,0,0,.58);" +
+      "color:#fff;font-size:9px;font-weight:700;letter-spacing:.1px;" +
+      "text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.65);pointer-events:none";
+    btn.appendChild(label);
+    btn.addEventListener("click", () => {
+      if (current === option.value) return;
+      current = option.value;
+      options.forEach(paintButton);
+      onChange(current);
+    });
+    buttons[option.value] = btn;
+    paintButton(option);
+    wrap.appendChild(btn);
+  });
+
   return wrap;
 }
 
@@ -1368,11 +1423,11 @@ export function createSettingsView(deps) {
     wrap.appendChild(sectionLabel("Appearance"));
     const theme = getThemeSettings();
 
-    const styleSelector = makeSegmented(
+    const styleSelector = makeStylePreviews(
       [
-        { value: "neo", label: "Neo" },
-        { value: "modern", label: "Modern" },
-        { value: "classic", label: "Classic" },
+        { value: "neo", label: "Neo", palette: THEME_PALETTES.neo },
+        { value: "modern", label: "Modern", palette: THEME_PALETTES.modern },
+        { value: "classic", label: "Classic", palette: THEME_PALETTES.classic },
       ],
       theme.style,
       (style) => {
@@ -1381,7 +1436,7 @@ export function createSettingsView(deps) {
         renderSettingsView();
       },
     );
-    wrap.appendChild(settingsRow("Style", styleSelector));
+    wrap.appendChild(styleSelector);
 
     const colorSwatch = makeColorInput(settingsView, theme.accent, (hex) => {
       GM_setValue(THEME_ACCENT_KEY, hex);
