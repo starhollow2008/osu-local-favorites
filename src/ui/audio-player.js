@@ -321,6 +321,12 @@ export function ensureAudio() {
   });
 
   audio.addEventListener("ended", () => {
+    // This singleton can dispatch an ended event that was queued by the
+    // previous network resource after load() has already installed the
+    // cached Blob. The event target is still this element, so verify its
+    // current resource really ended before advancing the queue.
+    if (!audio.ended) return;
+
     // Do NOT clearMediaSession() before a loop/auto-next: nulling the
     // metadata (even for one synchronous tick before startPlayback()
     // re-populates it) can make Android treat the session as ended and
@@ -426,6 +432,16 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
   const cachedBlob = getKnownCachedBlob(sourceUrl);
   if (!cachedBlob) return Promise.resolve(false);
 
+  // Bind the handoff to this exact playback request. A late cache completion
+  // must never replace a track selected after the writer started.
+  const trackId = audio._npCurrentId;
+  const requestSeq = audio._playRequestSeq;
+  const ownsTrack = () =>
+    audio._npCurrentId === trackId &&
+    audio._playRequestSeq === requestSeq &&
+    audio._activeCacheKey === sourceUrl;
+  if (!ownsTrack() || audio.ended) return Promise.resolve(false);
+
   let localUrl = _blobUrlCache.get(sourceUrl);
   if (!localUrl) {
     localUrl = URL.createObjectURL(cachedBlob);
@@ -439,21 +455,25 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
 
   // Paused (or ended mid-swap): no sound to bridge. The paused position
   // survives via the seek below; a paused element reloads silently.
-  if (audio.paused || audio.ended) {
+  if (audio.paused) {
     const resumeAt = audio.currentTime;
-    // Ensure metadata can load without requiring play() (Firefox Android
-    // creates the element with preload="none").
     try { audio.preload = "auto"; } catch {}
     applyState();
-    audio.src = localUrl;
-    try { audio.load(); } catch {}
-    audio.addEventListener("loadedmetadata", () => {
+    // Attach before load so the metadata event cannot race the listener.
+    const onMetadata = () => {
+      if (!ownsTrack() || audio._activePreviewUrl !== localUrl) return;
+      if (audio.currentSrc && audio.currentSrc !== localUrl) return;
+      if (audio.readyState < 1) return;
+      audio.removeEventListener("loadedmetadata", onMetadata);
       try {
         if (Number.isFinite(resumeAt) && resumeAt > 0 && resumeAt < (audio.duration || Infinity)) {
           audio.currentTime = resumeAt;
         }
       } catch (e) { /* unseekable blob - restart from the top */ }
-    }, { once: true });
+    };
+    audio.addEventListener("loadedmetadata", onMetadata);
+    audio.src = localUrl;
+    try { audio.load(); } catch {}
     return Promise.resolve(true);
   }
 
@@ -475,7 +495,8 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
     // would otherwise seek the new song to the old song's position).
     const startedActive = audio._activePreviewUrl;
     const superseded = () =>
-      handoffStarted ? audio._activePreviewUrl !== localUrl : audio._activePreviewUrl !== startedActive;
+      !ownsTrack() ||
+      (handoffStarted ? audio._activePreviewUrl !== localUrl : audio._activePreviewUrl !== startedActive);
     const cleanupShadow = () => {
       if (!shadow) return;
       try { shadow.pause(); } catch {}
@@ -498,12 +519,37 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
       cleanupShadow();
       resolve(true);
     };
+    let shadowEndHandled = false;
+    const handleShadowEnded = () => {
+      if (settled || !handoffStarted || shadowEndHandled || superseded()) return;
+      shadowEndHandled = true;
+      const advance = audio._queueAdvance;
+      // load() can suppress the network element's ended event during handoff.
+      finishOk();
+      if (musicLoopEnabled()) {
+        try { audio.currentTime = 0; } catch {}
+        const looped = audio.play();
+        if (looped && typeof looped.catch === "function") {
+          looped.catch(() => {
+            setMediaSessionPlaybackState("paused");
+            if (audio._npPlayBtn) audio._npPlayBtn.innerHTML = playSVG();
+          });
+        }
+      } else if (musicAutoNextEnabled() && advance) {
+        advance(1, {});
+      } else {
+        stopPlayback(audio);
+      }
+    };
 
-    shadowWatchdog = setTimeout(finishNoop, 1500);
+    shadowWatchdog = setTimeout(finishNoop, 5000);
 
     try {
       shadow = new Audio(localUrl);
       shadow.preload = "auto";
+      // Watch the bridge explicitly: load() can cancel the network source's
+      // natural ended event while the main element is being replaced.
+      shadow.addEventListener("ended", handleShadowEnded);
       // A shadow error only aborts BEFORE the handoff; afterwards the main
       // element owns playback and the shadow is just a bridge.
       shadow.addEventListener("error", () => { if (!handoffStarted) finishNoop(); }, { once: true });
@@ -511,20 +557,47 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
         if (settled || handoffStarted) return;
         if (superseded()) { finishNoop(); return; }
         const sh = shadow;
-        try { sh.currentTime = audio.currentTime; } catch {}
-        const sp = sh.play();
-        const proceed = () => {
-          // The watchdog (or a track change) may have aborted while play()
-          // was pending: never start the handoff for a settled operation.
-          if (settled || handoffStarted) return;
-          clearTimeout(shadowWatchdog);
-          if (superseded()) { finishNoop(); return; }
-          beginMainHandoff();
+        const shadowTarget = audio.currentTime;
+        if (!Number.isFinite(shadowTarget) || shadowTarget < 0) { finishNoop(); return; }
+
+        const startShadow = () => {
+          if (settled || handoffStarted || superseded()) {
+            if (!settled) finishNoop();
+            return;
+          }
+          // The requested seek is not complete until "seeked". Starting
+          // early can make the bridge play from 0 and roll the main track
+          // backwards by the time elapsed since playback began.
+          if (!Number.isFinite(sh.currentTime) || Math.abs(sh.currentTime - shadowTarget) > 0.75) {
+            finishNoop();
+            return;
+          }
+          const sp = sh.play();
+          const proceed = () => {
+            if (settled || handoffStarted) return;
+            clearTimeout(shadowWatchdog);
+            if (superseded()) { finishNoop(); return; }
+            beginMainHandoff();
+          };
+          if (sp && typeof sp.then === "function") sp.then(proceed).catch(finishNoop);
+          else proceed();
         };
-        if (sp && typeof sp.then === "function") {
-          sp.then(proceed).catch(finishNoop);
+
+        if (Math.abs(sh.currentTime - shadowTarget) <= 0.15 && !sh.seeking) {
+          startShadow();
         } else {
-          proceed();
+          const onShadowSeeked = () => startShadow();
+          sh.addEventListener("seeked", onShadowSeeked, { once: true });
+          try { sh.currentTime = shadowTarget; }
+          catch (_) {
+            sh.removeEventListener("seeked", onShadowSeeked);
+            finishNoop();
+            return;
+          }
+          if (!sh.seeking && Math.abs(sh.currentTime - shadowTarget) <= 0.15) {
+            sh.removeEventListener("seeked", onShadowSeeked);
+            startShadow();
+          }
         }
       }, { once: true });
     } catch {
@@ -548,69 +621,128 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
 
       let metaDone = false;
       const onMeta = () => {
-        if (metaDone) return;
+        if (metaDone || settled || superseded()) return;
+        // Ignore metadata from the old network resource, and never treat the
+        // watchdog as proof that the new Blob has metadata ready.
+        if (audio.currentSrc && audio.currentSrc !== localUrl) return;
+        if (audio.readyState < 1 || !Number.isFinite(audio.duration)) return;
         metaDone = true;
+        audio.removeEventListener("loadedmetadata", onMeta);
         clearTimeout(mainMetaWatchdog);
-        if (settled || superseded()) { finishNoop(); return; }
-        try {
-          const t = shadow ? shadow.currentTime : resumeFrom;
-          const dur = audio.duration;
-          if (Number.isFinite(t) && t > 0 && (!Number.isFinite(dur) || t < dur)) {
-            audio.currentTime = t;
-          }
-        } catch {}
-        // Register the "playing" listener BEFORE play(): the event can fire
-        // before the promise's fulfillment handler runs, and a listener
-        // added there would miss it and leave both players sounding until
-        // the fallback timer.
-        let bridgeDone = false;
-        let bridgeFallback = null;
-        const finishBridge = () => {
-          if (bridgeDone) return;
-          bridgeDone = true;
-          clearTimeout(bridgeFallback);
-          audio.removeEventListener("playing", finishBridge);
-          if (settled || superseded()) { finishNoop(); return; }
-          try {
-            const t2 = shadow ? shadow.currentTime : audio.currentTime;
-            if (Number.isFinite(t2) && Math.abs(audio.currentTime - t2) > 0.15) audio.currentTime = t2;
-          } catch {}
-          finishOk();
-        };
-        audio.addEventListener("playing", finishBridge);
-        const p = audio.play();
-        if (p && typeof p.then === "function") {
-          p.then(() => {
-            // play() resolving means the element is sounding: cut the
-            // shadow now instead of waiting on the event or a timer.
-            finishBridge();
-          }).catch(() => {
-            // Play rejected (autoplay stale). The blob source is already
-            // staged at the correct position but paused. Pause the cover
-            // shadow too so UI (paused) matches reality and one tap resumes.
-            // This is strictly better than the old directSwap which left
-            // the element paused at 0 with no position restore.
+        if (shadow && shadow.ended) { handleShadowEnded(); return; }
+
+        const startMainPlayback = (attempt = 0) => {
+          if (settled || superseded()) return;
+          if (shadow && shadow.ended) { handleShadowEnded(); return; }
+
+          let bridgeDone = false;
+          let bridgeFallback = null;
+          const finishBridge = () => {
+            if (bridgeDone || settled || superseded()) return;
+            if (shadow && shadow.ended) { handleShadowEnded(); return; }
+            if (audio.paused || audio.readyState < 2) return;
+            const finalDrift = shadow ? shadow.currentTime - audio.currentTime : 0;
+            if (finalDrift > 0.10 && attempt < 5) {
+              bridgeDone = true;
+              clearTimeout(bridgeFallback);
+              audio.removeEventListener("playing", finishBridge);
+              alignMainToShadow(attempt + 1);
+              return;
+            }
             bridgeDone = true;
             clearTimeout(bridgeFallback);
             audio.removeEventListener("playing", finishBridge);
-            try { if (shadow) shadow.pause(); } catch {}
+            // Do not sync to shadow.currentTime here: it can already be
+            // behind the main player's clock and cause a second rollback.
             finishOk();
-          });
-          // Safety net if neither the promise nor the event settles.
-          bridgeFallback = setTimeout(finishBridge, 400);
-        } else {
-          // No promise (older browser) - the event or a short timer ends it
-          bridgeFallback = setTimeout(finishBridge, 100);
-        }
+          };
+
+          audio.addEventListener("playing", finishBridge);
+          const p = audio.play();
+          if (p && typeof p.then === "function") {
+            p.then(() => {
+              if (!audio.paused && audio.readyState >= 2) finishBridge();
+            }).catch(() => {
+              // Keep the bridge alive if the replacement play() is denied;
+              // its ended handler still performs the normal loop/auto-next.
+              audio.removeEventListener("playing", finishBridge);
+            });
+            bridgeFallback = setTimeout(() => {
+              if (!audio.paused && audio.readyState >= 2) finishBridge();
+            }, 1500);
+          } else {
+            bridgeFallback = setTimeout(() => {
+              if (!audio.paused && audio.readyState >= 2) finishBridge();
+            }, 400);
+          }
+        };
+
+        const alignMainToShadow = (attempt = 0) => {
+          if (settled || superseded()) return;
+          if (shadow && shadow.ended) { handleShadowEnded(); return; }
+          const shadowPosition = shadow ? shadow.currentTime : resumeFrom;
+          if (!Number.isFinite(shadowPosition)) { startMainPlayback(attempt); return; }
+
+          const duration = Number.isFinite(audio.duration) ? audio.duration : Infinity;
+          const target = Math.max(0, Math.min(shadowPosition, duration));
+          // Never seek backwards to follow a lagging shadow clock.
+          if (target <= audio.currentTime + 0.04) {
+            startMainPlayback(attempt);
+            return;
+          }
+
+          let seekDone = false;
+          let seekWatchdog = null;
+          const onSeeked = () => {
+            if (seekDone) return;
+            seekDone = true;
+            clearTimeout(seekWatchdog);
+            audio.removeEventListener("seeked", onSeeked);
+            if (settled || superseded()) return;
+            if (!Number.isFinite(audio.currentTime) || Math.abs(audio.currentTime - target) > 0.75) return;
+
+            const drift = shadow ? shadow.currentTime - audio.currentTime : 0;
+            if (drift > 0.10 && attempt < 5) {
+              alignMainToShadow(attempt + 1);
+              return;
+            }
+            startMainPlayback(attempt);
+          };
+
+          audio.addEventListener("seeked", onSeeked, { once: true });
+          try { audio.currentTime = target; }
+          catch (_) {
+            audio.removeEventListener("seeked", onSeeked);
+            return;
+          }
+          if (!audio.seeking && Math.abs(audio.currentTime - target) <= 0.15) {
+            onSeeked();
+            return;
+          }
+          seekWatchdog = setTimeout(() => {
+            if (seekDone) return;
+            if (!audio.seeking && Math.abs(audio.currentTime - target) <= 0.75) onSeeked();
+            else {
+              seekDone = true;
+              audio.removeEventListener("seeked", onSeeked);
+              // Leave the shadow running if the main decoder fails to confirm
+              // its seek, rather than cutting off the track.
+            }
+          }, 2000);
+        };
+
+        alignMainToShadow();
       };
 
-      audio.addEventListener("loadedmetadata", onMeta, { once: true });
+      audio.addEventListener("loadedmetadata", onMeta);
       mainMetaWatchdog = setTimeout(() => {
-        if (!metaDone) {
-          audio.removeEventListener("loadedmetadata", onMeta);
-          onMeta();
-        }
-      }, 1200);
+        if (
+          !metaDone &&
+          audio.readyState >= 1 &&
+          Number.isFinite(audio.duration) &&
+          (!audio.currentSrc || audio.currentSrc === localUrl)
+        ) onMeta();
+      }, 2000);
       audio.src = localUrl;
       try { audio.load(); } catch {}
     };
