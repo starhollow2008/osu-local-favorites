@@ -13,7 +13,7 @@ import { cancelGlobalReenrichment, isReenrichRunning, runGlobalReenrichment, upd
 import { getFavorites, parseImportedFavorites, serializeFavorites, setFavorites } from "../data/storage.js";
 import { AUTO_UPDATE_CHECK_KEY, autoUpdateChecksEnabled, checkVersionUpdate, getCurrentVersion } from "../data/version-check.js";
 import { updateFloatingHeart } from "./floating-heart.js";
-import { THEME_ACCENT_KEY, THEME_ACTIVE_OPACITY_KEY, THEME_DEFAULTS, THEME_HEART_KEY, THEME_HOVER_DIM_KEY, THEME_IDLE_DIM_KEY, THEME_IDLE_OPACITY_KEY, applyTheme, getThemeSettings } from "./theme.js";
+import { THEME_ACCENT_KEY, THEME_ACTIVE_OPACITY_KEY, THEME_DEFAULTS, THEME_HEART_KEY, THEME_STYLE_KEY, THEME_HOVER_DIM_KEY, THEME_IDLE_DIM_KEY, THEME_IDLE_OPACITY_KEY, applyTheme, getThemeSettings } from "./theme.js";
 import { hover } from "./hover.js";
 
 // Gist ids whose real visibility was already checked against GitHub this page
@@ -1367,6 +1367,20 @@ export function createSettingsView(deps) {
     // ── Appearance ──
     wrap.appendChild(sectionLabel("Appearance"));
     const theme = getThemeSettings();
+
+    const styleSelector = makeSegmented(
+      [
+        { value: "neo", label: "Neo" },
+        { value: "modern", label: "Modern" },
+        { value: "classic", label: "Classic" },
+      ],
+      theme.style,
+      (style) => {
+        GM_setValue(THEME_STYLE_KEY, style);
+        applyTheme();
+      },
+    );
+    wrap.appendChild(settingsRow("Style", styleSelector));
 
     const colorSwatch = makeColorInput(settingsView, theme.accent, (hex) => {
       GM_setValue(THEME_ACCENT_KEY, hex);
