@@ -4795,7 +4795,9 @@
     ind.innerHTML = heartSVG(fav);
     ind.style.background = "rgba(17,17,17,0.95)";
     ind.style.border = fav ? "1px solid var(--osu-fav-accent)" : "1px solid var(--osu-fav-border)";
-    ind.style.boxShadow = "none";
+    ind.style.setProperty("box-shadow", "none", "important");
+    ind.style.setProperty("filter", "none", "important");
+    ind.style.setProperty("text-shadow", "none", "important");
     ind.style.opacity = dragging ? "0.85" : "";
   }
 
