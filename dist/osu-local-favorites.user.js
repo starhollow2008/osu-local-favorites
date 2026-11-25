@@ -2317,7 +2317,7 @@
           clearTimeout(mainMetaWatchdog);
           if (shadow && shadow.ended) { handleShadowEnded(); return; }
   
-          const startMainPlayback = () => {
+          const startMainPlayback = (attempt = 0) => {
             if (settled || superseded()) return;
             if (shadow && shadow.ended) { handleShadowEnded(); return; }
   
@@ -2327,6 +2327,14 @@
               if (bridgeDone || settled || superseded()) return;
               if (shadow && shadow.ended) { handleShadowEnded(); return; }
               if (audio.paused || audio.readyState < 2) return;
+              const finalDrift = shadow ? shadow.currentTime - audio.currentTime : 0;
+              if (finalDrift > 0.10 && attempt < 5) {
+                bridgeDone = true;
+                clearTimeout(bridgeFallback);
+                audio.removeEventListener("playing", finishBridge);
+                alignMainToShadow(attempt + 1);
+                return;
+              }
               bridgeDone = true;
               clearTimeout(bridgeFallback);
               audio.removeEventListener("playing", finishBridge);
@@ -2359,13 +2367,13 @@
             if (settled || superseded()) return;
             if (shadow && shadow.ended) { handleShadowEnded(); return; }
             const shadowPosition = shadow ? shadow.currentTime : resumeFrom;
-            if (!Number.isFinite(shadowPosition)) { startMainPlayback(); return; }
+            if (!Number.isFinite(shadowPosition)) { startMainPlayback(attempt); return; }
   
             const duration = Number.isFinite(audio.duration) ? audio.duration : Infinity;
             const target = Math.max(0, Math.min(shadowPosition, duration));
             // Never seek backwards to follow a lagging shadow clock.
-            if (target <= audio.currentTime + 0.15) {
-              startMainPlayback();
+            if (target <= audio.currentTime + 0.04) {
+              startMainPlayback(attempt);
               return;
             }
   
@@ -2380,11 +2388,11 @@
               if (!Number.isFinite(audio.currentTime) || Math.abs(audio.currentTime - target) > 0.75) return;
   
               const drift = shadow ? shadow.currentTime - audio.currentTime : 0;
-              if (drift > 1.25 && attempt < 2) {
+              if (drift > 0.10 && attempt < 5) {
                 alignMainToShadow(attempt + 1);
                 return;
               }
-              startMainPlayback();
+              startMainPlayback(attempt);
             };
   
             audio.addEventListener("seeked", onSeeked, { once: true });
