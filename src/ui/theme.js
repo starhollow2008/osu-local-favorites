@@ -68,7 +68,7 @@ export const THEME_PALETTES = {
       "header-bg": "#777cae", "header-bg-low": "#9599c4", "nav-bg": "#eee5f0", "stats-bg": "#c9c8e4",
       "surface-soft": "#f2f0f9", "bio-box": "#e8e5f3", "mode-active": "#d2cee7",
       "section-bar": "#b4afcc", heading: "#625c91", label: "#625b8c",
-      "username-link": "#5367a8", "login-link": "#5d70b7", "nav-text": "#514a6b",
+      "username-link": "#4c5f9c", "login-link": "#4c5f9c", "nav-text": "#514a6b",
       "chart-line": "#c27b50", "rank-ss": "#bd6c9a",
     },
   },
