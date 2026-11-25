@@ -207,7 +207,9 @@ function makeSlider(initialPct, onChange) {
 
   wrap.append(slider, valSpan);
   return wrap;
-}// ── Custom color picker ──
+}
+
+// ── Custom color picker ──
 // We used to hand off to a real <input type="color">, but the
 // saturation/value "plane" it opens is drawn by the browser's own
 // chrome (not page content), so a userscript has zero access to it -

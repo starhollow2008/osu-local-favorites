@@ -733,7 +733,9 @@ export function swapAudioSourceToCached(audio, sourceUrl) {
       try { audio.load(); } catch {}
     };
   });
-}// Builds the ordered list of download options for a beatmapset. Official
+}
+
+// Builds the ordered list of download options for a beatmapset. Official
 // download offers both a with-video and no-video (confirmed real
 // ?noVideo=1 param) variant - previously this was hardcoded to
 // video-only. Guests always see mirrors first, since Official won't work

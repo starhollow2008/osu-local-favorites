@@ -2425,7 +2425,9 @@
         try { audio.load(); } catch {}
       };
     });
-  }  // ━━━━━━━━━━ src/ui/popup-menu.js ━━━━━━━━━━
+  }
+
+  // ━━━━━━━━━━ src/ui/popup-menu.js ━━━━━━━━━━
 
   function createPopupMenu(anchorEl, id, css) {
     const existing = document.getElementById(id);
@@ -5134,7 +5136,9 @@
   
     wrap.append(slider, valSpan);
     return wrap;
-  }  function hexToRgb(hex) {
+  }
+
+  function hexToRgb(hex) {
     hex = String(hex).replace("#", "");
     if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
     const num = parseInt(hex, 16);
