@@ -31,9 +31,6 @@ export const THEME_DEFAULTS = {
 
 export const THEME_PALETTES = {
   neo: {
-    accent: "#ff91bb",
-    heartColor: "#ce7698",
-    preview: ["#111", "#1a1a1a", "#242424", "#333", "#666", "#ff91bb", "#ddd"],
     colors: {
       "panel-bg": "#111", surface: "#1a1a1a", "surface-alt": "#242424",
       divider: "#222", border: "#333", "border-strong": "#444",
@@ -48,9 +45,6 @@ export const THEME_PALETTES = {
     },
   },
   modern: {
-    accent: "#ff66ab",
-    heartColor: "#ce1c9d",
-    preview: ["#1c1719", "#2a2226", "#382e32", "#46393f", "#3d2932", "#ff66ab", "#ffffff"],
     colors: {
       "panel-bg": "#1c1719", surface: "#2a2226", "surface-alt": "#382e32",
       divider: "#3d2932", border: "#46393f", "border-strong": "#ff66ab",
@@ -65,11 +59,8 @@ export const THEME_PALETTES = {
     },
   },
   classic: {
-    accent: "#ff5bac",
-    heartColor: "#ff5bac",
-    preview: ["#666cbc", "#888adf", "#a9a9ff", "#ffffff", "#f0ecfa", "#e7e4fc", "#ffd6f3", "#5a539a"],
     colors: {
-      "panel-bg": "#a9a9ff", surface: "#ffffff", "surface-alt": "#f0ecfa",
+      "panel-bg": "#ffffff", surface: "#a9a9ff", "surface-alt": "#f0ecfa",
       divider: "#bea8f4", border: "#5a539a", "border-strong": "#5f5f5f",
       "muted-strong": "#5f5f5f", muted: "#5a539a", "muted-soft": "#3843a6",
       secondary: "#4e2151", "secondary-soft": "#3843a6", "secondary-bright": "#3366ff",
@@ -98,21 +89,12 @@ export function getThemeSettings() {
   const style = Object.prototype.hasOwnProperty.call(THEME_PALETTES, storedStyle)
     ? storedStyle
     : THEME_DEFAULTS.style;
-  const palette = THEME_PALETTES[style];
-  const storedAccent = GM_getValue(THEME_ACCENT_KEY, null);
-  const storedHeartColor = GM_getValue(THEME_HEART_KEY, null);
-  const legacyPresetColors = {
-    accent: ["#ff66aa", "#a64d83"],
-    heartColor: ["#d94f91", "#8c3f70"],
-  };
-  const isPresetColor = (value, key) =>
-    value == null ||
-    Object.values(THEME_PALETTES).some((preset) => preset[key] === value) ||
-    legacyPresetColors[key].includes(value);
   return {
     style,
-    accent: isPresetColor(storedAccent, "accent") ? palette.accent : storedAccent,
-    heartColor: isPresetColor(storedHeartColor, "heartColor") ? palette.heartColor : storedHeartColor,
+    // Accent and heart fill are independent user settings, not part of a
+    // style preset. Switching palettes must never rewrite or substitute them.
+    accent: GM_getValue(THEME_ACCENT_KEY, THEME_DEFAULTS.accent),
+    heartColor: GM_getValue(THEME_HEART_KEY, THEME_DEFAULTS.heartColor),
     idleOpacity: GM_getValue(THEME_IDLE_OPACITY_KEY, THEME_DEFAULTS.idleOpacity),
     idleDim: GM_getValue(THEME_IDLE_DIM_KEY, THEME_DEFAULTS.idleDim),
     hoverDim: GM_getValue(THEME_HOVER_DIM_KEY, THEME_DEFAULTS.hoverDim),
