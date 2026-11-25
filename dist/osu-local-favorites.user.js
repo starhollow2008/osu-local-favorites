@@ -672,7 +672,19 @@
     const storedAccent = GM_getValue(THEME_ACCENT_KEY, null);
     const storedHeartColor = GM_getValue(THEME_HEART_KEY, null);
     const isPresetColor = (value, key) =>
-      value == null || Object.values(THEME_PALETTES).some((preset) => preset[  function applyTheme() {
+      value == null || Object.values(THEME_PALETTES).some((preset) => preset[key] === value);
+    return {
+      style,
+      accent: isPresetColor(storedAccent, "accent") ? palette.accent : storedAccent,
+      heartColor: isPresetColor(storedHeartColor, "heartColor") ? palette.heartColor : storedHeartColor,
+      idleOpacity: GM_getValue(THEME_IDLE_OPACITY_KEY, THEME_DEFAULTS.idleOpacity),
+      idleDim: GM_getValue(THEME_IDLE_DIM_KEY, THEME_DEFAULTS.idleDim),
+      hoverDim: GM_getValue(THEME_HOVER_DIM_KEY, THEME_DEFAULTS.hoverDim),
+      activeOpacity: GM_getValue(THEME_ACTIVE_OPACITY_KEY, THEME_DEFAULTS.activeOpacity),
+    };
+  }
+
+  function applyTheme() {
     const t = getThemeSettings();
     const root = document.documentElement.style;
     const palette = THEME_PALETTES[t.style];
@@ -6272,7 +6284,7 @@
       );
       wrap.appendChild(settingsRow("Style", styleSelector));
 
-            const colorSwatch = makeColorInput(settingsView, theme.accent, (hex) => {
+      const colorSwatch = makeColorInput(settingsView, theme.accent, (hex) => {
         GM_setValue(THEME_ACCENT_KEY, hex);
         applyTheme();
       });
