@@ -321,6 +321,12 @@ export function ensureAudio() {
   });
 
   audio.addEventListener("ended", () => {
+    // This singleton can dispatch an ended event that was queued by the
+    // previous network resource after load() has already installed the
+    // cached Blob. The event target is still this element, so verify its
+    // current resource really ended before advancing the queue.
+    if (!audio.ended) return;
+
     // Do NOT clearMediaSession() before a loop/auto-next: nulling the
     // metadata (even for one synchronous tick before startPlayback()
     // re-populates it) can make Android treat the session as ended and
