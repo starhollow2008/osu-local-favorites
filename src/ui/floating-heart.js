@@ -20,11 +20,11 @@ function indApplyVisual(ind, fav, dragging) {
   // the DOM (parse + node replacement + style invalidation) several times
   // per second even when the heart's state hadn't changed. Skip when the
   // visual state is identical - the very first call still renders.
+  ind.style.background = "var(--osu-fav-floating-button-bg)";
   if (ind._lastFav === fav && ind._lastDragging === dragging) return;
   ind._lastFav = fav;
   ind._lastDragging = dragging;
   ind.innerHTML = heartSVG(fav);
-  ind.style.background = "var(--osu-fav-floating-button-bg, rgba(17,17,17,0.95))";
   ind.style.border = fav ? "1px solid var(--osu-fav-accent)" : "1px solid var(--osu-fav-border)";
   // No glow in either state. The accent-coloured border is already the
   // favorited signal; the pink drop shadow on top of it was the one piece
