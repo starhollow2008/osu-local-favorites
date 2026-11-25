@@ -101,8 +101,14 @@ export function getThemeSettings() {
   const palette = THEME_PALETTES[style];
   const storedAccent = GM_getValue(THEME_ACCENT_KEY, null);
   const storedHeartColor = GM_getValue(THEME_HEART_KEY, null);
+  const legacyPresetColors = {
+    accent: ["#ff66aa", "#a64d83"],
+    heartColor: ["#d94f91", "#8c3f70"],
+  };
   const isPresetColor = (value, key) =>
-    value == null || Object.values(THEME_PALETTES).some((preset) => preset[key] === value);
+    value == null ||
+    Object.values(THEME_PALETTES).some((preset) => preset[key] === value) ||
+    legacyPresetColors[key].includes(value);
   return {
     style,
     accent: isPresetColor(storedAccent, "accent") ? palette.accent : storedAccent,
