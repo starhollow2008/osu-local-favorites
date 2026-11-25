@@ -2118,6 +2118,14 @@
     const cachedBlob = getKnownCachedBlob(sourceUrl);
     if (!cachedBlob) return Promise.resolve(false);
 
+    const trackId = audio._npCurrentId;
+    const requestSeq = audio._playRequestSeq;
+    const ownsTrack = () =>
+      audio._npCurrentId === trackId &&
+      audio._playRequestSeq === requestSeq &&
+      audio._activeCacheKey === sourceUrl;
+    if (!ownsTrack() || audio.ended) return Promise.resolve(false);
+
     let localUrl = _blobUrlCache.get(sourceUrl);
     if (!localUrl) {
       localUrl = URL.createObjectURL(cachedBlob);
@@ -2129,19 +2137,20 @@
       audio._activePreviewUrl = localUrl;
     };
 
-    if (audio.paused || audio.ended) {
+    if (audio.paused) {
       const resumeAt = audio.currentTime;
       try { audio.preload = "auto"; } catch {}
       applyState();
-      audio.src = localUrl;
-      try { audio.load(); } catch {}
       audio.addEventListener("loadedmetadata", () => {
+        if (!ownsTrack() || audio._activePreviewUrl !== localUrl) return;
         try {
           if (Number.isFinite(resumeAt) && resumeAt > 0 && resumeAt < (audio.duration || Infinity)) {
             audio.currentTime = resumeAt;
           }
-        } catch (e) {  }
+        } catch (e) {}
       }, { once: true });
+      audio.src = localUrl;
+      try { audio.load(); } catch {}
       return Promise.resolve(true);
     }
 
@@ -2153,7 +2162,8 @@
       let mainMetaWatchdog = null;
       const startedActive = audio._activePreviewUrl;
       const superseded = () =>
-        handoffStarted ? audio._activePreviewUrl !== localUrl : audio._activePreviewUrl !== startedActive;
+        !ownsTrack() ||
+        (handoffStarted ? audio._activePreviewUrl !== localUrl : audio._activePreviewUrl !== startedActive);
       const cleanupShadow = () => {
         if (!shadow) return;
         try { shadow.pause(); } catch {}
@@ -2176,12 +2186,35 @@
         cleanupShadow();
         resolve(true);
       };
+      let shadowEndHandled = false;
+      const handleShadowEnded = () => {
+        if (settled || !handoffStarted || shadowEndHandled || superseded()) return;
+        shadowEndHandled = true;
+        const advance = audio._queueAdvance;
+        // load() can suppress the network element's ended event during handoff.
+        finishOk();
+        if (musicLoopEnabled()) {
+          try { audio.currentTime = 0; } catch {}
+          const looped = audio.play();
+          if (looped && typeof looped.catch === "function") {
+            looped.catch(() => {
+              setMediaSessionPlaybackState("paused");
+              if (audio._npPlayBtn) audio._npPlayBtn.innerHTML = playSVG();
+            });
+          }
+        } else if (musicAutoNextEnabled() && advance) {
+          advance(1, {});
+        } else {
+          stopPlayback(audio);
+        }
+      };
 
       shadowWatchdog = setTimeout(finishNoop, 1500);
 
       try {
         shadow = new Audio(localUrl);
         shadow.preload = "auto";
+        shadow.addEventListener("ended", handleShadowEnded);
         shadow.addEventListener("error", () => { if (!handoffStarted) finishNoop(); }, { once: true });
         shadow.addEventListener("canplay", () => {
           if (settled || handoffStarted) return;
@@ -2222,6 +2255,7 @@
           metaDone = true;
           clearTimeout(mainMetaWatchdog);
           if (settled || superseded()) { finishNoop(); return; }
+          if (shadow && shadow.ended) { handleShadowEnded(); return; }
           try {
             const t = shadow ? shadow.currentTime : resumeFrom;
             const dur = audio.duration;
@@ -2237,6 +2271,7 @@
             clearTimeout(bridgeFallback);
             audio.removeEventListener("playing", finishBridge);
             if (settled || superseded()) { finishNoop(); return; }
+            if (shadow && shadow.ended) { handleShadowEnded(); return; }
             try {
               const t2 = shadow ? shadow.currentTime : audio.currentTime;
               if (Number.isFinite(t2) && Math.abs(audio.currentTime - t2) > 0.15) audio.currentTime = t2;
