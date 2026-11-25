@@ -25,7 +25,7 @@ function indApplyVisual(ind, fav, dragging) {
   ind._lastDragging = dragging;
   ind.innerHTML = heartSVG(fav);
   ind.style.background = "rgba(17,17,17,0.95)";
-  ind.style.border = fav ? "1px solid var(--osu-fav-accent)" : "1px solid #333";
+  ind.style.border = fav ? "1px solid var(--osu-fav-accent)" : "1px solid var(--osu-fav-border)";
   // No glow in either state. The accent-coloured border is already the
   // favorited signal; the pink drop shadow on top of it was the one piece
   // of the old "glowing circle" look left over, and it read as a halo
