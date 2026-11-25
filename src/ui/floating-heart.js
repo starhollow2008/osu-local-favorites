@@ -24,7 +24,7 @@ function indApplyVisual(ind, fav, dragging) {
   ind._lastFav = fav;
   ind._lastDragging = dragging;
   ind.innerHTML = heartSVG(fav);
-  ind.style.background = "rgba(17,17,17,0.95)";
+  ind.style.background = "var(--osu-fav-floating-button-bg, rgba(17,17,17,0.95))";
   ind.style.border = fav ? "1px solid var(--osu-fav-accent)" : "1px solid var(--osu-fav-border)";
   // No glow in either state. The accent-coloured border is already the
   // favorited signal; the pink drop shadow on top of it was the one piece
